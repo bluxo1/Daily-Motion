@@ -677,3 +677,31 @@ Previous actual remote CI remains green on `a27dfdd`; new remote evidence is
 recorded separately after committing this change. The new CI also compiles the
 isolated routine prototype as an Android debug target. **No ADR changed. Phase 0
 is not complete; Phase 1 has not started.**
+
+### Remote audit checkpoint and runner recovery
+
+Committed/pushed the local audit as **`545a6ec53048b166172f04916c0533ce453b27c8`**.
+[Actual run 38451919078](https://github.com/bluxo1/Daily-Motion/actions/runs/38451919078)
+passed API and Linux mobile: **79 Python**, 18.15 s; **148 Flutter passed, 9 skipped**,
+clean analysis/52-file formatting, all four generated outputs unchanged, **29
+Markdown/273 local links/5 JSON**, **195 source files/0 credential findings**.
+Android debug/profile/release and the separate routine-prototype debug target
+compiled. The macOS job executed **zero steps** and was cancelled after 15 minutes
+because GitHub could not allocate a hosted ARM64 runner; the overall run is
+therefore **not green**. Prior unsigned iOS proof on `a27dfdd` remains historical
+evidence, not a successful new macOS run.
+
+The runner annotation also identified deprecated actions. CI now pins supported
+official releases to full commit SHAs (checkout v7.0.1, setup-java v6.0.1,
+setup-uv v10.3.0, Flutter composite v2), disables checkout credential persistence,
+pins Ubuntu 24.04 and uses the documented supported `macos-15-intel` image with
+explicit Xcode 26.3. Flutter/Python/Java/database versions and check scope are
+unchanged. Actual replacement-run results follow; runner substitution is compile
+infrastructure, never signed iPhone or Keychain qualification.
+
+Completed the additional non-provider-blocked **public feasibility desk review**
+in [the operator handoff](../infra/QUALIFICATION.md): verified published Mumbai
+region availability, database-backup/PITR and object/custom-role recovery limits,
+and current processor-review sources. No live project, backup restoration,
+agreement approval, SMTP delivery or legal compliance is claimed. Actual operator
+settings/contracts and reviewer appointments remain external. No ADR changed.

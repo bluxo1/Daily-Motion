@@ -13,6 +13,35 @@ external dependency; software tests cannot provide that approval.
 
 ## Hosted staging prerequisites
 
+### Public feasibility desk review — 2026-10-14 IST
+
+No project credentials were used. Published primary sources confirm the planned
+region is available: Supabase's specific Mumbai region is `ap-south-1`, and
+Cloud Run's Mumbai region is `asia-south1`.
+[Supabase regions](https://supabase.com/docs/guides/platform/regions),
+[Cloud Run locations](https://docs.cloud.google.com/run/docs/locations).
+Use a specific Supabase region rather than assuming a broad APAC selection is
+Mumbai. Cloud Run lists Mumbai services but not native custom-domain mapping;
+the default HTTPS service URL remains sufficient for the Phase 0 API origin.
+
+[Supabase backup documentation](https://supabase.com/docs/guides/platform/backups)
+lists daily database backups on paid plans and an optional PITR add-on. Free
+projects need separately arranged dumps; recovery settings/retention must be
+recorded from the actual project. Database backups omit Storage API object bytes,
+and daily-backup restoration requires resetting custom role passwords. Those
+boundaries belong in the future operator restore drill; no restore was performed.
+
+Reviewed the published source inventory for operator/privacy review:
+[Supabase DPA](https://supabase.com/legal/customer-resources/data-processing-addendum),
+[subprocessors](https://supabase.com/legal/customer-resources/subprocessor-list),
+[data-location/transfer FAQ](https://supabase.com/legal/privacy-resources/data-residency-and-transfers-faq)
+and [Google Cloud DPA](https://cloud.google.com/terms/data-processing-addendum).
+This establishes available review materials, not an executed agreement, approved
+processing arrangement or India compliance determination. Actual project,
+backup/recovery, contract and named-reviewer approvals remain external.
+
+### Operator-managed configuration
+
 - Create isolated development/staging Supabase and API environments using the
   accepted Mumbai hosting default. Record actual project/database/API locations,
   available recovery settings, retention/PITR, plan limits and processor terms.

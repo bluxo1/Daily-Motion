@@ -653,3 +653,23 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   region/backups/processor/signing/store accounts and named review appointments.
   **Physical samples 0; real hosted-provider qualifications 0. Phase 0 remains in
   progress; Phase 1 not started; no ADR changed.**
+
+## 2026-10-14, 00:35–01:00 IST — Audit commit, CI capacity and public desk review
+
+- Committed/pushed **545a6ec** (unsigned, configured SSH signing passphrase
+  unavailable; signing configuration unchanged). Actual CI **38451919078** passed
+  API **79** (18.15 s), Linux **148 passed/9 skipped**, all Android app modes and
+  the separate routine-prototype debug compile. Contracts/Drift, lint/types,
+  docs **29/273 links/5 JSON** and credential guard **195/0** pass.
+- Overall run **not green**: macOS ARM64 was never allocated, executed zero steps
+  and GitHub cancelled it after 15 minutes. Annotations explicitly report hosted
+  runner capacity; prior a27dfdd macOS/iOS proof remains historical only.
+- Recovered the software build path with supported public `macos-15-intel` and
+  explicit Xcode 26.3; pinned Ubuntu 24.04 and current official action commits,
+  removed deprecated actions and disabled checkout credential persistence.
+  Application SDKs/protocol/domain source unchanged. Replacement CI is run next.
+- Public primary-source desk review confirmed Mumbai availability and recorded
+  database backup/PITR, omitted object bytes/custom-role reset boundaries and
+  DPA/subprocessor review inventory in [the handoff](../infra/QUALIFICATION.md).
+  No hosted project, restore, contract approval, real OTP/SMTP or legal conclusion.
+  Operator signing/settings/reviewer and physical gates still open. No ADR change.

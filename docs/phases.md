@@ -40,6 +40,7 @@ Updated: 2026-10-14 (IST). This is the execution checklist for the accepted plan
 - [x] Exercise actual Android emulator protected session/SQLite seed, external force-stop/recover and full caller debug benchmark mechanics; retain raw evidence and exclude this from physical qualification.
 - [ ] Provision operator-managed Android/iOS signing and qualify signed installations; no store-ready signing is claimed.
 - [ ] Confirm managed Mumbai region, backup/recovery and processor arrangements; commission a named India privacy/security reviewer and developer/store accounts. Preparation is in [the operator handoff](../infra/QUALIFICATION.md); actual project/contract/operator evidence is unavailable.
+- [x] Complete public-source region feasibility and backup/processor prerequisite desk review: published Mumbai availability, backup/object/custom-role limits and current DPA/subprocessor source inventory. This is not live project, restore or legal/provider qualification.
 
 All remaining Phase 0 rows require external hardware, provider, signing or operator/reviewer resources. Full public routine features, conflict-resolution UI, export/deletion jobs, production retention/restore operations and long-history release qualification remain Phase 1 work under the roadmap; their foundation safety primitives above are exercised. This scope clarification does not close physical Phase 0 acceptance or reduce any public-release requirement.
 
