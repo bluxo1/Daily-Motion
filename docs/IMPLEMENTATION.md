@@ -1,6 +1,6 @@
 # Phase 0 implementation evidence
 
-Updated: 2026-10-13. **Phase 0 is in progress. Phase 1 has not started.** This
+Updated: 2026-10-14 (IST). **Phase 0 is in progress. Phase 1 has not started.** This
 milestone adds Windows-executable native qualification, fault tests and device
 harnesses to the connected synchronization/authentication foundation.
 Physical-device, hosted-provider delivery and release gates in
@@ -523,3 +523,46 @@ File-backed recovery coverage adds the 100-root case to the prior 27 sync, 21
 account, three timer/capacity/migration and three hard-kill cases (**55 cases**
 in that named recovery/account/fault subset). All four generated outputs remain
 unchanged by this read-only optimization. No protocol, owner policy or ADR changed.
+
+### Final qualification results — closing 2026-10-14 IST
+
+Read-cost fix **`a27dfdde77a408008efe1a081c5b4e58450fdce5`** also
+[passed actual remote CI, run 38445714228](https://github.com/bluxo1/Daily-Motion/actions/runs/38445714228):
+all three jobs succeeded. Linux and macOS each report **144 passed, 9 skipped**,
+**50 Dart files formatted with zero changes**, clean analysis and reproducible
+Drift. Linux Android debug/profile/release and hosted Mac unsigned iOS debug/
+release compile successfully. API reports **70 passed**, 17.81 s, with the real
+restricted-role PostgreSQL/live HTTP harness, Ruff, strict mypy, generated contracts,
+static native guards and documentation checks passing. Latest local full/live
+results remain **144 + 9 Flutter**, **70 Python** (43.19 s), **40 PostgreSQL**.
+Remote tests are repeated validations, not additional distinct cases.
+
+The rebuilt debug emulator benchmark on **that exact revision** completed:
+**100 history roots, 32 warmups, 200 measured full caller acknowledgements,
+0 failures**, 165 s total harness runtime including setup. Native metadata is
+Android **16/API 36**, `sdk_gphone64_x86_64`, `physical=false`, `backup_allowed=false`.
+Every raw measured/warmup sample and nearest-rank percentile method is preserved
+in [the safe machine-readable evidence](evidence/phase0-windows-native-2026-10-13.json).
+That file also preserves native seed/recover, external force-stop and APK hashes.
+Its filename uses the observed **UTC** date; closing local date is October 14.
+
+`physical_performance_evidence=false` and `target_met=false` correctly exclude
+this debug/emulator workload from the phone target. **Physical sample count 0;
+physical p95 unavailable.** No phone <=100 ms claim or improvement ratio inferred
+from the incomplete pre-fix run. Three native harness invocations passed (seed,
+recover, benchmark); each reports one declared case plus an integration-binding
+teardown check (`+2`). Native storage and benchmark source revisions are recorded
+separately, rather than relabelling the earlier storage binaries as the fix.
+
+Final self-review checks ownership/file boundaries, stale auth events, frozen
+retry/receipt semantics, transaction/cursor boundaries, retirement, bootstrap
+preservation, logging, native storage/configuration and benchmark provenance.
+Confirmed timer/backup/signing/read-cost defects are fixed; physical lifecycle,
+backup/transfer, Keychain/protected hardware, phone storage/power failures,
+accessibility, signed installs and hosted SMTP/provider gates remain open.
+No Phase 1, deployment or ADR change. The task emulator was stopped after evidence
+collection; unrelated applications and containers were preserved.
+Closing documentation validation: **27 Markdown files, 250 local links, 5 JSON
+examples**; native static guards, machine-readable evidence parsing and Git
+whitespace checks pass. The final follow-up changes evidence/docs only; native CI
+success above belongs to the exact code revision `a27dfdd`.

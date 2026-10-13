@@ -176,11 +176,14 @@ requires an API restart. The API rejects this public-key override outside explic
 native secure-storage and release qualification remain separate gates.
 
 [CI](.github/workflows/verify.yml) defines Linux PostgreSQL and Android checks plus
-macOS iOS builds. [Remote CI on the Phase 0 checkpoint passed](https://github.com/bluxo1/Daily-Motion/actions/runs/38438667550):
-70 Python cases including nine live Flutter HTTP/PostgreSQL cases; 143 ordinary
+macOS iOS builds. [Remote CI on the latest code checkpoint passed](https://github.com/bluxo1/Daily-Motion/actions/runs/38445714228):
+70 Python cases including nine live Flutter HTTP/PostgreSQL cases; 144 ordinary
 Flutter cases on Linux and macOS; Android debug/profile/release and unsigned iOS
 debug/release compilation. Hardware secure storage, signed iPhone installation,
 physical-device durability/accessibility and phone performance remain open.
+Android emulator seed/external force-stop/recover and a 200-sample debug benchmark
+harness passed. [Raw evidence](docs/evidence/phase0-windows-native-2026-10-13.json)
+explicitly records zero physical samples and no qualifying phone p95.
 
 Native configuration can be checked without a phone:
 

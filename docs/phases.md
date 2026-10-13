@@ -1,6 +1,6 @@
 # Implementation phases
 
-Updated: 2026-10-13. This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
+Updated: 2026-10-14 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
 
 **Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, Windows fault tests and native qualification harnesses are implemented. Remote Linux/PostgreSQL/Android and macOS unsigned iOS build jobs passed on `b8968ca`; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope. Hosted OTP/SMTP, signed iOS installation, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
 
@@ -34,7 +34,8 @@ Updated: 2026-10-13. This is the execution checklist for the accepted plan. [ROA
 - [x] Compile unsigned iOS debug/release on hosted macOS and Android debug/profile/release on Linux through actual remote CI; this proves compilation only.
 - [ ] Install/run signed iOS on hardware; qualify physical Android/iPhone process loss, reboot, suspension, clock/timezone changes, disk-write failures, backup/restoration and native Keychain/protected storage.
 - [ ] Qualify hardware VoiceOver/TalkBack, native keyboard/back/sheets, large text and reduced motion; desktop widget semantics complement rather than close this gate.
-- [x] Run published remote CI for Linux/PostgreSQL/Android and macOS/iOS; all three jobs passed on `b8968ca`.
+- [x] Run published remote CI for Linux/PostgreSQL/Android and macOS/iOS; all three jobs passed on `b8968ca` and the read-cost fix `a27dfdd`.
+- [x] Exercise actual Android emulator protected session/SQLite seed, external force-stop/recover and full caller debug benchmark mechanics; retain raw evidence and exclude this from physical qualification.
 - [ ] Provision operator-managed Android/iOS signing and qualify signed installations; no store-ready signing is claimed.
 
 No production prediction, conversational assistant, health permission, billing or speculative shared package is needed to pass this gate.

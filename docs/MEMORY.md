@@ -547,3 +547,67 @@ project/inbox, authorized all honest Windows preparation, and requested a commit
 - No ADR change or Phase 1 work. Physical Android/iPhone, Mac/iOS, Keychain/device
   secure storage, backup/restore, VoiceOver/TalkBack, reboot/process-kill phone
   tests, physical p95 and real Supabase/custom SMTP remain open.
+
+## 2026-10-14, 00:02–00:10 IST — Native qualification and commit closing state
+
+Closing local date crossed midnight; native artifact filenames use the October 13
+UTC date. The user asked when to commit and to continue. No Phase 1 work started.
+
+- Committed accumulated Phase 0 implementation as **b8968ca**; signing required an
+  unavailable private-key passphrase, so the checkpoint is unsigned without
+  changing Git configuration. Staged credential scan found no private/provider/
+  GitHub secrets. Ignored transient Kotlin cache/session artifacts. Published
+  `phase0-qualification-2026-10-13` for the requested actual remote CI, leaving
+  remote main at its planning baseline; no deployment or PR message was sent.
+- Actual [first CI run](https://github.com/bluxo1/Daily-Motion/actions/runs/38438667550)
+  passed Linux/API/PostgreSQL, Linux/Android and hosted macOS jobs. This supplied a
+  real Mac compilation host despite no local Mac: unsigned iOS debug/release and
+  Android debug/profile/release compile. It does not qualify iPhone execution,
+  signing, Keychain, physical secure storage or screen readers.
+- Agent-caused concurrent Flutter dependency refresh rewrote the native release
+  registrant and failed compilation. Fixed validation order: run all Flutter/Dart/
+  nested live commands serially, regenerate tooling when switching modes, and
+  avoid retaining another mode's registrant with `--no-pub`. Serial Windows release
+  build passed; `apksigner` confirms deliberately unsigned output. No dev-only
+  plugin was moved into production dependencies to conceal the failure.
+- Actual Android 16/API 36 x86_64 emulator protected-storage/SQLite seed and recover
+  passed on b8968ca. Kept the seed app running, then externally force-stopped its
+  observed PID at **2026-10-13 17:53:21 UTC**. Replacement recovery APK retained the
+  saved observation, draft, two pending commands, frozen checksum and synthetic
+  session. SQLite integrity is `ok`; native metadata says physical=false and
+  backup_allowed=false. Backup Manager was disabled, so no restore claim is made.
+- High-resolution emulator attempts hit host memory pressure/ADB disconnects and
+  were not counted as passes. Used a task-only 480×800 display, 1024 MiB guest RAM
+  and two virtual cores. Preserved unrelated user processes and containers.
+- Benchmark investigation found excessive history query round trips on caller
+  acknowledgement and active-session checks. Committed the fix as **a27dfdd**:
+  three bulk table reads in the original guarded transaction, shared projection
+  decoder, active validation from metadata. This changes read cost, not protocol,
+  ownership, ordering, revisions, frozen commands or conflict/deletion policy.
+- New 100-root real-file parity/query-bound test covers a multi-exercise root,
+  pending/frozen state, active exclusion and lock/unlock. Focused test passed; the
+  loaded full fixture needed an explicit two-minute test budget. Final full local
+  results: **144 ordinary passed, 9 live skipped** (131 s), **9 live HTTP passed**,
+  **70 Python passed, 0 skipped** (43.19 s), including **40 PostgreSQL** cases.
+  Named file-backed recovery/account/fault subset is **55**; Windows hard kills **3**.
+- Actual [fix CI run](https://github.com/bluxo1/Daily-Motion/actions/runs/38445714228)
+  passed **all three jobs on a27dfdd**: Linux/macOS each **144 passed, 9 skipped**,
+  Android all three build modes and unsigned iOS debug/release compile. API **70
+  passed**, 17.81 s; 50 Dart/27 Python formatting, clean analysis/Ruff/11-file strict
+  mypy, Drift/contract regeneration and documentation/native guards pass.
+- Rebuilt benchmark APK carries exact a27dfdd revision. Android debug emulator
+  harness completed **100 history roots, 32 warmups, 200 measured saves, zero
+  failures** (165 s including setup). Retained all raw samples/nearest-rank method
+  in [safe evidence](evidence/phase0-windows-native-2026-10-13.json), alongside seed,
+  force-stop, recover, checksums and CI scope. Incomplete pre-fix benchmark is not
+  counted; no speedup ratio is inferred. physical_performance_evidence=false,
+  target_met=false; **physical sample count 0 and physical p95 unavailable**.
+- Each native invocation has one declared assertion case plus the integration
+  binding's generated teardown check (+2 reported); three invocations passed.
+  The emulator was stopped after collection. Final documentation follows in a
+  separate evidence commit; its docs-only checks do not need another native build.
+- Real Supabase/custom SMTP/inbox/publishable project setup, physical Android/
+  iPhone, signed installations, actual backup/transfer, hardware Keychain/protected
+  storage, phone kills/reboot/suspension/clock changes, disk/power failures,
+  VoiceOver/TalkBack and physical p95 remain open. Other authoritative Phase 0
+  export/erasure/restore/capacity/security gates remain as documented. No ADR changed.
