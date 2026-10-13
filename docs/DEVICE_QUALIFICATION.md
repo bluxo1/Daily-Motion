@@ -12,11 +12,12 @@ Windows SQLite kills, controlled auth responses, static native checks and emulat
 results cannot close those gates. Record each unavailable case as **blocked**,
 not passed, skipped successfully or inferred from another platform.
 
-GitHub access exists, but the remote contains the planning commit and no Actions
-workflows. Running remote CI on that revision would not test this code;
-publication and dispatch remain pending.
-The local workflow now supports manual dispatch and native build checks when it
-is published. No remote CI success is claimed.
+GitHub Actions on the published qualification branch now provides actual Linux/
+PostgreSQL/Android and macOS unsigned iOS build evidence. The initial run on
+`b8968ca` [passed all three jobs](https://github.com/bluxo1/Daily-Motion/actions/runs/38438667550).
+The hosted Mac is a compilation/test runner, not an accessible physical iPhone
+or a Keychain-device qualification host. See implementation evidence for exact
+results and the revision tested. Local Windows has no iOS build host.
 
 ## Build preparation
 
@@ -27,6 +28,10 @@ Set `JAVA_HOME`, `ANDROID_HOME`, `GRADLE_USER_HOME`, `PUB_CACHE`, `TEMP` and `TM
 for the command process; do not change global settings or expose credentials.
 Run Flutter/Dart commands and the connected API harness serially in each checkout:
 dependency refresh changes native registrants even when a build is already running.
+When switching debug/profile/release modes, allow the normal pub/tooling step;
+`--no-pub` can retain a registrant from the previous mode on the pinned SDK.
+Use a prebuilt binary with the driver only after that binary's native plugins
+have been generated for its own build mode.
 
 ```sh
 cd apps/mobile
@@ -162,6 +167,9 @@ nearest rank `ceil(p*n)` on sorted samples; do not trim outliers, retry failures
 into successes or mix debug/emulator data with phone samples. Any failed write,
 fewer than 200 measured saves, unsupported metadata source, debug build or emulator
 prevents a passing physical-performance claim. The target is **p95 ≤100,000 µs**.
+Native Android emulator classification is a heuristic; the operator must confirm
+actual phone hardware and the declared cohort. A metadata flag alone is not
+independent physical-device evidence.
 Record device model/hardware identifier, OS/API, build mode/content hash, sample
 count/method, history, warmups, battery/thermal state and connectivity/sync workload.
 

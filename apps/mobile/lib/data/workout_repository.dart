@@ -116,24 +116,36 @@ class WorkoutRepository {
         )
         .getSingleOrNull();
     if (session == null) return null;
+    final exercises = await db
+        .customSelect(
+          'SELECT * FROM exercises WHERE session_id=? ORDER BY ordinal',
+          variables: [Variable(id)],
+        )
+        .get();
+    final sets = <String, List<QueryRow>>{};
+    for (final row in exercises) {
+      final exerciseId = row.read<String>('id');
+      sets[exerciseId] = await db
+          .customSelect(
+            'SELECT * FROM workout_sets WHERE exercise_id=? ORDER BY ordinal',
+            variables: [Variable(exerciseId)],
+          )
+          .get();
+    }
+    return _decodeProjection(session, exercises, sets);
+  }
+
+  Json _decodeProjection(
+    QueryRow session,
+    List<QueryRow> rows,
+    Map<String, List<QueryRow>> sets,
+  ) {
     final state = jsonDecode(session.read<String>('metadata')) as Json;
     final exercises = <Json>[];
-    for (final row
-        in await db
-            .customSelect(
-              'SELECT * FROM exercises WHERE session_id=? ORDER BY ordinal',
-              variables: [Variable(id)],
-            )
-            .get()) {
+    for (final row in rows) {
       final exercise = jsonDecode(row.read<String>('definition')) as Json;
       exercise['sets'] = [
-        for (final item
-            in await db
-                .customSelect(
-                  'SELECT * FROM workout_sets WHERE exercise_id=? ORDER BY ordinal',
-                  variables: [Variable(row.read<String>('id'))],
-                )
-                .get())
+        for (final item in sets[row.read<String>('id')] ?? <QueryRow>[])
           {
             ...jsonDecode(item.read<String>('prescription')) as Json,
             'observation': item.readNullable<String>('observation') == null
@@ -153,14 +165,33 @@ class WorkoutRepository {
 
   Future<List<Json>> workouts() => db.transaction(() async {
     await _guard();
-    final result = <Json>[];
+    // One consistent snapshot with bounded database round trips, not one series
+    // of isolate queries per historical session on every set acknowledgement.
+    final sessions = await db
+        .customSelect('SELECT * FROM sessions ORDER BY rowid DESC')
+        .get();
+    final exercises = <String, List<QueryRow>>{};
     for (final row
         in await db
-            .customSelect('SELECT id FROM sessions ORDER BY rowid DESC')
+            .customSelect('SELECT * FROM exercises ORDER BY ordinal')
             .get()) {
-      result.add((await _read(row.read<String>('id')))!);
+      exercises.putIfAbsent(row.read<String>('session_id'), () => []).add(row);
     }
-    return result;
+    final sets = <String, List<QueryRow>>{};
+    for (final row
+        in await db
+            .customSelect('SELECT * FROM workout_sets ORDER BY ordinal')
+            .get()) {
+      sets.putIfAbsent(row.read<String>('exercise_id'), () => []).add(row);
+    }
+    return [
+      for (final session in sessions)
+        _decodeProjection(
+          session,
+          exercises[session.read<String>('id')] ?? [],
+          sets,
+        ),
+    ];
   });
 
   Future<Json?> workout(String id) => db.transaction(() async {
@@ -290,9 +321,10 @@ class WorkoutRepository {
           );
         }
         for (final row
-            in await db.customSelect('SELECT id FROM sessions').get()) {
+            in await db.customSelect('SELECT metadata FROM sessions').get()) {
           require(
-            (await _read(row.read<String>('id')))!['status'] != 'active',
+            (jsonDecode(row.read<String>('metadata')) as Json)['status'] !=
+                'active',
             'Resume or finish the active workout first.',
           );
         }

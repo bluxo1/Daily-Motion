@@ -2,7 +2,7 @@
 
 Updated: 2026-10-13. This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
 
-**Current state:** Phase 0 is **in progress**. Connected foreground synchronization and production-shaped Supabase OTP/account lifecycle are implemented and desktop-tested. Windows Android compilation/emulator startup, timer/backup configuration, hard Windows process-kill and SQLite-capacity tests extend that evidence; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope. Hosted OTP/SMTP, iOS/macOS, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
+**Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, Windows fault tests and native qualification harnesses are implemented. Remote Linux/PostgreSQL/Android and macOS unsigned iOS build jobs passed on `b8968ca`; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope. Hosted OTP/SMTP, signed iOS installation, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
 
 ## Phase summary
 
@@ -18,7 +18,7 @@ Updated: 2026-10-13. This is the execution checklist for the accepted plan. [ROA
 
 ## Phase 0 — Prove the foundation
 
-- [ ] Pin supported stable toolchains; establish Android/Linux and iOS/macOS build paths.
+- [x] Pin supported stable toolchains; establish Android/Linux and iOS/macOS build paths with actual passing remote compilation on checkpoint `b8968ca`.
 - [ ] Implement a small internal design system and representative one-handed set editor.
 - [ ] Prove Drift transactions, owner isolation, recoverable drafts, outbox and timer restoration.
 - [ ] Prove aggregate CAS, exact retry receipts, commit-ordered pull and consistent bootstrap against PostgreSQL.
@@ -31,9 +31,11 @@ Updated: 2026-10-13. This is the execution checklist for the accepted plan. [ROA
 - [ ] Qualify real Supabase/custom SMTP delivery, rate limits and revocation behavior; verify Keychain/Android storage, restart, backup and release configuration on physical devices.
 - [x] Prepare native storage/recovery and full caller durable-save benchmark entrypoints; compile Android debug/profile and exercise unconfigured startup on a Windows Android emulator, without claiming physical-device evidence.
 - [x] Exercise hard Windows process kills before/during/after real SQLite commits, SQLite capacity failure, additive schema 2→3 timer migration and controlled monotonic/clock-change recovery.
-- [ ] Compile/run iOS on macOS; qualify physical Android/iPhone process loss, reboot, suspension, clock/timezone changes, disk-write failures, backup/restoration and native Keychain/protected storage.
+- [x] Compile unsigned iOS debug/release on hosted macOS and Android debug/profile/release on Linux through actual remote CI; this proves compilation only.
+- [ ] Install/run signed iOS on hardware; qualify physical Android/iPhone process loss, reboot, suspension, clock/timezone changes, disk-write failures, backup/restoration and native Keychain/protected storage.
 - [ ] Qualify hardware VoiceOver/TalkBack, native keyboard/back/sheets, large text and reduced motion; desktop widget semantics complement rather than close this gate.
-- [ ] Run published remote CI and provision operator-managed Android/iOS signing; no remote run or store-ready signing is claimed locally.
+- [x] Run published remote CI for Linux/PostgreSQL/Android and macOS/iOS; all three jobs passed on `b8968ca`.
+- [ ] Provision operator-managed Android/iOS signing and qualify signed installations; no store-ready signing is claimed.
 
 No production prediction, conversational assistant, health permission, billing or speculative shared package is needed to pass this gate.
 

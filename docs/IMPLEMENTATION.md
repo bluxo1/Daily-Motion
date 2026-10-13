@@ -165,7 +165,7 @@ SQLite DLL lock. Widget teardown uses the runner's real async context for domain
 cleanup, without changing application behavior.
 
 CI installs Flutter in the PostgreSQL job, runs connected tests and checks
-transport generation. **Remote CI has not run.** The subsequent native milestone
+transport generation. Remote CI had not run at that earlier milestone. The subsequent native milestone
 below installs Android tooling. iOS requires macOS; desktop/emulator results do
 not establish phone process-death behavior or **p95 ≤100 ms**.
 
@@ -393,7 +393,7 @@ These artifacts precede closing clock-parser/theme fixes; final checks and any
 additional native results are recorded below. Large cold-build times are build
 times, never local-save latency measurements.
 
-### Closing Windows validation
+### Closing Windows validation (checkpoint `b8968ca`)
 
 | Check | Observed result |
 | --- | --- |
@@ -436,11 +436,90 @@ checkout; no production dependency or generated file is patched to hide it.
 
 ### Explicitly open hardware/provider gates
 
-Physical Android/iPhone qualification, iOS compilation on macOS, actual Keychain/
+Physical Android/iPhone qualification, signed iOS installation, actual Keychain/
 hardware protected storage, backup/restore/device transfer, VoiceOver/TalkBack,
 phone process kills/reboot/suspension/token refresh, full-device disk/power faults,
 native keyboard/navigation and physical p95 remain open. **Physical sample count:
 0; no physical p95 result.** Hosted Supabase OTP, custom SMTP delivery, publishable
 project configuration and controlled-inbox testing remain open. Controlled SDK
-tests are not SMTP evidence. Remote CI has not run; remote main still contains
-the planning revision and zero workflows. Phase 1 remains unstarted. No ADR changed.
+tests are not SMTP evidence. Remote main remains at the planning revision;
+the qualification branch now has actual passing CI evidence below. Phase 1
+remains unstarted. No ADR changed.
+
+### Published checkpoint and actual remote CI
+
+Checkpoint **`b8968ca87dc7412f5a2f6cf3cb845dfb8a00652f`** commits the accumulated
+Phase 0 foundation, connected sync, authentication and qualification work. It is
+unsigned because the configured signing key requires an unavailable passphrase;
+Git signing configuration was not changed. Credential scan found no staged private
+keys or privileged provider/GitHub secrets. Generated Kotlin session/cache files
+are excluded. No application deployment occurred.
+
+Published branch: `phase0-qualification-2026-10-13`. Actual
+[GitHub Actions run 38438667550](https://github.com/bluxo1/Daily-Motion/actions/runs/38438667550)
+**passed all three jobs** on that exact checkpoint:
+
+- Ubuntu **24.04** API: **70 Python passed**, 14.78 s, including restricted-role
+  PostgreSQL and the live nine-case Flutter HTTP harness; Ruff, strict mypy,
+  OpenAPI/transport reproduction, documentation and native static checks pass.
+- Ubuntu **24.04** mobile: **143 passed, 9 live skipped**, clean analysis/format,
+  reproducible Drift output; Android **debug/profile/release** builds pass.
+- Hosted **macOS 26.6.2 (25G83), arm64** mobile: **143 passed, 9 live skipped**,
+  clean analysis/format and reproducible Drift; unsigned iOS **debug and release**
+  compilation pass. This closes native Swift compilation, not signed installation,
+  Keychain/hardware storage, navigation/screen-reader or actual iPhone behavior.
+
+Final serial Windows Android release build also passed (`assembleRelease`: 380.6 s),
+**61,512,640 bytes**, SHA-256
+`75F1B481840447AC732AE3C134F729B0EF8962801F73BBA4B4BA02ABB5E475C0`.
+`apksigner verify` correctly rejects the unsigned artifact. Compilation therefore
+does not claim release signing, installation or distribution readiness. The
+agent-caused concurrent registrant failure is retained above as a failed attempt;
+it is not counted as success.
+
+### Native recovery and performance review follow-up
+
+The real native protected-storage/SQLite entrypoint **passed seed and recover**
+on the Android **16/API 36 x86_64 emulator**, debug build, package
+`com.dailymotion.training.daily_motion.qualification`. After acknowledged seed,
+an external `adb shell am force-stop` at **2026-10-13 17:53:21 UTC** cleared its
+observed process ID. Recover used a replacement APK with the same signing identity
+and preserved application data. It required the existing database and restored
+the recorded set, draft, two pending commands, original frozen checksum and
+synthetic session through the actual Android protected-storage plugin; SQLite
+integrity was `ok`. Native metadata reports `physical=false`, `backup_allowed=false`.
+This proves emulator behavior, not hardware-backed protection or actual restore/
+transfer. Backup Manager was disabled; no backup restoration pass is claimed.
+
+The initial high-resolution emulator exhausted available host memory and an ADB
+disconnect prevented app launch. It was retried with a dedicated **480×800**
+virtual display, **1024 MiB** guest RAM and two virtual cores; no personal device
+or unrelated process was changed. Failed/incomplete attempts remain separate.
+
+The first debug benchmark was intentionally interrupted under memory pressure;
+it produced no complete 200-sample report and is not counted as a passing run.
+Review identified a real read-cost problem: set acknowledgement reloaded history
+through a series of queries for each session/exercise, and new-workout validation
+loaded all historical exercise/set graphs merely to check active status.
+The repository now loads a whole consistent projection with **three table reads**
+plus the unchanged owner/account guard, and active-session validation reads only
+session metadata under the existing transaction. Session/exercise/set ordering,
+working sequences, conflicts and frozen transport are unchanged.
+
+A new real file-backed **100-root** regression (including a multi-exercise root)
+compares bulk projections to individual reads, bounds database round trips,
+checks active-session exclusion, pending count, sign-out lock/reverified unlock,
+frozen request equality and integrity. Its loaded first run failed while the
+focused run passed; the sizable file fixture now has an explicit two-minute test
+budget. The preserved final full run **passed 144, skipped 9 live**, 131 s. This
+test budget and desktop/emulator durations are not physical set-save measurements.
+The current formatter checks **50 Dart files**. Further live/native results are
+recorded when completed; the physical sample count remains **zero**.
+
+After the read-cost fix, the complete live/API rerun **passed 70 Python, 0 skipped**
+in **43.19 s**, including the **40 real PostgreSQL cases and all 9 live Flutter
+HTTP cases**. Thus **153 distinct Flutter cases** pass across ordinary/live runs.
+File-backed recovery coverage adds the 100-root case to the prior 27 sync, 21
+account, three timer/capacity/migration and three hard-kill cases (**55 cases**
+in that named recovery/account/fault subset). All four generated outputs remain
+unchanged by this read-only optimization. No protocol, owner policy or ADR changed.

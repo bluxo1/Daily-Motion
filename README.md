@@ -20,7 +20,7 @@ has not started.
 
 Windows qualification now includes Android debug/profile compilation and emulator
 startup, native clock/backup configuration, real SQLite capacity faults and hard
-Windows process-kill recovery. Physical Android/iPhone, macOS builds, hosted
+Windows process-kill recovery. Physical Android/iPhone, hosted
 OTP/SMTP, backup transfer, hardware secure storage and phone p95 remain open.
 Use [the device qualification procedure](docs/DEVICE_QUALIFICATION.md) for the
 prepared native recovery and full durable-save benchmark harnesses. Emulator or
@@ -176,7 +176,11 @@ requires an API restart. The API rejects this public-key override outside explic
 native secure-storage and release qualification remain separate gates.
 
 [CI](.github/workflows/verify.yml) defines Linux PostgreSQL and Android checks plus
-macOS iOS builds. Remote CI and physical-device qualification have not run here.
+macOS iOS builds. [Remote CI on the Phase 0 checkpoint passed](https://github.com/bluxo1/Daily-Motion/actions/runs/38438667550):
+70 Python cases including nine live Flutter HTTP/PostgreSQL cases; 143 ordinary
+Flutter cases on Linux and macOS; Android debug/profile/release and unsigned iOS
+debug/release compilation. Hardware secure storage, signed iPhone installation,
+physical-device durability/accessibility and phone performance remain open.
 
 Native configuration can be checked without a phone:
 
