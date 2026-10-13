@@ -673,3 +673,28 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   DPA/subprocessor review inventory in [the handoff](../infra/QUALIFICATION.md).
   No hosted project, restore, contract approval, real OTP/SMTP or legal conclusion.
   Operator signing/settings/reviewer and physical gates still open. No ADR change.
+
+## 2026-10-14, 01:17 IST — Audit closing CI evidence
+
+- [Replacement CI 38454815935](https://github.com/bluxo1/Daily-Motion/actions/runs/38454815935)
+  passed **all three jobs on 46f5d5a35305c8da51180b195e77b6b6a8df8077**.
+  Ubuntu API **79 passed** (18.49 s), Linux and Intel Mac each **148 passed/9 live
+  skipped**. Separate live Flutter **9** are exercised in the API harness; unique
+  Flutter **157**, real PostgreSQL **44**, named file-backed subset **55** with
+  **3 hard Windows kills**. Repeated CI runs do not add distinct cases.
+- Android app debug/profile/release and isolated routine debug target compile.
+  Actual hosted Mac **15.7.9/24G830, Intel x64**, selected **Xcode 26.3**, compiles
+  unsigned iOS debug/release (Xcode 217.3/134.2 s, not save latency). Supported
+  runner selection resolved the earlier ARM64 capacity cancellation honestly.
+- Source46 docs **29 files/275 links/5 JSON**; scanner **195/0**; 52 Dart and 30
+  Python formatting, analyze/Ruff/11-file strict mypy and all four generated
+  outputs pass. Closing documentation follows separately with no source changes.
+- Five lagging original Phase 0 rows reconciled from prior proof; missing routine
+  prototype, security guards/CI baseline and public hosting/backup/processor desk
+  review completed. Only actual hardware/provider/signing/operator/reviewer
+  acceptance remains. Public routine/conflict/export/deletion/production operations
+  remain Phase 1 scope, not a reason to start it now. **Physical samples 0, real
+  hosted-provider qualifications 0; Phase 0 in progress; no ADR changed.**
+- Closing docs-only check: **29 Markdown/275 local links/5 JSON**; native guards,
+  credential guard **195/0** and Git whitespace pass. No code/generated changes
+  after successful source CI. The evidence follow-up is committed separately.

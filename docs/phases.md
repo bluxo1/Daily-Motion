@@ -2,7 +2,7 @@
 
 Updated: 2026-10-14 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
 
-**Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, interaction prototypes, Windows fault tests and native qualification harnesses are implemented. Remote Linux/PostgreSQL/Android and macOS unsigned iOS build jobs passed on `b8968ca` and `a27dfdd`; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope. The [audited evidence matrix](PHASE0_EVIDENCE.md) reconciles foundation completion with the separate external acceptance. Hosted OTP/SMTP, managed-provider/operator review, signing, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
+**Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, interaction prototypes, Windows fault tests and native qualification harnesses are implemented. All three remote Linux/PostgreSQL/Android and macOS unsigned iOS jobs passed on `46f5d5a` after earlier `b8968ca`/`a27dfdd` proof; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope and the resolved ARM64 runner allocation failure. The [audited evidence matrix](PHASE0_EVIDENCE.md) reconciles foundation completion with the separate external acceptance. Hosted OTP/SMTP, managed-provider/operator review, signing, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
 
 ## Phase summary
 
@@ -18,7 +18,7 @@ Updated: 2026-10-14 (IST). This is the execution checklist for the accepted plan
 
 ## Phase 0 — Prove the foundation
 
-- [x] Pin supported stable toolchains; establish Android/Linux and iOS/macOS build paths with actual passing remote compilation on `b8968ca` and `a27dfdd`.
+- [x] Pin supported stable toolchains; establish Android/Linux and iOS/macOS build paths with actual passing remote compilation on `b8968ca`, `a27dfdd` and `46f5d5a` (supported Intel Mac/Xcode 26.3).
 - [x] Implement a small internal light/dark design system and representative one-handed set editor; prove contrast, labeled targets and 320px/200% text/keyboard behavior in widget tests. Physical acceptance remains separate.
 - [x] Provide executable onboarding, routine-editing, active-logging and history interaction prototypes. The isolated routine study edits planned values and freezes previews without adding personal routine storage or Phase 1 feature breadth.
 - [x] Prove Drift transactions, owner isolation, recoverable drafts, outbox and timer restoration with real file-backed databases, controlled clocks and hard Windows process kills. Phone acceptance remains separate.
@@ -35,7 +35,7 @@ Updated: 2026-10-14 (IST). This is the execution checklist for the accepted plan
 - [x] Compile unsigned iOS debug/release on hosted macOS and Android debug/profile/release on Linux through actual remote CI; this proves compilation only.
 - [ ] Install/run signed iOS on hardware; qualify physical Android/iPhone process loss, reboot, suspension, clock/timezone changes, disk-write failures, backup/restoration and native Keychain/protected storage.
 - [ ] Qualify hardware VoiceOver/TalkBack, native keyboard/back/sheets, large text and reduced motion; desktop widget semantics complement rather than close this gate.
-- [x] Run published remote CI for Linux/PostgreSQL/Android and macOS/iOS; all three jobs passed on `b8968ca` and the read-cost fix `a27dfdd`.
+- [x] Run published remote CI for Linux/PostgreSQL/Android and macOS/iOS; all three jobs passed on `b8968ca`, `a27dfdd` and audit/runner recovery `46f5d5a`.
 - [x] Establish CI security basics: credential scan, synthetic-auth release rejection, logging hygiene and per-transaction restricted-role/forced-RLS validation; real PostgreSQL rejects privileged/owner-member roles and missing RLS policies.
 - [x] Exercise actual Android emulator protected session/SQLite seed, external force-stop/recover and full caller debug benchmark mechanics; retain raw evidence and exclude this from physical qualification.
 - [ ] Provision operator-managed Android/iOS signing and qualify signed installations; no store-ready signing is claimed.

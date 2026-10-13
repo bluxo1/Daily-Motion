@@ -40,6 +40,12 @@ personal data or database, and is disabled in release builds. Full routine
 features remain Phase 1. Hosted project/region/backup/processor and named review
 prerequisites are in [the operator handoff](infra/QUALIFICATION.md).
 
+[Actual CI on `46f5d5a`](https://github.com/bluxo1/Daily-Motion/actions/runs/38454815935)
+passed all three jobs: **148 ordinary Flutter + 9 live HTTP cases**, **79 Python
+including 44 PostgreSQL cases**, Android debug/profile/release and unsigned iOS
+debug/release. Hardware and hosted-provider gates remain open; source/test scope
+and final documentation validation are recorded in the implementation evidence.
+
 ## Repository
 
 ```text

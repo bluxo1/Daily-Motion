@@ -705,3 +705,43 @@ region availability, database-backup/PITR and object/custom-role recovery limits
 and current processor-review sources. No live project, backup restoration,
 agreement approval, SMTP delivery or legal compliance is claimed. Actual operator
 settings/contracts and reviewer appointments remain external. No ADR changed.
+
+### Closing audit evidence — 2026-10-14, 01:17 IST
+
+[Replacement CI run 38454815935](https://github.com/bluxo1/Daily-Motion/actions/runs/38454815935)
+**passed all three jobs** on exact source
+**`46f5d5a35305c8da51180b195e77b6b6a8df8077`**. Actual evidence:
+
+- API on Ubuntu 24.04: **79 passed**, **18.49 s**, including the real restricted-role
+  PostgreSQL/live Flutter harness. Ruff/30-file formatting, strict mypy/11 files,
+  generated contracts, native guards and credential guard **195 files/0 findings**
+  pass. Source documentation: **29 Markdown files, 275 local links, 5 JSON**.
+- Linux mobile: **148 passed, 9 live skipped**, **52 Dart files/0 changes**, clean
+  analysis and reproducible Drift. Android app **debug/profile/release** and the
+  separate synthetic routine-prototype **debug target** compile successfully.
+- Hosted **macOS 15.7.9 (24G830), Intel/x64**, explicitly selected **Xcode 26.3**:
+  **148 passed, 9 live skipped**, **52 Dart files/0 changes**, clean analysis and
+  reproducible Drift. Unsigned iOS **debug/release** compile successfully; Xcode
+  reports **217.3 s / 134.2 s**. These are compiler durations, not set-save latency.
+
+Thus local results remain **157 distinct Flutter cases**, **79 Python**, **44 real
+PostgreSQL**, **55 named file-backed cases including 3 hard Windows kills**.
+Remote runs repeat those tests rather than increasing distinct counts. All **4**
+checked generated artifacts reproduce. Ignored API/Linux/macOS logs are retained
+as `.tools/phase0-reconcile-*-recovery-ci.log`. The failed first Mac allocation is
+preserved above; the supported Intel runner resolved the CI capacity issue without
+weakening checks or adding signing/provider credentials.
+
+All software work within the audited Phase 0 scope is implemented and tested in
+the available environments. Only the external acceptance/dependencies listed
+above remain; full public feature/operations qualification stays in Phase 1.
+**Physical samples 0; real hosted Supabase/SMTP qualifications 0; no physical p95
+claim. No ADR changed. Phase 0 is in progress; Phase 1 has not started.**
+
+This closing follow-up changes documentation only. Native/test CI evidence belongs
+to `46f5d5a`; final documentation validation is recorded after these edits.
+
+Final follow-up checks: **29 Markdown files, 275 local links, 5 JSON examples**;
+native static guards and **195-source-file credential guard/0 findings** pass.
+Git whitespace checks are clean. No code, contract, fixture or generated artifact
+changed after the successful source CI.
