@@ -1,0 +1,446 @@
+# Phase 0 implementation evidence
+
+Updated: 2026-10-13. **Phase 0 is in progress. Phase 1 has not started.** This
+milestone adds Windows-executable native qualification, fault tests and device
+harnesses to the connected synchronization/authentication foundation.
+Physical-device, hosted-provider delivery and release gates in
+[ROADMAP.md](ROADMAP.md) remain open. Earlier results are retained in [MEMORY.md](MEMORY.md).
+
+## Implemented
+
+- Contract-derived Dart DTOs, closed schema validation and operating limits from
+  checked OpenAPI. Command-specific payloads, strict versions, actual UTC instants,
+  Unicode code-point limits and shared fixtures are checked. Optional defaults
+  populate a separate domain copy; frozen transport JSON stays unchanged.
+  Generated validation runs before local acceptance and HTTP send.
+- A domain foreground coordinator discovers eligible heads, freezes envelopes,
+  packs up to 50 independent roots within 1 MiB, records attempts and sends HTTP.
+  Deferred heads remain pending; oversized legacy/corrupt heads need attention
+  without starving other roots. Successors use their own predecessor receipts.
+- Whole-request timeout, disconnect/lost-response and non-JSON 5xx/429 handling,
+  bounded reads, persisted backoff/jitter and explicit retry. Each cycle retains
+  one credential; a switched owner cannot acquire the original outbox. Auth
+  failures pause cloud work while durable training remains usable.
+- Atomic acknowledgements and own echoes, monotonic server shadows, unchanged
+  pending working branches and original conflict bases. Conflicts/rejections are
+  durable attention states retaining local state, remote shadow, root/mutation
+  identity and expected revision. No timestamp ordering or automatic field merge.
+- Ordered pull pages install changes and the opaque cursor in one SQLite
+  transaction. Repeated requests cannot duplicate work; duplicate/gapped positions
+  and malformed echoes fail safely. Pull runs before and after pushes.
+- Remote tombstones/redactions retire root/child IDs and remove projections,
+  observations, drafts, timers and personal outbox bodies. Epoch changes recover
+  through bootstrap; old queued commands cannot recreate retired IDs. Verified,
+  matching-owner disable responses purge and persist local account disable.
+  Missing account initialization and expired credentials do not imply erasure.
+- Bounded snapshot download into durable staging, checksum validation, final
+  owner/generation/epoch/expiry validation and atomic shadow/cursor activation.
+  Pending branches, local-only roots and work logged during download survive.
+  Failed activation leaves the previous database and staging usable. Retired IDs
+  survive feed pruning. Snapshot slots are per installation; publication/page reads
+  retain the guarded server proof.
+- Additive PostgreSQL migration `0002_connected_sync` for retention watermark and
+  installation slots. Drift schema 2 adds branch basis, delivery/retry metadata and
+  staging. The schema 1 upgrade preserves active work, draft, timer and frozen
+  requests. The original server migration remains unchanged.
+- Minimal domain/UI status, foreground lifecycle scheduling and a local commit
+  duration hook. Network requests never hold a SQLite transaction or run on the
+  local save path. A stalled-upload test commits another durable set before the
+  upload is released. Observer failures cannot reverse local success.
+- Debug-only synthetic identity setup and a live harness verify signed JWTs using
+  a public key. Mobile receives a user token/API URL, never an admin, service,
+  database or signing secret. Forced RLS remains enabled. Synthetic public-key
+  verification requires explicit development/test API configuration and cannot
+  silently operate in staging/production.
+
+## Authentication and account lifecycle implemented
+
+- Supported `supabase_flutter` **2.18.3** SDK email OTP request, `OtpType.email`
+  verification, resend, refresh and local-scope provider sign-out. Six-digit code
+  entry is transient/masked and cleared before verification; request, invalid or
+  expired code, throttling, provider/network and application-account failures have
+  distinct safe feedback. Resend has a 60-second cooldown; provider limits remain
+  authoritative. Request responses do not disclose account existence.
+- Explicit, awaited `LocalStorage` session persistence and secure PKCE storage
+  backed by `flutter_secure_storage` **11.2.0**. iOS requests non-synchronizing,
+  device-only unlocked Keychain items; Android uses protected-storage defaults.
+  The supported SDK client/Auth API is used directly with automatic refresh
+  disabled. The Flutter wrapper's default preferences/URI login and unawaited
+  auth-event persistence are not used. This gives the account controller a single
+  fenced persistence authority. No custom OTP HTTP protocol is implemented.
+- A domain account controller separates protected verified local-owner grants
+  from cloud sessions. Cached unlocked ownership restores the existing private
+  SQLite database before any refresh/network call. Expired, missing or corrupt
+  cloud credentials leave logging, corrections, completion, history, drafts and
+  outbox available. Corrupt owner grants/missing owner files fail closed and
+  require verified recovery; they never guess a user or create an unverified store.
+- Verified sign-in initializes the API account, checks the returned subject,
+  opens/unlocks only that owner's UUID-scoped file and persists the owner grant.
+  Project/environment namespaces isolate provider projects; API endpoint rotation
+  does not strand the owner's file. Fresh accounts have an empty training store,
+  a minimal `kg` profile shell and no personal sample workouts. Existing sessions
+  can be bootstrapped/resumed; broader workout/routine/catalog authoring is deferred.
+- Explicit sign-out immediately pauses synchronization and invalidates asynchronous
+  auth completions, persists a locked marker, drains the original coordinator,
+  locks SQLite, closes the owner scope and removes session material. Unsynced
+  training stays under its original owner. Returning to that verified account
+  unlocks it. Account switching replaces the entire provider/navigation scope and
+  coordinator; the next account receives no prior drafts, cursor, conflicts,
+  snapshot stage, workouts or outbox. Secure-storage failure still locks SQLite
+  and reports attention. Offline cloud logout is not claimed to revoke a session.
+- Foreground refresh uses the SDK's refresh grant, awaits rotated-token persistence
+  and resumes synchronization with original frozen mutations. Transient refresh
+  uses bounded exponential scheduling; repeated rejection of a refreshed token
+  pauses for reauthentication rather than hammering the provider. Auth epochs and
+  serialized operations fence late verification/refresh/grant writes across logout
+  and switching. Credentials structurally bind token subject to the SDK user;
+  actual signature/ownership authority remains the API.
+- `POST /v1/account/initialize` consumes a generated closed empty request/account
+  response. JWT verification is followed by a bounded, non-redirecting HTTPS
+  current-provider-user check. Identity comes only from the verified subject;
+  unconfirmed, anonymous, banned/deleted or rejected identities cannot initialize.
+  Within real PostgreSQL, a per-owner advisory lock and the existing owner guard
+  serialize absent creation/retirement and enforce active state. Insert-on-conflict
+  preserves one application account/profile, existing generation/feed and history.
+- Additive migration **0003** adds forced-RLS profiles and an immutable account
+  retirement barrier. It retains the existing `owner_state` account authority.
+  Retired subjects cannot recreate a purged application account with an old JWT.
+  Matching-owner disable applies the accepted local erasure policy, including
+  signed-out stores. Ordinary auth errors never trigger deletion. Final backend
+  purge, public lifecycle jobs and restored-backup suppression remain open.
+- Release configuration rejects fixture flags, synthetic tokens, development
+  environment, insecure external URLs and privileged key formats. Only project
+  publishable configuration enters the application. SDK auth logs are disabled;
+  safe errors suppress echoed OTP/token/headers. Auth HTTP restricts origin, blocks
+  redirects and bounds response size; per-operation clients are disposed/closed.
+  Android release Internet permission and iOS Keychain entitlements are configured.
+
+The explicit development fixture remains repetition-only with one synthetic
+workout template. The real account path never creates that sample. It adds
+no routine/catalog breadth, predictions, ML, assistant, health, broker, CRDT or
+framework. It has not been deployed.
+
+## Authentication milestone validation (earlier evidence)
+
+Windows 11; Flutter **3.47.7**, Dart **3.13.5**, Python **3.13.14** and Docker
+PostgreSQL **17.7**. All data/credentials are synthetic. Flutter/cache/temp reside
+on the workspace drive. No hosted Supabase project, SMTP credentials or phone was
+used. Validation uses controlled provider responses and signed synthetic ES256
+identities. The live API uses `DM_ENVIRONMENT=test`, a public verification key,
+synthetic publishable config and an actual restricted PostgreSQL role. No
+production secret was used.
+
+| Check | Observed result |
+| --- | --- |
+| Flutter analysis | No issues |
+| Ordinary Flutter suite | **122 passed, 9 explicitly skipped live cases**; preserves the previous 80 and adds 25 lifecycle, 14 SDK/storage-boundary and 3 widget cases |
+| Connected Flutter suite | **9 passed**, actual HTTP, verified ES256 JWT, real SQLite and restricted PostgreSQL; includes account initialization and A → B → A |
+| Distinct Flutter cases exercised | **131 passed** across the two runs |
+| Python with `DM_RUN_CONNECTED=1` | **70 passed, 0 skipped**; includes the runner asserting all nine live Flutter cases pass |
+| Real PostgreSQL | **40 Python integration cases**: previous 19 plus 21 account/auth cases, including live runner, under `NOSUPERUSER NOBYPASSRLS`; CAS, receipts, rollback, forced RLS, tenant reset, locks, concurrent commits, erasure and snapshot invalidation |
+| SQLite | Previous **27 file-backed sync recovery cases** retained, plus **21 file-backed account lifecycle cases** for ownership/restart/locking; four other lifecycle cases cover OTP/config/missing-file gates, while SDK timing and native-channel storage adapters are controlled separately |
+| Ruff | API/tooling lint and format pass |
+| Strict mypy | **11 source/script files**, no issues |
+| Dart formatting | **39 files**, zero changes in final check |
+| Generated output | Checked OpenAPI, DTOs/limits and Drift regeneration verified reproducible |
+| Documentation/whitespace | **26 Markdown files, 238 local links, 5 JSON examples**; UTF-8/newlines/fences and Git whitespace pass |
+
+Commands are in [README.md](../README.md). The live runner fails if requested but
+Flutter is unavailable. Ordinary tests' nine skips do not replace the separate
+passing live run. PostgreSQL tests never use SQLite/fakes as evidence of server
+transactions, RLS or locks. Transport fakes inject timing/failures around real
+repositories; loopback HTTP tests cover status, malformed bodies, redirects and
+timeouts. The SDK tests execute supported SDK methods against a controlled HTTP
+adapter; native method-channel tests verify secure-storage routing/options, not
+Keychain/Keystore hardware protection. Provider-user checks are controlled in the
+API tests while actual signed-token verification, API, transactions, locks and
+forced RLS use real PostgreSQL. No fake substitutes for those database guarantees.
+
+During the final run Docker Desktop was unavailable: **30 Python cases passed and
+40 database cases errored during connection setup**. Docker was restarted and the
+dedicated service was checked healthy before the complete suite was rerun. That
+failed environment attempt is not counted as database evidence. Flutter test runs
+and the API harness's nested Flutter run remain serial to avoid a Windows native
+SQLite DLL lock. Widget teardown uses the runner's real async context for domain
+cleanup, without changing application behavior.
+
+CI installs Flutter in the PostgreSQL job, runs connected tests and checks
+transport generation. **Remote CI has not run.** The subsequent native milestone
+below installs Android tooling. iOS requires macOS; desktop/emulator results do
+not establish phone process-death behavior or **p95 ≤100 ms**.
+
+## Adversarial faults and restart evidence
+
+| Boundary | Deliberate fault and verified result |
+| --- | --- |
+| Before local outbox creation | SQLite insert trigger aborts; projection/outbox roll back; reopen contains no acknowledged workout |
+| After local commit | File reopen restores pending work, observation, timer and draft |
+| Before HTTP send | Frozen identity/body retained; offline start/retries leave training usable |
+| While sending | Stalled upload permits another local commit; disconnect, timeout and flapping preserve queue |
+| Server commit before response | Actual accepted HTTP command with injected lost response; exact replay/own echo avoid duplicate acceptance |
+| Response before local acknowledgement | Acknowledgement trigger aborts metadata; reopen retains frozen request and recovers receipt/echo |
+| During pull installation | SQLite transaction fault leaves shadow, branch and cursor unchanged |
+| Page changes before cursor write | Cursor trigger aborts entire page; reopen confirms old cursor, no partial shadow/ack, successful retry |
+| During bootstrap staging | Page insert aborts; reopen retains manifest and no partial page; retry succeeds |
+| During bootstrap activation | Cursor trigger aborts; reopen preserves work/staging; retry activates atomically |
+| During deletion | Delete trigger aborts retirement/purge; reopen retains payload without partial retirement; retry purges |
+| During conflict creation | Conflict trigger aborts shadow/branch/cursor; reopen retains original local values/cursor |
+
+Other cases cover pending successors, late acknowledgements after external state,
+clean roots, stale two-device edits, own echoes before/after acknowledgement,
+repeated pages, commits between pages, terminal rejection without other-root
+blockage, mixed/large packing, retired-ID replay, snapshot checksum/expiry/
+generation/capacity bounds, child collisions, partial download/restart, logging
+while staging, disable/restart, invalid authentication and unsupported/malformed
+contracts.
+
+The earlier synchronization cases use transaction faults and graceful reopening.
+The native milestone below adds actual Windows process kills and real SQLite
+capacity failures. Phone kills, flash/power-loss behavior and interrupted native
+upgrades remain unqualified.
+
+## Defects found and fixed
+
+Self-review and independent read-only adversarial review identified and fixed:
+
+1. Non-JSON proxy 5xx/429 errors looked like permanent malformed data.
+2. Unbound/wrong-owner disable responses could purge the original owner's data;
+   credentials are now fixed per cycle and disable requires matching verified owner.
+3. Missing account initialization was conflated with permanent account disable.
+4. Snapshot defaults changed checksum bytes; pages retain exact stored shape and
+   only a separate domain copy is normalized.
+5. Legacy acknowledgement logic failed to clear resolved branch bases; entry points
+   now share the installer.
+6. Snapshot child/root collisions and reparented sets could corrupt another branch;
+   atomic installation rejects identity collisions.
+7. Generic payload parsing missed command-specific fields; generated schemas now
+   run before local acceptance/send, preventing stranded accepted commands.
+8. Valid omitted defaults and supplementary Unicode names blocked feed reduction;
+   normalization/code-point bounds match the server. Blank correction reasons are
+   rejected consistently.
+9. Duplicate feed positions were skipped; they now reject the page. Snapshot
+   cursors beyond committed position/below retention fail safely.
+10. Dart normalized impossible dates; actual UTC calendar validation rejects them.
+    Server snapshot expiry now emits the protocol's `Z` representation.
+11. Snapshot capacity was checked too late; server accumulation/local staging now
+    enforce bounded storage before activation.
+12. Observer errors could misreport durable success; they are isolated. Disabled
+    UI reports erasure accurately, including restart. Foreground cancellation
+    cannot claim incomplete bootstrap is synchronized; close drains in-flight work.
+
+No finding justified weakening an invariant or changing an accepted ADR.
+
+Authentication adversarial review additionally found and fixed:
+
+1. A cached cloud session could have bypassed a prior explicit local lock. Restore
+   now requires a protected grant and an existing unlocked, matching owner file;
+   cached sessions never unlock SQLite. Permanently disabled stores refuse unlock.
+2. Sign-out during secure owner-grant persistence could leave an unlocked marker.
+   Epoch checks now lock the selected SQLite store and persist a locked marker
+   before releasing the canceled selection. Late OTP/refresh completions cannot
+   grant access or populate the next account.
+3. Protected-storage failure during logout could have left local access enabled.
+   The independent SQLite lock now persists even if credential storage fails;
+   the UI reports attention instead of successful credential removal.
+4. Refresh output could contain an A user object with a B token. Session subject
+   binding rejects it before persistence; verified API owner checks remain in force.
+5. Reauthentication could join a still-running old-token cycle without starting
+   recovery. A forced follow-up now runs with refreshed credentials and the
+   original frozen outbox identity/body, including after a committed lost response.
+6. Repeated fresh-token rejection could hammer refresh. Foreground backoff and a
+   refresh guard now pause for attention; foreground flapping cannot skip backoff.
+7. Remote disable during initialization of an already signed-out account could
+   leave its locked local payload unprocessed. Verified, matching-owner disable
+   now erases that existing store according to the accepted policy, never a
+   different account. Retirement survives account-row removal under forced RLS.
+8. Auth cancellation during bootstrap/queue preparation could start another HTTP
+   operation. Authorization/close checks now fence each next request, retain
+   staged pages/local work and allow restart/reauthentication to resume.
+9. SDK default PKCE/preferences and exception logging were unsuitable for secrets.
+   Both persistence paths explicitly use protected storage; SDK loggers are
+   disabled and errors sanitized. Auth transport rejects redirects, wrong origins
+   and oversized responses, and disposes timed-out clients.
+10. Slow OTP requests left the send button enabled. Explicit requesting state now
+    shows progress and disables duplicate submission; a delayed-provider widget
+    case verifies it without logging code or token material.
+11. Secure logout failure could skip provider logout and race a remote-disable
+    transition. Cleanup now drains synchronization before the SQLite lock, still
+    attempts provider logout, and reports persistence failures accurately. Remote
+    deactivation cancels refresh timers/queued callbacks; failure cannot silently
+    leave an authenticated UI state. A file-restart test covers secure storage
+    failing during authoritative disable. Sign-out remains busy until its bounded
+    provider attempt finishes, so a late logout cannot overwrite new OTP UI state.
+
+Fault tests include lost initialization responses, verified identity before local
+store failure, token expiry after server commit/before pull, refresh persistence
+failure, refresh failure during active logging, pending-work sign-out, switch
+during coordinator wakeup, stale verification/refresh/grant completion, missing or
+corrupt session/owner state, account disable under lock, and release dev-auth
+misconfiguration. Real SQLite files and PostgreSQL transactions provide persistence
+and security evidence; simulated provider failures do not qualify hosted delivery.
+
+## Limitations and remaining Phase 0 gates
+
+1. Conflicts/rejections preserve both branches and display attention. Interactive
+   comparison/resolution remains open; nothing is silently discarded or merged.
+2. Foreground sync only. OTP/refresh/storage adapters and account initialization/
+   switching are implemented with desktop evidence. Real Supabase/custom SMTP,
+   provider rate/revocation behavior, urgent JWKS rotation, native protected storage
+   and recent-auth privacy remain unqualified. Existing bearer JWTs can remain valid
+   until expiry after provider sign-out; app disable is separately enforced under
+   lock. Provider refresh rotation followed by process death before durable storage
+   may require reauthentication; locally cached training remains available.
+3. Account disable remains an internal lifecycle primitive with client erasure
+   handling. Public erasure/export jobs, final backend account payload purge,
+   restore-time suppression, deployment grants and abuse budgets remain open.
+4. Feed pruning is implemented/tested; scheduled retention/cleanup remain open.
+   Ten-year histories, maximum-volume snapshots/activation latency, incremental
+   exercise commands and full capacity qualification remain open. Capacity failure
+   retains usable local state and reports attention.
+5. Qualify iOS builds and physical Android/iPhone storage and backup/privacy,
+   keyboard/back, VoiceOver/TalkBack, hard phone kills, full physical storage/power
+   loss and interrupted migration. Native configuration and Windows/emulator
+   results below only close their own narrower checks. No prior publicly shipped
+   local schema exists.
+6. Qualify the implemented monotonic timer on physical devices across suspension,
+   reboot and clock changes; its countdown estimate is not measured actual rest.
+   Measure profile/release
+   durable-save p95 on physical phones with sync load. Snapshot activation is atomic
+   but large-history transaction latency is unqualified; network independence is
+   not the device performance gate.
+
+**No ADR changed. Phase 0 is not complete.**
+
+## Native qualification milestone — 2026-10-13
+
+The user confirmed **no physical Android phone, iPhone, Mac host, hosted Supabase
+project or real test inbox** is available. Work proceeds on Windows without
+claiming those gates. Procedures and native entrypoints are in
+[DEVICE_QUALIFICATION.md](DEVICE_QUALIFICATION.md).
+
+### Implemented and reviewed
+
+- Native clock bridge: Android elapsed realtime includes suspension and combines
+  boot count with an installation nonce in no-backup storage. iOS uses continuous
+  time with process-scoped continuity. Persisted anchors survive database reopen;
+  unknown continuity/reboot uses a clamped wall estimate marked approximate.
+  Detected clock divergence is sticky. No notification or tick establishes truth.
+- Additive Drift schema **3**, with real schema 1/2 upgrade coverage preserving
+  drafts, active work and frozen requests. Timer sampling has a **20 ms** native
+  timeout and malformed/unsupported clock fallback; no auth/HTTP call joins set
+  saving. Foreground timer display reloads on resume and tolerates closed owners.
+- Android cloud-backup/device-transfer exclusion covers nine credential/device
+  storage domains; `allowBackup=false` remains. iOS creates/checks a canonical
+  application-support directory with backup exclusion before SQLite opens, rejects
+  outside paths and applies file protection. Swift is statically reviewed only.
+  SQLite remains OS-private, not independently encrypted.
+- Predictive-back manifest configuration, large-text/reduced-motion/keyboard and
+  Android/iOS navigation widget checks. Native screen-reader/back gestures remain
+  hardware gates. Startup errors distinguish unavailable local storage from
+  missing auth configuration; the startup theme uses its actual inherited theme.
+- Dedicated synthetic native storage seed/recover/cleanup entrypoint, real
+  protected-storage adapter/session restoration, frozen checksum and SQLite draft/
+  outbox/integrity checks. Qualification Android package uses `.qualification`,
+  separate from the normal application. No provider credential enters its report.
+- Durable-save benchmark measures the complete `WorkoutController.record` Future,
+  including validation/read, native clock, durable SQL and projection refresh.
+  Declares 100 history roots, 32 warmups, 200 samples; retains every raw sample and
+  uses nearest-rank `ceil(p*n)`. Device/native-source/build metadata, profile/release,
+  physical hardware and zero failures are required for a passing claim.
+- Android release output is intentionally unsigned pending operator signing,
+  rather than silently debug-signed. CI adds native static guards, qualification
+  source formatting, debug/profile/release compilation and manual dispatch. iOS
+  unsigned build jobs are prepared but have not run remotely.
+
+### Real database and fault evidence
+
+- Three **hard Windows OS process kills** before, during and after local commit.
+  A separate Dart process runs real file-backed Drift/WAL `synchronous=FULL`;
+  recovery verifies observations, original frozen request, outbox, draft, integrity
+  and foreign keys. The interrupted transaction either fully survives or rolls
+  back. These are not graceful close tests or phone power-loss evidence.
+- Actual **SQLITE_FULL (13)** generated with a pager quota and allocation trigger
+  inside the real save transaction. No local acknowledgement fires; the preceding
+  observation, pending queue and durable next-set draft survive reopen.
+- Real file-backed monotonic anchor/clock-uncertainty persistence and schema 2→3
+  upgrade. Previous 27 sync recovery and 21 auth file-backed cases remain covered.
+- Controlled timer suspension, wall-clock ±1 hour, timezone, reboot/unknown
+  continuity, legacy anchors, malformed/stalled bridge and percentile guard tests.
+  Clock/provider injection is explicitly separated from native hardware behavior.
+
+### Native build/runtime evidence boundary
+
+Windows 11 **10.0.26300.9550**, Flutter **3.47.7** / Dart **3.13.5**, Python
+**3.13.14**, PostgreSQL **17.7**. Ignored task-local tooling: Temurin
+**21.0.12.1+1**, Android command-line tools **15859902**, platforms **36/35**,
+build-tools **36.0.0**, NDK **28.2.13676358**, CMake **3.22.1**, Gradle **9.3.1**.
+Official JDK/command-tool downloads were checksum-verified. No global SDK settings
+or production secrets were changed. SDK XML compatibility warnings were observed.
+
+Android **debug** compilation succeeded (cold `assembleDebug`: 1828.0 s), followed
+by successful **profile** compilation (`assembleProfile`: 580.3 s). The normal
+debug APK installed/launched on Android **16/API 36**, x86_64 Google APIs
+`sdk_gphone64_x86_64`, WHPX/software graphics emulator. The actual unconfigured
+application displayed its auth-configuration boundary and offered no unverified
+training. Package inspection showed no `ALLOW_BACKUP` flag. This is emulator
+compilation/startup evidence, not physical storage/OTP qualification.
+
+Archived interim debug SHA-256:
+`FD2408BA79D39C51C4B447657A972FB6902C020AFE92ECAB14AD2A0CBB3BF13B`;
+profile:
+`98198A9CF2D138EEC729C5F9956EEBD21B02B2916995A508CFC6C57989F8D951`.
+These artifacts precede closing clock-parser/theme fixes; final checks and any
+additional native results are recorded below. Large cold-build times are build
+times, never local-save latency measurements.
+
+### Closing Windows validation
+
+| Check | Observed result |
+| --- | --- |
+| Ordinary Flutter | **143 passed, 9 live cases explicitly skipped**, 192 s; 21 additional ordinary cases beyond the auth milestone |
+| Live Flutter HTTP/PostgreSQL | **9 passed** separately; **152 distinct Flutter cases** across both runs |
+| Full Python/live runner | **70 passed, 0 skipped**, 61.39 s; includes **40 PostgreSQL integration cases** under restricted runtime RLS |
+| New SQLite/native preparation | **3 real Windows hard-kill cases**, **3 additional file-backed timer/capacity/migration cases**, controlled timer/parser/benchmark guards and **3 platform widget cases** |
+| Flutter analysis | No issues; native source compilation is a separate check |
+| Formatting/lint/type checking | **49 Dart files**, **27 Python files**; Ruff clean, strict mypy clean across **11 files** |
+| Generated artifacts | OpenAPI, two Dart transport outputs and Drift schema-3 output: **all four match SHA-256 after regeneration** |
+| Static native guards | Android backup/back/network, iOS backup/Keychain/clock and release signing boundary pass; no hardware protection claim |
+
+The resumed host had severe memory pressure. Only task-owned Gradle/emulator
+processes were stopped; unrelated applications/containers were preserved. Gradle
+now uses a bounded 2 GiB heap and two workers rather than the template's 8 GiB
+heap. Interrupted release/emulator attempts are not passing evidence. The release
+build and native recovery harness are still being checked at this checkpoint.
+One release attempt failed because the agent ran dependency refresh/regeneration
+concurrently with native compilation, rewriting the generated registrant with a
+dev-only integration-test plugin. The pinned SDK correctly filters that plugin
+for release when run serially. Validation commands now run sequentially in this
+checkout; no production dependency or generated file is patched to hide it.
+
+### Adversarial defects corrected
+
+1. Wall-only ticking could produce misleading countdowns after clock changes;
+   native elapsed anchors now project time independently of UI ticks.
+2. Boot count alone could match a different restored Android installation; a
+   no-backup installation nonce prevents assuming continuity across that case.
+3. iOS private SQLite lacked backup exclusion; the guarded native setup now fails
+   closed before opening storage if exclusion cannot be established.
+4. Release configuration silently inherited debug signing; the artifact now
+   requires explicit operator signing for installation/distribution.
+5. A stalled or non-map native clock response could delay/fail local recording;
+   bounded type-checked wall fallback preserves logging.
+6. Timer reads could finish after owner closure; the display guards concurrent
+   reads and handles closure/storage failure without claiming a saved set failed.
+7. Inner SQL timing underestimated caller acknowledgement; the benchmark now
+   includes the complete caller path and rejects missing metadata/negative samples.
+
+### Explicitly open hardware/provider gates
+
+Physical Android/iPhone qualification, iOS compilation on macOS, actual Keychain/
+hardware protected storage, backup/restore/device transfer, VoiceOver/TalkBack,
+phone process kills/reboot/suspension/token refresh, full-device disk/power faults,
+native keyboard/navigation and physical p95 remain open. **Physical sample count:
+0; no physical p95 result.** Hosted Supabase OTP, custom SMTP delivery, publishable
+project configuration and controlled-inbox testing remain open. Controlled SDK
+tests are not SMTP evidence. Remote CI has not run; remote main still contains
+the planning revision and zero workflows. Phase 1 remains unstarted. No ADR changed.

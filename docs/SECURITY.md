@@ -62,6 +62,80 @@ Validate typed request bodies, sizes, enum values, owner references, and command
 
 Restrict storage objects by owner and use short-lived authenticated download paths. Do not log signed URLs. Audit dependencies and release signing; keep mobile signing keys and production deployment authority separate from untrusted PR jobs.
 
+## Phase 0 development authentication boundary
+
+The connected spike supports an explicitly configured **public** verification key
+for a synthetic signed ES256 test issuer. Signature, issuer, audience, expiry and
+subject validation still run; active-account checks and forced RLS still apply.
+The local setup script alone has migration/admin authority. The API uses a separate
+`NOSUPERUSER NOBYPASSRLS` runtime role. Mobile receives only a short-lived user JWT
+and origin; no private signing key, database credential or service/admin secret.
+Fixture/token flags are rejected in release builds. The API's public-key override
+requires explicit `DM_ENVIRONMENT=development` or `test`; staging/production use
+the trusted issuer's JWKS. This development path does not qualify hosted Supabase
+delivery, provider revocation or native storage.
+
+Foreground cycles freeze credentials through preflight/push/pull/bootstrap.
+Successful responses are checked against the database's owner. Account-disable
+errors carry a verified owner/version; mismatching/unbound responses cannot erase
+another owner's database. A missing account record pauses sync as
+`account_not_initialized`, not permanent erasure. Expired/invalid credentials keep
+local training available. HTTPS is required outside explicit emulator/loopback
+debug development; redirects do not forward credentials.
+
+## Phase 0 authentication implementation boundary
+
+The production-shaped path uses `supabase_flutter`'s supported SupabaseClient/Auth
+API for email OTP, verification, refresh and local-scope provider logout. Each
+bounded operation owns/disposes its SDK client. Automatic SDK refresh, URI login
+and its default SharedPreferences session/PKCE persistence are not enabled.
+Instead the account controller awaits the supported `LocalStorage` adapter and
+uses a secure PKCE adapter. A serialized lifecycle and invalidation epoch fence
+late verification/refresh results; they cannot persist credentials or unlock a
+new account after sign-out. SDK auth logging is disabled, and application errors
+expose safe codes without provider text, OTPs, tokens or authorization headers.
+HTTP is restricted to the configured auth origin, rejects redirects and bounds
+responses; disposable clients abort timed-out operations.
+
+Both sessions and the minimal verified local-owner grant use
+`flutter_secure_storage` 11.2.0. iOS requests non-synchronizing Keychain items with
+`unlocked_this_device` accessibility; Android uses the package's protected-storage
+defaults. Native bridge/option routing is desktop-tested; actual Keychain/Keystore,
+reinstall, backup, lock-screen and hardware behavior remain device qualification.
+Training databases remain OS-private SQLite, not independently encrypted by this
+milestone. Android disables backup and excludes cloud/device-transfer domains.
+iOS now guards and excludes the application-support directory before opening
+SQLite, with native file protection. Windows static checks and Android emulator
+package flags are configuration evidence; iOS compilation and physical backup,
+restore, Keychain/Keystore protection and transfer behavior remain unqualified.
+
+The protected owner grant restores only an existing matching, already-unlocked
+database. Missing/corrupt cloud session material does not remove that grant or its
+outbox. Missing/corrupt owner grants require verified sign-in; they never guess an
+owner. Reauthentication unlocks only after verified API initialization. Explicit
+sign-out writes a protected locked marker, drains the old coordinator, locks the
+SQLite owner and removes session material. Either durable lock prevents a stale
+cached session from reopening the database; storage failure reports attention.
+Cloud logout can fail offline after local locking and is not misreported as a
+confirmed provider revocation. Returning to the same account recovers pending
+work; a different verified account opens its own UUID-scoped file and UI/domain
+scope under the project's namespace.
+
+Migration `0003` forces owner RLS on profiles and immutable account-retirement
+markers. Runtime RLS allows retirement read/insert, with no update/delete policy.
+The marker must be recorded before final account removal, under the same
+initialization/retirement lock; restored-environment deletion-ledger replay remains
+a separate operational gate. Matching-owner remote disable applies the existing
+local erasure policy, including an already signed-out store. Ordinary auth errors
+never invoke erasure. No new public erasure/export endpoint ships here.
+
+Operators must configure separate projects, asymmetric signing/JWKS, confirmed
+six-digit email OTP templates, custom SMTP, sender-domain SPF/DKIM, delivery monitoring and
+provider resend/attempt limits. The UI's 60-second resend cooldown supplements
+provider limits and is not an abuse-control replacement. Keep SMTP, service/admin
+and signing secrets outside client-safe configuration. Hosted OTP/SMTP, urgent
+JWKS rotation and observable session revocation have not been qualified here.
+
 ## AI and health data boundaries
 
 No AI or health integration ships in MVP. Future LLM context is minimized to authorized training facts required for the request; provider retention/training settings and subprocessors require documented review. Imported HealthKit/Health Connect data remains local by default and is excluded from cloud sync, global model datasets, and LLM context. Permission to read a device store does not authorize onward sharing. See [HEALTH_INTEGRATIONS.md](HEALTH_INTEGRATIONS.md).

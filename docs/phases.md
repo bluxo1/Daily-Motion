@@ -1,8 +1,8 @@
 # Implementation phases
 
-Updated: 2026-10-12. This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
+Updated: 2026-10-13. This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
 
-**Current state:** planning documentation is being delivered; every product implementation phase below is **not started**. Writing architecture documents does not complete Phase 0's engineering proofs. The next implementation task is the foundation work, not the assistant or model training.
+**Current state:** Phase 0 is **in progress**. Connected foreground synchronization and production-shaped Supabase OTP/account lifecycle are implemented and desktop-tested. Windows Android compilation/emulator startup, timer/backup configuration, hard Windows process-kill and SQLite-capacity tests extend that evidence; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope. Hosted OTP/SMTP, iOS/macOS, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
 
 ## Phase summary
 
@@ -25,6 +25,15 @@ Updated: 2026-10-12. This is the execution checklist for the accepted plan. [ROA
 - [ ] Exercise account-disable races, erased feed/snapshot copies and local schema migration.
 - [ ] Measure durable set-save p95 against the 100 ms target on representative physical devices.
 - [ ] Record contracts, fixture evidence and any ADR changes before expanding implementation.
+- [x] Connect foreground Flutter HTTP push/pull/bootstrap to verified test authentication and restricted PostgreSQL; prove receipt, branch, erasure and cursor safety on desktop databases.
+- [x] Exercise the foundation Drift version 1 to 2 upgrade with frozen outbox, active workout, timer and draft preserved; test file reopening in pending/conflict/bootstrap/cursor/deletion states.
+- [x] Connect the supported Supabase email OTP/refresh API to awaited platform-secure session persistence, verified idempotent application-account initialization and owner-scoped local unlocking; prove expiry/refresh failure, sign-out, restart, stale completions and A → B → A isolation on desktop SQLite/PostgreSQL.
+- [ ] Qualify real Supabase/custom SMTP delivery, rate limits and revocation behavior; verify Keychain/Android storage, restart, backup and release configuration on physical devices.
+- [x] Prepare native storage/recovery and full caller durable-save benchmark entrypoints; compile Android debug/profile and exercise unconfigured startup on a Windows Android emulator, without claiming physical-device evidence.
+- [x] Exercise hard Windows process kills before/during/after real SQLite commits, SQLite capacity failure, additive schema 2→3 timer migration and controlled monotonic/clock-change recovery.
+- [ ] Compile/run iOS on macOS; qualify physical Android/iPhone process loss, reboot, suspension, clock/timezone changes, disk-write failures, backup/restoration and native Keychain/protected storage.
+- [ ] Qualify hardware VoiceOver/TalkBack, native keyboard/back/sheets, large text and reduced motion; desktop widget semantics complement rather than close this gate.
+- [ ] Run published remote CI and provision operator-managed Android/iOS signing; no remote run or store-ready signing is claimed locally.
 
 No production prediction, conversational assistant, health permission, billing or speculative shared package is needed to pass this gate.
 

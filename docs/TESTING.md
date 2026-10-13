@@ -1,6 +1,6 @@
 # Testing and release qualification
 
-Planning baseline: 2026-10-12. This is the intended verification strategy for future implementation. The current documentation task can validate Markdown coverage, links, diagrams, and agreement between decisions; it cannot establish application performance, synchronization correctness, model quality, or app-store readiness.
+Planning baseline: 2026-10-12. This is the intended verification strategy. Phase 0 desktop application tests now exist; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact evidence and remaining gates. Documentation checks alone cannot establish application performance, synchronization correctness, model quality or app-store readiness.
 
 Tests prioritize the core loop in [PRODUCT.md](PRODUCT.md): create routine, start workout, log sets, finish, and inspect history/progress. Test ownership and scope follow [ROADMAP.md](ROADMAP.md). The free MVP has no health integration, prediction service, assistant, imports, billing, or multiweek program UI to qualify.
 
@@ -68,6 +68,17 @@ Property-based tests generate session commands and transport failures. Assert un
 
 Exercise domain API behavior with valid, expired, malformed, wrong-issuer/audience, revoked-session, and disabled-account credentials. Test account status checks independently of token expiry. Owner A cannot read/write owner B's roots or nested IDs, use B's prediction identifiers, or download B's snapshot/export. Missing transaction-local tenant context fails closed. Pooled connections cannot leak the previous tenant. Tests run under the actual restricted runtime role, not only the migration owner.
 
+The Phase 0 auth suite now executes the supported Supabase SDK against controlled
+OTP/refresh HTTP responses, verifies secure native-channel routing/options, and
+uses file-backed Drift for cached-owner recovery, pending-work logout, stale
+completions and A → B → A isolation. The connected case uses actual authenticated
+API initialization/sync and restricted PostgreSQL with the provider boundary
+controlled. Backend tests verify signed JWT rejection, idempotent/concurrent
+initialization, current-provider rejection, retirement and disable races under
+forced RLS. See [IMPLEMENTATION.md](IMPLEMENTATION.md) for exact counts.
+These tests do not qualify real email delivery or native protected-storage hardware.
+Hosted SMTP/provider revocation and physical-device restore/backup remain required.
+
 Verify composite owner-aware foreign keys, session CAS, immutable historical corrections, receipt uniqueness/hash binding, retired UUID checks, and atomic feed publication. Deliberately force transaction rollback after intermediate writes. Exercise simultaneous transactions against the per-user feed lock and ensure committed cursor ordering. Validate new/existing migration paths on real PostgreSQL and every supported released Drift schema. [Drift migration testing](https://drift.simonbinder.eu/migrations/)
 
 Job tests cover duplicate execution, crashed workers, lease expiry/renewal, retry exhaustion, deletion racing job completion, and artifact cleanup. Prove ordinary jobs cannot publish after disable while authorized erasure jobs still complete in deleting state. Sensitive-data tests scan logs/crash breadcrumbs and fixtures for token, set payload, note, health, and prompt leakage. Account deletion tests verify immediate access disable, live-store purge, model eligibility exclusion, snapshot/export removal, and documented backup-restore suppression. See [SECURITY.md](SECURITY.md).
@@ -79,6 +90,35 @@ Phase 3 requires deterministic baseline regression fixtures and cross-language p
 Phase 4 tests the assistant against mocked tool results and real authorization boundaries: unsupported numerical claims, absent predictions, stale revisions, malicious notes/imported text, oversized context, repeated tool calls, cancellation, and schema-invalid arguments. A future-plan write requires an explicit confirmation bound to its proposal/current revision. Race a local edit/draft against confirmation and prove the client reservation prevents a hidden overwrite without holding SQLite across network I/O. Kill the app after dispatch, lose the response, and reconcile the same receipt before unlocking the affected root. Test unseen pending edits on another device resolve through CAS. No assistant path commits active or historical workouts. Test rejection and expiry as carefully as acceptance. Offline users retain the entire logger when AI is unavailable. See [CHATBOT_ARCHITECTURE.md](CHATBOT_ARCHITECTURE.md).
 
 Phase 2 optional health export tests app-owned identifiers/versions, lost acknowledgements, corrections, deletions, permission revocation, and designated-device changes. Race an obsolete accepted export with deletion/correction/exporter-generation change, and verify pre-write refresh plus post-write compensation rather than stale record recreation. Phase 6 additionally tests read-permission ambiguity, unavailable providers, history limits, duplicate origins, source deletions, expired change tokens, and local-only data boundaries. Test physical devices; permission mocks are insufficient. See [HEALTH_INTEGRATIONS.md](HEALTH_INTEGRATIONS.md).
+
+## Connected Phase 0 desktop suite
+
+Use `DM_RUN_CONNECTED=1` with `DM_TEST_ADMIN_URL` and the pinned Flutter SDK when
+running Python tests. The harness starts actual loopback HTTP, signs synthetic
+JWTs in memory and supplies the API only a public verification key. Nine Flutter
+cases use the real HTTP transport and PostgreSQL runtime role. Its transactions,
+RLS and CAS are not replaced by mocks. Ordinary Flutter tests explicitly skip
+these cases and must be supplemented by the live harness.
+
+Run Flutter pub/analyze/test/build/drive, Dart regeneration and the connected
+Python harness sequentially within one checkout: they prepare shared native
+assets and generated plugin registrants. Concurrent test runs produced a locked
+SQLite DLL; concurrent dependency refresh during a release build rewrote its
+registrant with a dev-only integration-test plugin and failed Java compilation.
+Use serial runs rather than moving test plugins into production dependencies or
+editing generated registrants. Separate CI jobs use independent checkouts.
+
+Transport timing fakes and loopback fault servers operate around real SQLite
+repositories. Recovery tests use file-backed databases, close/reopen after
+transaction faults and check integrity/foreign keys. They cover pending/frozen
+uploads, conflicts, staged/partial bootstrap, installed cursors and retired IDs,
+including the schema 1→2→3 upgrades. Exact observed counts and failure boundaries
+are in [IMPLEMENTATION.md](IMPLEMENTATION.md). Three separate Windows worker
+processes are hard-killed before/during/after local commit. A real SQLite pager
+quota forces SQLITE_FULL inside a save; no acknowledgement or partial changes
+survive. These tests do not qualify phone power loss or full physical storage.
+Native seed/recover and caller-latency entrypoints, metadata requirements and
+hardware/provider blockers are in [DEVICE_QUALIFICATION.md](DEVICE_QUALIFICATION.md).
 
 ## Performance and release gates
 

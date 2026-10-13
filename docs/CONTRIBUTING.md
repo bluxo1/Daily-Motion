@@ -1,6 +1,6 @@
 # Contributing to Daily Motion
 
-Planning baseline: 2026-10-12. The repository currently contains planning documentation, not a production application. This guide defines conventions for future implementation. Commands below are intended toolchain checks once their components exist; do not claim they run in today's documentation-only repository.
+Planning baseline: 2026-10-12. Phase 0 implementation began after the documentation baseline. The repository now contains a development foundation, not a production application. [IMPLEMENTATION.md](IMPLEMENTATION.md) owns current evidence and gaps; root [README.md](../README.md) contains executable setup/check commands. This guide defines contribution and release conventions.
 
 Read [PRODUCT.md](PRODUCT.md), [ARCHITECTURE.md](ARCHITECTURE.md), [DATA_MODEL.md](DATA_MODEL.md) and [SYNC_PROTOCOL.md](SYNC_PROTOCOL.md) before changing workout behavior. [DECISIONS.md](DECISIONS.md) records accepted choices. A requested feature must identify its roadmap phase and user outcome; future AI/ML ambitions do not authorize expanding the MVP.
 

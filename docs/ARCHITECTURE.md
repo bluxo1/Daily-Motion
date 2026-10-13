@@ -1,6 +1,6 @@
 # Technical architecture
 
-Planning baseline: 2026-10-12. This document describes intended implementation; no production application exists yet. Product scope is governed by [PRODUCT.md](PRODUCT.md), phases by [ROADMAP.md](ROADMAP.md), and detailed synchronization by [SYNC_PROTOCOL.md](SYNC_PROTOCOL.md).
+Planning baseline: 2026-10-12. This document describes the intended architecture; a scoped Phase 0 foundation now exists, with evidence in [IMPLEMENTATION.md](IMPLEMENTATION.md). No production application exists yet. Product scope is governed by [PRODUCT.md](PRODUCT.md), phases by [ROADMAP.md](ROADMAP.md), and detailed synchronization by [SYNC_PROTOCOL.md](SYNC_PROTOCOL.md).
 
 ## Decisions and release boundaries
 

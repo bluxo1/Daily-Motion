@@ -1,6 +1,6 @@
 # API and domain interfaces
 
-Status: accepted planning baseline. Updated: 2026-10-12. Examples describe planned interfaces, not an implemented service.
+Status: accepted planning baseline. Updated: 2026-10-13. The Phase 0 service implements scoped workout/sync and account-initialization proofs; [IMPLEMENTATION.md](IMPLEMENTATION.md) and [checked OpenAPI](../contracts/openapi.json) identify its actual surface. Other interfaces/examples below remain planned, not released.
 
 Keep a small versioned HTTP/JSON surface around domain capabilities. FastAPI owns authorization and authoritative cloud mutations; mobile domain controllers own immediate local actions. Numerical prediction and assistant interfaces are planned now but implemented only in their roadmap phases.
 
@@ -25,15 +25,40 @@ Use `/v1` for the initial cloud contract, UTC RFC3339 timestamps, UUID strings, 
 
 The server derives the owner from verified identity. Client-controlled installation IDs and timestamps are provenance only. Never accept an assistant-selected owner or a generic SQL/query endpoint.
 
-Generated OpenAPI and cross-language fixtures will become implementation artifacts under `contracts/`; Markdown remains the planning source of truth. Domain validation is shared through specifications/fixtures, not a fictional executable Dart/Python shared package.
+Generated OpenAPI, derived mobile DTOs/limits and cross-language fixtures are implementation artifacts under `contracts/` and `apps/mobile/lib/sync/`. Markdown remains the specification source of truth. Command-specific payload schemas are declared in OpenAPI; original validated operation JSON is retained for receipts and own echoes. Optional defaults normalize a separate domain copy without rewriting frozen requests.
 
 ## Authentication and account lifecycle
 
 Mobile calls Supabase's supported SDK for OTP and refresh. Configure explicit code emails, production SMTP, verification limits and secure token persistence. After verification, `POST /v1/account/initialize` idempotently creates the app account/profile for the verified subject, validating current provider identity and deletion state. It cannot recreate an erased account using an old JWT.
 
+The implemented initialization request is an empty, closed `{}` object. It accepts
+no owner, email, device-selected identity or profile mutation. The API verifies
+the JWT, then calls the configured HTTPS Supabase `/auth/v1/user` with the same
+token and a publishable key. Current subject, confirmed email and provider account
+eligibility must match. Redirects and oversized provider responses fail closed.
+Provider unavailability returns a safe 503; invalid identity returns 401, without
+creating an application account.
+
+Within one restricted-role transaction, a per-owner advisory lock serializes
+absent-account initialization with retirement, the existing `owner_state` guard
+validates active state and insert-on-conflict creates a single minimal `profiles`
+row with unit `kg`. This uses the existing application-account authority, not a
+second user model. Repeated calls retain the generation, feed/cursor position,
+profile and training data. It creates no personal workouts or device-ownership
+model. The generated response extends `/v1/me` with `profile: {unit: "kg"}`.
+Disabled/retired subjects return owner-bound `account_inactive`; an irreversible
+retirement marker survives eventual account-row removal. The marker is an internal
+erasure prerequisite, not a public deletion API or a completed purge workflow.
+
 Authenticated API calls use `Authorization: Bearer <access-token>`. Signature/key, algorithm, issuer, audience, expiry and account state are checked. Supabase tokens/secret keys never appear in domain payloads or logs.
 
 `GET /v1/me` reports cloud account state and supported contract capabilities. Offline cached identity remains sufficient for local training even when this call cannot succeed. Explicit logout locks the prior owner's local database; it does not silently discard pending work.
+
+Bearer JWTs remain usable until expiry unless the provider rejects them or the
+application account is disabled. Normal sync validates JWT claims and guarded
+application state; it does not claim immediate refresh-session revocation detection.
+Current-provider checks during initialization complement those checks. Account
+disable is enforced again under the same owner lock as each mutation/snapshot.
 
 Account export is a durable owner-scoped job returning a short-lived private download when ready. Account deletion requires a deliberate UI action and recent authentication, disables cloud writes immediately, and returns job status. It is not an assistant tool. Export/deletion status routes do not expose another user's jobs.
 
@@ -123,9 +148,27 @@ Results are `accepted`, `duplicate`, `conflict` or `rejected`. Independent opera
 
 Do not automatically retry that operation against revision 9. Present the preserved working branch alongside authorized server state. Resolution creates new mutation IDs.
 
-`GET /v1/sync/pull?cursor=<opaque>&limit=100` returns atomic change batches, an opaque `next_cursor`, `has_more` and generation. Persist a full page and cursor atomically. Payloads include changed current projections/tombstones and root revisions; historical correction payloads are available through bounded owner-authorized history reads when needed. Permanent deletion redacts prior feed payloads, preserving cursor metadata, and invalidates older bootstrap tokens. Redacted entries carry no live observation to reinstall. Sync/snapshot responses are private and no-store.
+`GET /v1/sync/pull?cursor=<opaque>&limit=100` returns ordered change batches, opaque `next_cursor`, explicit `next_position`, `has_more`, verified owner, schema version, generation and erasure epoch. Persist a full page and cursor atomically. The Phase 0 feed uses live `{position, operation, revision}` deltas reduced against the acknowledged shadow, or erased `{position, aggregate_id, redacted, retired_ids}` entries without personal payload. Bootstrap carries current projections. Permanent deletion redacts prior feed payloads while preserving positions and invalidates older snapshot tokens. Sync/snapshot responses are private and no-store.
 
 `POST /v1/sync/bootstrap` prepares a consistent owner snapshot; page reads use the returned token. Bind token expiry, checksum, schema version, captured cursor and owner erasure epoch. Publication/page reads reject stale epochs, including a snapshot prepared before workout deletion but published afterward. Expired cursors/snapshots return typed recovery errors. Never discard pending local work during bootstrap. [SYNC_PROTOCOL.md](SYNC_PROTOCOL.md) defines commit order, materialization and retention.
+
+The implemented request includes `installation_id`, binding a per-device snapshot
+slot. The manifest includes verified owner, generation/epoch, installation, captured
+position/cursor, page count, checksums and UTC expiry. Pages contain `roots` and
+minimal `retired_ids`; checksums cover their exact canonical JSON before defaults.
+`GET /v1/sync/bootstrap/validate?token=<opaque>` revalidates immediately before
+activation and returns current `/v1/me` context. Activation rejects expiry,
+generation/epoch mismatch, incomplete/corrupt pages and unusable retention cursors.
+Already-issued responses cannot be recalled; subsequent authenticated contact
+enforces newer erasure state before upload.
+
+`/v1/me` advertises command/batch/page/snapshot limits plus `minimum_position` for
+pruned feed history. Push responses wrap per-mutation results with owner/version/
+generation/epoch context. `X-DM-Contract: 1` is supported; other versions return
+`426 upgrade_required`. Cursor/generation expiry returns `bootstrap_required`;
+expired/invalidated snapshots require staging recovery. `account_not_initialized`
+pauses sync without deletion. `account_inactive` includes verified owner/version;
+only a matching-owner lifecycle response permits local account erasure.
 
 ## Analytics and predictions
 

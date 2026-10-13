@@ -2,7 +2,7 @@
 
 Review date: 2026-10-12. Scope: the complete Markdown planning package and root README, including the requested PRD, phase checklist, rules and implementation prompt. Reviewers independently examined product/platform, architecture/synchronization, and ML/assistant risks, followed by reconciliation across documents.
 
-**Status:** specification findings below are corrected, independent closing reviews found no remaining material contradiction, and the documentation checks below passed. Product code does not exist; future implementation gates are not claimed to have passed.
+**Original planning-review status (2026-10-12):** specification findings below were corrected, independent closing reviews found no remaining material contradiction, and the documentation checks below passed. Phase 0 code now exists; [IMPLEMENTATION.md](IMPLEMENTATION.md) records the subsequent self-review, desktop tests and open gates. The historical documentation results below do not qualify application release behavior.
 
 ## Review method and authority
 
@@ -89,3 +89,21 @@ At handoff, verify required-file coverage, UTF-8 integrity, heading/fence struct
 | Repository change scope and Git whitespace check | README and docs only; no product code, scaffold, deployment or commit |
 
 Application tests, model evaluation, benchmarks, compliance certification and store approval have not been run for this documentation-only delivery. [TESTING.md](TESTING.md) specifies what evidence implementation must produce. Any new risk found during implementation reopens the affected decision and its acceptance gate.
+
+## 2026-10-13 — Connected Phase 0 adversarial pass
+
+The milestone received deliberate fault injection and an independent read-only
+agent review, followed by regression fixes. Confirmed defects included non-JSON
+transient errors, wrong-owner disable/credential-switch erasure, missing-account
+misclassification, checksum changes from defaults, duplicate positions, snapshot
+identity collisions, invalid dates, late capacity checks, local acceptance versus
+transport disagreement, Unicode text bounds and blank correction reasons.
+
+The final corrected suites passed: 80 ordinary Flutter cases, eight actual
+HTTP/JWT/restricted-PostgreSQL Flutter cases and 49 Python cases. File-backed
+SQLite tests reopen after acknowledgement, pull/cursor, bootstrap, conflict and
+delete faults; no partial transaction is treated as installed. Exact scope and
+limitations are in [IMPLEMENTATION.md](IMPLEMENTATION.md). Review found no reason
+to weaken root CAS, frozen identities, owner isolation, pending-branch protection,
+monotonic shadows or deletion suppression. No ADR changed. Physical-device,
+production authentication, account-erasure jobs and release gates remain open.
