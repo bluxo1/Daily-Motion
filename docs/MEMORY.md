@@ -611,3 +611,45 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   storage, phone kills/reboot/suspension/clock changes, disk/power failures,
   VoiceOver/TalkBack and physical p95 remain open. Other authoritative Phase 0
   export/erasure/restore/capacity/security gates remain as documented. No ADR changed.
+
+## 2026-10-14, 00:10–00:35 IST — Phase 0 evidence reconciliation
+
+- User requested an audit on `phase0-qualification-2026-10-13` and completion of
+  every local Phase 0 task, preserving explicit external blockers and no Phase 1.
+  Started from clean `e888571`; reviewed roadmap/checklist/testing/evidence/memory
+  against actual source and the passing CI run on `a27dfdd`.
+- Reconciled five original unchecked rows already proven by later evidence:
+  design/editor, Drift recovery/ownership, PostgreSQL CAS/receipts/feed/bootstrap,
+  disable/redaction/migration and generated contracts/fixtures. Physical acceptance
+  remains separate. Corrected migration naming to schema 1→3 and 2→3.
+- Added [evidence matrix](PHASE0_EVIDENCE.md) and
+  [operator handoff](../infra/QUALIFICATION.md). Earlier chronological entries
+  called public export/deletion/conflict UI/production restore/retention/capacity
+  work Phase 0 gates; **the authoritative roadmap puts production completeness
+  in Phase 1**. Those public-release requirements remain open without authorizing
+  Phase 1 now. This append clarifies prior status rather than rewriting history.
+- Implemented the missing disposable routine interaction study, editing planned
+  sets/rep ranges/rest and freezing workout previews. No owner/store/outbox/API,
+  no personal sample data, release-disabled. Four new Dart cases cover immutable
+  prescription/validation, keyboard/back/large text/semantic targets and contrast.
+- Added CI secret scanning and five synthetic scanner/settings-redaction tests.
+  Confirmed a database-role configuration assumption during adversarial review:
+  tenant transactions now reject superuser/BYPASSRLS, owner-role membership and
+  absent enabled/forced RLS. Four actual PostgreSQL attacks and restoration pass.
+  Database URL no longer appears in settings representation. No protocol/ADR change.
+- Full local results: **148 ordinary Flutter passed, 9 live skipped** (90 s),
+  separate **9 live passed**, **79 Python passed, 0 skipped** (31.48 s), including
+  **44 real PostgreSQL cases**. Distinct Flutter count **157**. Named file-backed
+  recovery/account/fault subset remains **55**, hard Windows kills **3**. Dart
+  formatting **52 files/0 changes**, analysis clean; Python formatting **30**,
+  Ruff clean, strict mypy **11**; four generated outputs unchanged.
+- New prototype test setup failures were corrected (outer scrollable, lazy list
+  visibility, semantics disposal). No app data-loss/account-crossover defect was
+  exposed by the final full suite. CI/native/document/credential checks are rerun
+  after final evidence edits; source revision and actual remote results follow.
+- Remaining Phase 0 dependencies are external: phones, signed installation,
+  hardware secure storage/backup-transfer/accessibility/process-reboot-storage-
+  power/physical p95, hosted OTP/SMTP/inbox/project configuration, operator-managed
+  region/backups/processor/signing/store accounts and named review appointments.
+  **Physical samples 0; real hosted-provider qualifications 0. Phase 0 remains in
+  progress; Phase 1 not started; no ADR changed.**

@@ -120,6 +120,24 @@ survive. These tests do not qualify phone power loss or full physical storage.
 Native seed/recover and caller-latency entrypoints, metadata requirements and
 hardware/provider blockers are in [DEVICE_QUALIFICATION.md](DEVICE_QUALIFICATION.md).
 
+The [audited Phase 0 evidence matrix](PHASE0_EVIDENCE.md) maps tests to roadmap
+scope. The separate routine interaction study has no owner, database, outbox or
+HTTP client; its tests exercise prescription validation, immutable previews and
+320px/200% text with keyboard/back and semantic target checks. It proves a Phase 0
+interaction prototype, not Phase 1 routine persistence. Light/dark control/text
+contrast is checked explicitly. These widget tests do not qualify screen readers
+on physical hardware.
+
+CI also runs `tools/check_secrets.py`, scanning tracked/nonignored source without
+printing matched values. Synthetic adversarial cases reject private keys,
+non-publishable JWTs and common credential formats while permitting client-safe
+publishable keys. Runtime guard tests deliberately connect as the PostgreSQL
+administrator, grant the runtime role membership in the table-owner role and
+remove/restore forced RLS. Every tenant transaction must fail closed for those
+unsafe conditions and recover after configuration correction; pooled tenant
+context must remain clear. This supplements, rather than replaces, tenant/CAS
+tests under the restricted role or a production security/dependency review.
+
 ## Performance and release gates
 
 Measure durable local set saves from command invocation to committed local acknowledgement with realistic history, in profile/release builds. The target is p95 at most 100 ms on the declared physical qualification cohort, with airplane mode and background sync independently exercised. Record device, OS, build, sample count, percentile method, and traces. Do not subtract inconvenient outliers silently or equate a fast optimistic animation with durable persistence. Test frame pacing, scrolling, memory, and battery during a representative long workout.

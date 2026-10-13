@@ -50,6 +50,16 @@ Migration/admin roles are separate, audited, and unavailable to request handlers
 
 Authorization applies to nested session/set IDs, routine versions, snapshots, exports, predictions, conversation IDs, tool proposals, and job polling. Return sanitized errors; possession of an opaque identifier or signed artifact token alone never proves ownership.
 
+The foundation now checks runtime-role metadata before every tenant transaction:
+superuser/BYPASSRLS credentials, table-owner role membership or training tables
+without enabled **and forced** RLS fail closed with a sanitized configuration
+error. Actual PostgreSQL tests attack and restore each condition. This detects
+unsafe deployment configuration; it is not protection against a malicious
+database administrator. Database URLs/signing material are excluded from settings
+representation. CI's credential guard reports only path/line/category, never the
+matched token. Hosted grants, TLS and processor settings still need operator
+qualification; see [the handoff](../infra/QUALIFICATION.md).
+
 ## Encryption, mobile controls, and API hardening
 
 Require HTTPS for every external call and encrypted database connections with verified transport configuration. Managed PostgreSQL/storage encryption at rest must be confirmed in provider settings. Keep secrets in environment-specific secret managers, inject them at runtime, rotate SMTP/database/provider credentials, and scan commits/CI artifacts for leaks. Separate development, synthetic staging, and production projects and credentials.

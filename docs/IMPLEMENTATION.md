@@ -279,7 +279,13 @@ corrupt session/owner state, account disable under lock, and release dev-auth
 misconfiguration. Real SQLite files and PostgreSQL transactions provide persistence
 and security evidence; simulated provider failures do not qualify hosted delivery.
 
-## Limitations and remaining Phase 0 gates
+## Foundation limitations and later release work
+
+The [Phase 0 evidence reconciliation](PHASE0_EVIDENCE.md) maps these limitations
+to the authoritative roadmap. Interactive conflict resolution, public export/
+deletion jobs and full production capacity/operations remain Phase 1 release
+work, not additional authority to implement Phase 1 during this milestone.
+Foundation safety tests do not waive those later requirements.
 
 1. Conflicts/rejections preserve both branches and display attention. Interactive
    comparison/resolution remains open; nothing is silently discarded or merged.
@@ -297,7 +303,8 @@ and security evidence; simulated provider failures do not qualify hosted deliver
    Ten-year histories, maximum-volume snapshots/activation latency, incremental
    exercise commands and full capacity qualification remain open. Capacity failure
    retains usable local state and reports attention.
-5. Qualify iOS builds and physical Android/iPhone storage and backup/privacy,
+5. Unsigned iOS builds are now qualified by hosted macOS compilation below.
+   Qualify physical Android/iPhone storage and backup/privacy,
    keyboard/back, VoiceOver/TalkBack, hard phone kills, full physical storage/power
    loss and interrupted migration. Native configuration and Windows/emulator
    results below only close their own narrower checks. No prior publicly shipped
@@ -566,3 +573,107 @@ Closing documentation validation: **27 Markdown files, 250 local links, 5 JSON
 examples**; native static guards, machine-readable evidence parsing and Git
 whitespace checks pass. The final follow-up changes evidence/docs only; native CI
 success above belongs to the exact code revision `a27dfdd`.
+
+## Phase 0 evidence audit and remaining local work — 2026-10-14 IST
+
+Audited the clean `phase0-qualification-2026-10-13` branch at `e888571` against
+README, phases, roadmap, testing, implementation, chronological memory and actual
+source/tests/evidence. The [evidence matrix](PHASE0_EVIDENCE.md) records each
+authoritative Phase 0 requirement. Five previously unchecked foundation items
+were already proven: internal design/editor, Drift recovery/ownership, PostgreSQL
+CAS/receipts/feed/bootstrap, disable/redaction/migration and contracts/fixtures.
+They are now checked at their actual evidence level; separate physical acceptance
+is still unchecked. The migration row now correctly names schema 1→3 and 2→3.
+
+### Work completed
+
+- Added an executable **isolated routine interaction prototype** at
+  `apps/mobile/lib/qualification/routine_prototype.dart`. It edits a bounded
+  planned set/rep-range/rest prescription, previews immutable content versions
+  and preserves the editor on back. It has no owner, database, outbox, credentials
+  or HTTP client, records no performed sets and is disabled in release builds.
+  Production routine/catalog persistence remains Phase 1. Existing onboarding,
+  active logging and history complete the Phase 0 prototype set.
+- Added four Dart cases for immutable prescriptions, invalid/blank inputs,
+  320px/200% text with keyboard/back and accessible tap targets, and actual
+  light/dark text/action contrast pairs. This is automated desktop interaction
+  evidence, not hardware screen-reader qualification.
+- Added a CI credential guard over versioned/nonignored source. It rejects
+  private keys, non-publishable JWTs and common privileged credential formats;
+  only safe path/line/category reaches output. Five Python cases exercise those
+  attacks/client-safe keys and settings representation. Database URLs now join
+  signing/key material in fields excluded from `Settings` representation.
+- Removed the deployment assumption that the supplied API database credentials
+  must be restricted. Every tenant transaction checks the actual role and
+  training table metadata before setting owner context: superuser/BYPASSRLS,
+  membership in table-owner roles or missing enabled/forced RLS returns sanitized
+  `503 service_not_configured`. Four **real PostgreSQL** cases use the administrator,
+  grant/revoke owner-role membership and remove/restore RLS; corrected settings
+  resume use and pooled tenant context stays clear. No credential or owner label
+  is accepted from a request to bypass this check.
+- Added [operator qualification handoff](../infra/QUALIFICATION.md) for actual
+  region, backup, processor, project, SMTP, signing and named review assignments.
+  Those are external dependencies, not evidence inferred from local configuration.
+  Documentation validation now also covers the new infrastructure Markdown.
+- Corrected scope ambiguity in prior remaining-work lists: full public routine
+  features, conflict-resolution UI, export/deletion jobs and complete production
+  retention/restore/capacity qualification remain **Phase 1 release work** under
+  the unchanged roadmap. Their Phase 0 safety primitives are tested. No public
+  release requirement, physical gate or accepted invariant was weakened.
+
+### Exact local validation
+
+Environment remains Windows 11 10.0.26300.9550, Flutter **3.47.7/Dart 3.13.5**,
+Python **3.13.14** and real Docker PostgreSQL **17.7** in the dedicated
+`daily_motion_test` database. Tests use a separate `NOSUPERUSER NOBYPASSRLS` runtime
+role; only scoped setup/attack tests hold administrator authority. Other user
+applications/containers and the main branch were preserved.
+
+| Check | Actual result |
+|---|---|
+| Full ordinary Flutter suite | **148 passed, 9 live cases skipped**, 90 s; four new prototype/design cases, previous 144 retained |
+| Separate live Flutter HTTP suite | **9 passed**, invoked by the full Python harness; real FastAPI/PostgreSQL, synthetic signed test identity |
+| Distinct Flutter cases | **157 passed** across ordinary/live runs; repeated remote validation does not add cases |
+| Full Python suite | **79 passed, 0 skipped**, **31.48 s**; previous 70 plus five credential/config and four runtime-guard cases |
+| Real PostgreSQL coverage | **44 cases**, independently counted by fixture collection; prior 40 retained plus four role/RLS attacks |
+| Named file-backed recovery subset | **55 cases** retained, including **3 hard Windows process kills**, timer/pager-full/migrations and account/sync recovery; no physical evidence inferred |
+| Dart format / Flutter analyze | **52 files, 0 changes**; **no issues**, 20.5 s |
+| Python format / Ruff / strict mypy | **30 files formatted**, lint clean; **11 source files**, no type issues |
+| Generated artifacts | All **4** outputs reproduce byte-for-byte: checked OpenAPI, Dart DTOs/limits and Drift schema; protocol version/fixtures unchanged |
+| Native guards / credential guard | Static backup/back/Keychain/clock/signing checks pass; **195 source files, 0 credential findings** |
+
+Logs are retained locally in ignored `.tools/phase0-reconcile-flutter.log` and
+`.tools/phase0-reconcile-python.log`. The live two-device tests emit Drift's debug
+multiple-instance advisory: each device explicitly uses a **different** real
+`NativeDatabase.memory()` executor, so they do not share a database connection.
+The restart cases separately use real file-backed SQLite. This advisory is not
+suppressed to hide persistence behavior.
+
+### Adversarial review and remaining blockers
+
+Confirmed and fixed: stale unchecked evidence rows; misclassified later-phase
+release work; missing routine interaction prototype; no durable CI credential
+scan; privileged/RLS-misconfigured API connections depended on operator discipline;
+database credentials could appear in settings representation. New widget test
+setup initially needed an explicit outer scrollable, scrolling to lazy preview
+content and semantics disposal before end-of-test verification; the corrected
+tests pass. The production implementation was not changed to accommodate test
+timing. Review retained owner/switch/late-callback boundaries, immutable retries,
+branch/conflict/echo safety, atomic cursors/bootstrap, retirement/disable,
+release-auth guards and benchmark provenance; the complete existing fault suites
+pass. No new data-loss, crossover, duplicate or resurrection defect was found.
+
+Only external **Phase 0** acceptance/dependencies remain: physical Android/iPhone
+and signed installations; hardware Keychain/protected-storage and backup/transfer;
+VoiceOver/TalkBack/native navigation/keyboard and accessibility; phone process,
+reboot/suspension/clock/storage/power behavior and physical profile/release p95;
+real hosted Supabase/custom SMTP/inbox/publishable-project delivery/rate/revocation;
+managed region/backup/processor settings, developer/store/signing credentials and
+named operator/privacy/security review appointments. The repository owner is
+accountable for commissioning that review; no appointment or approval is invented.
+Physical sample count remains **0**, real hosted-provider qualification **0**.
+
+Previous actual remote CI remains green on `a27dfdd`; new remote evidence is
+recorded separately after committing this change. The new CI also compiles the
+isolated routine prototype as an Android debug target. **No ADR changed. Phase 0
+is not complete; Phase 1 has not started.**

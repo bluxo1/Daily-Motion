@@ -51,6 +51,7 @@ jobs:
       - run: git diff --exit-code -- ../../apps/mobile/lib/sync/transport_contract.dart ../../apps/mobile/lib/sync/transport_limits.dart
       - run: uv run --no-sync python ../../tools/check_docs.py
       - run: uv run --no-sync python ../../tools/check_native_config.py
+      - run: uv run --no-sync python ../../tools/check_secrets.py
   mobile:
     strategy:
       matrix:
@@ -83,6 +84,8 @@ jobs:
         run: flutter build apk --profile
       - if: runner.os == 'Linux'
         run: flutter build apk --release
+      - if: runner.os == 'Linux'
+        run: flutter build apk --debug -t lib/qualification/routine_prototype.dart
       - if: runner.os == 'macOS'
         run: flutter build ios --debug --no-codesign
       - if: runner.os == 'macOS'

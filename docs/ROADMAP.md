@@ -4,6 +4,10 @@ Planning baseline: 2026-10-12. Phases are evidence gates, not calendar promises.
 
 [phases.md](phases.md) provides the execution checklist. Phase 0 is in progress; later phases have not started. [IMPLEMENTATION.md](IMPLEMENTATION.md) records connected foreground synchronization, production-shaped authentication/account lifecycle and their desktop evidence. Hosted provider and physical-device release gates are not complete. This roadmap remains the detailed scope authority.
 
+The [Phase 0 evidence audit](PHASE0_EVIDENCE.md) maps these requirements to actual
+code/tests and separates complete foundation work from external acceptance.
+It corrects checklist lag without changing the scope or physical exit gate.
+
 ## Phase 0 — Foundations and design system
 
 **Objective:** establish a buildable, testable offline foundation before feature breadth.

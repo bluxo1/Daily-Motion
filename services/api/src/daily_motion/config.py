@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="DM_", env_file=".env", extra="ignore")
-    database_url: str = ""
+    database_url: str = Field(default="", repr=False)
     jwt_issuer: str = ""
     jwt_audience: str = "authenticated"
     sync_signing_key: str = Field(default="", repr=False)

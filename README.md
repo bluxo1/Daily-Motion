@@ -26,13 +26,27 @@ Use [the device qualification procedure](docs/DEVICE_QUALIFICATION.md) for the
 prepared native recovery and full durable-save benchmark harnesses. Emulator or
 desktop timings do not establish the **physical p95 ≤100 ms** target.
 
+The [Phase 0 evidence audit](docs/PHASE0_EVIDENCE.md) reconciles completed local
+foundation work with external hardware/provider/operator acceptance. Routine
+editing is available as a separate disposable interaction study:
+
+```sh
+cd apps/mobile
+flutter run -t lib/qualification/routine_prototype.dart
+```
+
+It edits planned prescriptions and immutable workout previews, creates no
+personal data or database, and is disabled in release builds. Full routine
+features remain Phase 1. Hosted project/region/backup/processor and named review
+prerequisites are in [the operator handoff](infra/QUALIFICATION.md).
+
 ## Repository
 
 ```text
 apps/mobile/      Flutter, Riverpod, Drift, design and workout modules
 services/api/     FastAPI commands, PostgreSQL models, Alembic and fault tests
 contracts/        Generated OpenAPI and shared synthetic fixtures
-infra/            Local PostgreSQL configuration
+infra/            Local PostgreSQL and operator qualification handoff
 docs/             Product, architecture and implementation evidence
 ```
 

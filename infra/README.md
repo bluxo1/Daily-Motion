@@ -3,6 +3,10 @@
 This development service contains synthetic data only. It binds PostgreSQL to
 `127.0.0.1:25432`; no Supabase project or cloud deployment is created.
 
+[QUALIFICATION.md](QUALIFICATION.md) records the operator-managed hosted-provider,
+region/backup/processor, review and signing prerequisites. None is inferred from
+local PostgreSQL or remote unsigned builds.
+
 ```sh
 docker compose -f infra/compose.yaml up -d
 docker compose -f infra/compose.yaml exec -T postgres createdb -U dm_admin daily_motion_test
