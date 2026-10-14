@@ -7,6 +7,11 @@ This development service contains synthetic data only. It binds PostgreSQL to
 region/backup/processor, review and signing prerequisites. None is inferred from
 local PostgreSQL or remote unsigned builds.
 
+[staging/README.md](staging/README.md) is the executable Supabase + Render
+preparation/provisioning runbook. Real hosted resources still require operator
+login and secure environment setup; the local destructive test database is never
+used as a hosted qualification fixture.
+
 ```sh
 docker compose -f infra/compose.yaml up -d
 docker compose -f infra/compose.yaml exec -T postgres createdb -U dm_admin daily_motion_test

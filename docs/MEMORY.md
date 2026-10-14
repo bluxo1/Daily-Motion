@@ -698,3 +698,39 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
 - Closing docs-only check: **29 Markdown/275 local links/5 JSON**; native guards,
   credential guard **195/0** and Git whitespace pass. No code/generated changes
   after successful source CI. The evidence follow-up is committed separately.
+
+## 2026-10-14, 18:15–18:50 IST — Hosted staging preparation and login boundary
+
+- User explicitly requested **Supabase staging + Render FastAPI**, real OTP/inbox
+  and hosted sync qualification, Phase 0 only. Started clean at `dacc803`; read
+  README/implementation/evidence/memory/phases/security/API/sync before edits.
+- Available process has no Render/Supabase credentials/CLI session; both browser
+  dashboards redirect to **sign-in**. Asked for direct provider login/workspace
+  selection and controlled test inboxes. No resources created/deployed, credentials
+  read/printed, actual staging URLs invented or provider qualification claimed.
+- Prepared [blueprint](../render.yaml), [runbook](../infra/staging/README.md), OTP
+  template, four-field client example and credential-gated Flutter hosted harness.
+  Render Singapore/free/manual deployment uses pinned Python/uv/frozen lockfile.
+  Provider secrets remain outside mobile/source; real `.env.*`/browser artifacts
+  ignored. Official Render JSON schema validates the blueprint locally.
+- Operator-only staging module/script verifies target before writes, applies
+  Alembic through an injected admin connection, provisions restricted runtime
+  grants and revokes direct training grants from provider roles. Probe inserts
+  synthetic owners only inside rolled-back transactions and tests pool reset.
+- Added hosted HTTPS/issuer/audience/publishable/TLS verification checks and
+  `/readyz` for revision 0003, grants, forced RLS and missing-owner denial; existing
+  `/healthz` remains liveness. SQL failures return sanitized 503 without exception
+  payload logging. Fixed any-grant validation and denied CREATEROLE/CREATEDB/
+  replication privilege; quoted-password setup and actual database attacks pass.
+- Full local **148 Flutter passed/10 skipped** (115 s), separate live **9 passed**,
+  **99 Python passed/0 skipped** (37.00 s), **51 PostgreSQL** collected cases.
+  Executed Flutter count **157**; hosted harness unrun and not counted. Existing
+  named file-backed subset **55**, hard Windows kills **3** retained. Dart format
+  **53**, Python **33**, strict mypy **13**; analysis/Ruff clean; four generated
+  artifacts unchanged. Native guards and credential guard **203/0** pass.
+- Added **DM-018**, explicitly requested Supabase Mumbai / Render Singapore
+  **staging-only** exception; DM-003 production Cloud Run Mumbai unchanged.
+  Actual regions/project/API revision/URLs, hosted migration/RLS/TLS, OTP/SMTP,
+  refresh/account/sync checks remain unperformed until user provider access and
+  inbox/operator configuration. Physical gates unchanged. Phase 0 in progress;
+  Phase 1 not started. Final docs/commit/remote evidence follows when completed.

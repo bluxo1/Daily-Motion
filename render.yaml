@@ -1,0 +1,31 @@
+# Staging only. Secrets are entered in Render, never committed or bundled in Flutter.
+services:
+  - type: web
+    name: daily-motion-staging-api
+    runtime: python
+    region: singapore
+    plan: free
+    repo: https://github.com/bluxo1/Daily-Motion
+    branch: phase0-qualification-2026-10-13
+    rootDir: services/api
+    autoDeployTrigger: "off"
+    buildCommand: pip install uv==0.13.0 && uv sync --frozen --no-dev
+    startCommand: .venv/bin/uvicorn daily_motion.main:app --host 0.0.0.0 --port $PORT --no-access-log
+    healthCheckPath: /readyz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.14
+      - key: DM_ENVIRONMENT
+        value: staging
+      - key: DM_DATABASE_URL
+        sync: false
+      - key: DM_SUPABASE_URL
+        sync: false
+      - key: DM_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: DM_JWT_ISSUER
+        sync: false
+      - key: DM_JWT_AUDIENCE
+        value: authenticated
+      - key: DM_SYNC_SIGNING_KEY
+        generateValue: true

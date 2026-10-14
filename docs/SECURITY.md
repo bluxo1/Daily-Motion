@@ -74,6 +74,20 @@ Restrict storage objects by owner and use short-lived authenticated download pat
 
 ## Phase 0 development authentication boundary
 
+The requested hosted staging setup is documented in
+[the Supabase/Render runbook](../infra/staging/README.md). Render holds only the
+restricted runtime connection and synchronization signing key; migrations run
+in a separate operator process. Staging/production runtime connections require
+`sslmode=verify-full` and a trusted root certificate, HTTPS issuer/project agreement,
+the authenticated audience and a publishable client key. The configured session
+pooler uses port 5432; transaction-pooler compatibility is not silently assumed.
+Readiness rejects unready grants/schema or privileged roles. Database errors are
+sanitized and engine parameters hidden; provider/browser snapshots and real
+`.env.*` are excluded from version control. Provisioning never prints passwords.
+These are locally tested controls, not hosted/TLS/SMTP qualification. Render
+Singapore staging crosses regions relative to Supabase Mumbai under DM-018;
+no India-only processing is claimed.
+
 The connected spike supports an explicitly configured **public** verification key
 for a synthetic signed ES256 test issuer. Signature, issuer, audience, expiry and
 subject validation still run; active-account checks and forced RLS still apply.

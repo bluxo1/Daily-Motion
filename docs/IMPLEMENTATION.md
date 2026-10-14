@@ -745,3 +745,128 @@ Final follow-up checks: **29 Markdown files, 275 local links, 5 JSON examples**;
 native static guards and **195-source-file credential guard/0 findings** pass.
 Git whitespace checks are clean. No code, contract, fixture or generated artifact
 changed after the successful source CI.
+
+## Supabase + Render staging preparation — 2026-10-14 IST
+
+User explicitly requested a real **staging** Supabase database/Auth project and
+Render FastAPI service, without starting Phase 1. Inspected the clean branch at
+`dacc803` and README/evidence/memory/phases/security/API/sync documents first.
+There is no Supabase/Render process credential or CLI session. The available
+automation browser opened **both providers at sign-in**. User-owned login/workspace,
+project and inbox configuration is therefore the actual boundary; **no hosted
+resource was created or changed**. No production/workout data was used.
+
+### Implemented preparation
+
+- [Render blueprint](../render.yaml): staging-only named service, Singapore,
+  free compute, qualification branch, manual deployment, pinned Python **3.13.14** /
+  uv **0.13.0**, frozen production dependencies and Uvicorn without access logs.
+  Render prompts for values and generates the stable synchronization signing key;
+  administrator/migration credentials are absent from the runtime blueprint.
+  Validated against the actual public **official Render JSON schema** with
+  temporary local tooling. That proves syntax, not provider deployment.
+- [Staging runbook](../infra/staging/README.md), six-digit OTP email template and
+  four-field client-safe Flutter configuration example. Instructions separate
+  default provider delivery from custom SMTP, identify authorized default-delivery
+  recipients/limits, preserve email confirmation and asymmetric signing, and keep
+  the training schema unexposed through the Data API. No actual URL or publishable
+  key was invented. Browser snapshots and real `.env.*` files are now ignored.
+- Explicit operator-only `scripts/provision_staging.py` and `daily_motion.staging`:
+  project confirmation and verified TLS precede mutations; Alembic runs through
+  a supplied administrator connection, not API environment overrides. Provision
+  `dm_staging_runtime` as non-owner/non-superuser/non-BYPASSRLS, without database,
+  role or replication privileges. Grant the private tables and read-only migration
+  metadata; revoke direct training access from PUBLIC/provider roles. No reset,
+  personal account seeding, public admin endpoint or credential output. Read-only
+  verification uses the runtime connection and rollback-only synthetic owner/RLS
+  probes. An initial local test deliberately rebuilt the **dedicated test schema**
+  and proved all migrations plus repeated setup with a quoted password safely.
+- Hosted configuration requires HTTPS issuer/project agreement, authenticated
+  audience, publishable key, bounded signing-key minimum and database
+  `sslmode=verify-full` plus root certificate. The session/direct path is port 5432;
+  transaction-pooler 6543 is rejected rather than assuming driver compatibility.
+  Actual certificate negotiation remains hosted qualification.
+- `/healthz` already existed and remains liveness. Added infrastructure `/readyz`
+  outside checked transport OpenAPI: actual restricted role, current revision
+  **0003**, complete table grants, forced RLS and absent-owner denial are checked
+  before reporting ready. Queries/connections/pool waits are bounded. Unexpected
+  SQLAlchemy database errors return sanitized 503 responses and engine parameters
+  are hidden, avoiding exception/SQL payload leakage. No migration runs at startup.
+- Opt-in desktop Flutter `test/hosted_staging_test.dart` receives real short-lived
+  staging user credentials through protected process environment, never app
+  bundle/defines. Server initialization establishes owner before local access;
+  the harness prepares synthetic local work, exact duplicate send/lost local ack,
+  A→B→A locked file reopening and resumed synchronization. **Skipped without
+  actual credentials**. It does not pretend to prove OTP delivery, SDK refresh,
+  native secure storage or provider logout; those use the actual app separately.
+
+### Exact current local results
+
+Windows 11 workspace, Flutter **3.47.7/Dart 3.13.5**, Python **3.13.14**, dedicated
+Docker PostgreSQL **17.7**, restricted runtime role. Docker was started for this
+task; unrelated containers/workloads were preserved.
+
+| Check | Actual result |
+|---|---|
+| Full ordinary Flutter | **148 passed**, **10 skipped**, **115 s**: previous 9 local live cases plus 1 explicitly unqualified hosted case |
+| Separate actual loopback Flutter/FastAPI/PostgreSQL | **9 passed** through the full Python harness; provider remains controlled/synthetic |
+| Distinct executed Flutter cases | **157**; new hosted case is **not** counted as executed |
+| Full Python | **99 passed, 0 skipped**, **37.00 s**; previous 79 plus 20 staging/config/readiness/security cases |
+| Real PostgreSQL | **51 cases**, independently counted from fixture collection; previous 44 plus seven migration/provision/readiness attacks |
+| File-backed recovery/account/fault subset | Existing **55** cases retained, including **3 hard Windows process kills**; no hardware inference |
+| Formatting / analyze | **53 Dart files**, no outstanding format changes; analysis clean. **33 Python files**, Ruff clean; strict mypy **13 source files** clean |
+| Contracts/artifacts | All **4** checked artifacts reproduce byte-for-byte; no transport schema/version change. `/readyz` is infrastructure only |
+| Blueprint / native / secrets | Official Render schema validation and native static guards pass; credential scan **203 files, 0 findings** |
+
+Full logs are ignored `.tools/phase0-staging-flutter.log` and
+`.tools/phase0-staging-python.log`. The prepared live hosted harness is unrun;
+its skip is explicit. Controlled provider tests/local PostgreSQL do not qualify
+Supabase delivery, TLS, pooler behavior or hosted RLS. Current remote validation,
+if run after the preparation commit, is recorded separately from these results.
+
+### Adversarial findings fixed
+
+Readiness could previously report process health without checking usable database
+configuration. The new guard rejects incomplete migration/grants and privileged
+connections. Review corrected an any-privilege check to require each necessary
+grant and added role-creation/database-creation/**replication** privilege denial;
+actual PostgreSQL attacks cover all three. SQL exceptions could expose connection
+or private parameter detail; responses now fail safely with no exception logging.
+Provisioning validates all project/runtime/admin identity before changing roles,
+uses quoted identifiers/passwords and requires the expected RLS SQLSTATE, rather
+than treating any SQL failure as proof of isolation. Browser snapshots and extra
+real environment files could have been tracked; they are excluded. The new
+qualification harness was corrected during static review for generated DTO map
+shape, extension imports, first-owner initialization and safe store closure.
+No synchronization/auth invariant was relaxed; existing tests all pass.
+
+### Hosted status and external boundary
+
+| Required evidence | Current status |
+|---|---|
+| Supabase project / region / PostgreSQL version | **Not created/observed**; intended specific Mumbai `ap-south-1` |
+| Render service / region / deployed API revision | **Not deployed/observed**; intended Singapore; no deployed revision |
+| Hosted Alembic / runtime role / forced RLS / HTTPS | **Unperformed**; local target/proof is revision **0003**, 11 training tables |
+| Real Supabase OTP / inbox / refresh / account qualification | **0 hosted qualification cases**, login/project/test inbox required |
+| Custom SMTP | **Not configured; 0 delivered SMTP messages**; operator sender credentials required |
+| Hosted Flutter synchronization / restart / account switching | **Unperformed**; prepared guarded harness and app procedure |
+| Actual Supabase URL / Render URL / publishable key | **Unavailable**; examples are placeholders only |
+
+To resume, sign in directly to the Supabase and Render dashboards in the available
+browser, select the staging organization/workspace and provide two controlled test
+inbox addresses (or one for initial delivery). Billing/domain/SMTP secrets remain
+operator-owned and must be entered in provider storage, never chat/source/mobile.
+The complete provisioning/deploy work is now concrete and reviewable at this
+boundary. Physical devices, signed installation, native storage/backup/accessibility,
+phone lifecycle/storage/power and physical profile/release p95 still remain open.
+
+**ADR DM-018 added** for the explicitly requested Render Singapore **staging-only**
+exception. Production DM-003 Cloud Run Mumbai remains unchanged. Cross-region
+processing is disclosed; no residency/compliance assertion. **Phase 0 remains in
+progress. Phase 1 has not started.**
+
+Staging preparation closing documentation checks: **30 Markdown files, 294 local
+links, 5 JSON examples**; native guards and **203 source files/0 credential
+findings** pass. Final Flutter analysis is clean (**13.3 s**); the focused hosted
+case explicitly reports **1 skipped, 0 executed** without credentials. All code
+changes are recorded as staging preparation, not hosted qualification.

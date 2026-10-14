@@ -8,7 +8,7 @@ from urllib.parse import unquote
 root = Path(__file__).resolve().parents[1]
 paths = [root / "README.md", *sorted((root / "docs").glob("*.md"))]
 paths.append(root / "contracts/README.md")
-paths.extend(sorted((root / "infra").glob("*.md")))
+paths.extend(sorted((root / "infra").rglob("*.md")))
 links = examples = 0
 for path in paths:
     content = path.read_text(encoding="utf-8")

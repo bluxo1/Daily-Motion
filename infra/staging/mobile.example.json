@@ -1,0 +1,6 @@
+{
+  "DM_ENVIRONMENT": "staging",
+  "DM_SUPABASE_URL": "https://PROJECT_REF.supabase.co",
+  "DM_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_REPLACE_WITH_CLIENT_SAFE_KEY",
+  "DM_API_URL": "https://ASSIGNED_STAGING_SERVICE.onrender.com"
+}

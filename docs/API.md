@@ -6,6 +6,17 @@ Keep a small versioned HTTP/JSON surface around domain capabilities. FastAPI own
 
 ## Boundaries and conventions
 
+Process liveness is `GET /healthz`. The staging deployment now also prepares
+`GET /readyz` (infrastructure endpoint, outside the versioned transport schema):
+verified hosted configuration, restricted database role, current Alembic revision,
+required table grants/forced RLS and empty-owner denial must pass. It returns
+`{"status":"ready"}` or a sanitized 503 with `service_not_configured`/
+`database_unavailable`; no user, token, connection or SQL payload is returned.
+Readiness does not qualify email delivery or perform migrations. Unexpected
+database errors in domain routes use the same safe 503 response rather than
+printing parameter-bearing database exceptions. Current checked contracts are
+otherwise unchanged. [Staging deployment](../infra/staging/README.md).
+
 | Domain | Interface responsibility | First availability |
 |---|---|---|
 | Authentication | Supabase email OTP request/verification/refresh; API verifies JWT and active application account. No custom password store. | MVP |

@@ -24,6 +24,14 @@ the overall Phase 0 exit gate.
 
 ## Scope corrections
 
+The next explicitly requested milestone is hosted **Supabase + Render staging**,
+with a scoped [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification)
+hosting decision. [Deployment preparation](../infra/staging/README.md), role/
+migration verification and the real-credential Flutter harness are implemented.
+Both dashboards require user login; no project/region, HTTPS deployment, hosted
+RLS, OTP/SMTP or live synchronization result has been established. This milestone
+remains open independently of the previous local/CI evidence.
+
 Older chronological evidence called interactive conflict resolution, public
 account export/deletion jobs, final account purge, backup deletion-ledger restore
 drills, scheduled production retention/abuse operations and full ten-year capacity

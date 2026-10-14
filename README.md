@@ -123,6 +123,16 @@ policy. See [security](docs/SECURITY.md) and [evidence](docs/IMPLEMENTATION.md).
 
 ## API and database checks
 
+The requested **Supabase + Render staging** path is prepared in
+[render.yaml](render.yaml) and [the staging runbook](infra/staging/README.md).
+It uses separate migration/runtime credentials, verified database TLS and a
+database/RLS-aware `/readyz` check. Copy only the four client-safe values from
+[the mobile example](infra/staging/mobile.example.json) into an ignored staging
+configuration file; real project/API URLs are not available yet. Both provider
+dashboards currently require login, so no hosted project/deployment or real
+OTP/SMTP result is claimed. See [DM-018](docs/DECISIONS.md#dm-018--render-staging-provider-qualification)
+for the staging hosting exception; production Cloud Run Mumbai is unchanged.
+
 Install [uv](https://docs.astral.sh/uv/) and start the synthetic database using
 [infra instructions](infra/README.md). From `services/api`:
 
@@ -196,8 +206,8 @@ requires an API restart. The API rejects this public-key override outside explic
 native secure-storage and release qualification remain separate gates.
 
 [CI](.github/workflows/verify.yml) defines Linux PostgreSQL and Android checks plus
-macOS iOS builds. [Remote CI on the latest code checkpoint passed](https://github.com/bluxo1/Daily-Motion/actions/runs/38445714228):
-70 Python cases including nine live Flutter HTTP/PostgreSQL cases; 144 ordinary
+macOS iOS builds. [Remote CI on the audited code checkpoint passed](https://github.com/bluxo1/Daily-Motion/actions/runs/38454815935):
+79 Python cases including nine live Flutter HTTP/PostgreSQL cases; 148 ordinary
 Flutter cases on Linux and macOS; Android debug/profile/release and unsigned iOS
 debug/release compilation. Hardware secure storage, signed iPhone installation,
 physical-device durability/accessibility and phone performance remain open.
