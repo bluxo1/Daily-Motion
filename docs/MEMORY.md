@@ -867,3 +867,26 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   device/signing/storage/accessibility/lifecycle/p95 gates remain external.
   No new ADR; DM-018's observed staging status is documented. Phase 0 remains in
   progress; Phase 1 has not started.
+
+## 2026-10-15, 00:04 IST — Hosted-auth prerequisite remains blocked
+
+- User narrowed work to real hosted authentication qualification; no new features,
+  mocks substituted for hosted evidence, or Phase 1 work. Clean starting revision
+  **4798c7f**; SCRAM operator fix is source **6606db0**, last observed hosted API
+  **8e5af65**. Pushing/deploying source does not prove credential rotation.
+- Discovery confirms Supabase/Render/Gmail connectors are available but not
+  connected; provider/browser control, operator credential context and inbox access
+  are absent. SMTP/code-template completion is unconfirmed. Asked to restore
+  protected access, without requesting codes/tokens/passwords in chat.
+- No new OTP or authenticated hosted request was sent. First complete historical
+  log review and rotation of potentially exposed credentials, update Render
+  secrets, and reverify restricted runtime/readiness/RLS. No rotation/log clearance
+  or new deployment is claimed. Prior two accepted requests are not deliveries.
+- Existing focused suite **25 passed / 0 skipped / 15.50 s**, using real dedicated
+  local PostgreSQL; actual invocation of hosted Flutter harness **0 executed /
+  1 skipped** with no fake credentials. Full baseline remains **104 Python /
+  56 PostgreSQL**, **148 ordinary Flutter / 10 skipped + 9 live HTTP**; not rerun
+  here. Existing CI **38611404742** rechecked green on **6606db0**, not rerun.
+- Delivery/verification/distinct A/B/authenticated hosted sync/refresh/account
+  switching remain **unqualified**. Restore provider/inbox access and confirm
+  SMTP/templates before continuing. No new ADR or completed Phase 0 gate.

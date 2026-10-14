@@ -1069,3 +1069,41 @@ Android debug/profile/release and the routine study, plus unsigned iOS debug/rel
 compiled. This source is separate from the **deployed 8e5af65**; compilation does
 not qualify physical behavior. Final evidence documentation is committed separately
 with CI skipped after local documentation/security checks.
+
+### Hosted authentication qualification checkpoint — 2026-10-15, 00:04 IST
+
+Scope is hosted authentication qualification only; no features or protocol changes.
+Working tree was clean on **4798c7f**. Source **6606db0** already contains the
+client-side SCRAM operator fix; applying it is a separate protected database
+operation, not something proved by deploying or pushing source alone.
+
+This session has no provider/browser control, connected Supabase/Render/Gmail
+connector, usable operator credential context or inbox access. Plugin discovery
+confirms those integrations are available but not connected. SMTP and prepared
+code-template completion have **not** been re-observed. The last observed API
+deployment remains **8e5af65**; no new deployment, credential rotation or hosted
+runtime-role verification is claimed in this checkpoint.
+
+The requested prerequisite is enforced: **no new OTP request or authenticated
+hosted mutation was attempted before the historical log review and credential
+rotation**. Earlier plaintext role DDL could have entered provider logs; inspect
+protected log/statistics metadata without returning credentials/query text, rotate
+potentially exposed credentials, update Render secret storage, then reverify the
+restricted runtime role/readiness/RLS before requesting fresh codes. Source
+parameter hiding and the SCRAM fix do not retroactively clear historical logs.
+
+Executed now: focused existing staging suite **25 passed / 0 skipped / 15.50 s**
+against the dedicated real local PostgreSQL test database; the credential-gated
+Flutter hosted harness reports **0 executed / 1 skipped**. No fake credentials
+were supplied. The latest full regressions remain the earlier **104 Python /
+56 PostgreSQL**, **148 ordinary Flutter / 10 skipped**, and **9 live loopback
+Flutter** cases; the full suites were not rerun in this checkpoint. The existing
+current-source remote CI result was rechecked: run **38611404742** remains
+successful on **6606db0**, with no new remote run triggered.
+
+Hosted deliveries verified **0**, OTP verifications **0**, verified distinct A/B
+identities **0**, authenticated hosted sync/account-switch/refresh cases **0**.
+Earlier two HTTP-200 OTP requests remain request-acceptance evidence only.
+Restore protected provider control and the controlled inbox, and confirm SMTP/
+code templates directly in Supabase. No OTP/token/password should be pasted into
+chat. All physical/provider Phase 0 gates remain open; no new ADR or Phase 1 work.

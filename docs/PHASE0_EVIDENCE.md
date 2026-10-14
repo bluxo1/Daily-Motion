@@ -1,6 +1,6 @@
 # Phase 0 evidence reconciliation
 
-Audited 2026-10-14 (IST) on `phase0-qualification-2026-10-13`.
+Audited 2026-10-15 (IST) on `phase0-qualification-2026-10-13`.
 [ROADMAP.md](ROADMAP.md) remains the scope authority. This matrix distinguishes
 implemented foundation work from its separate physical/provider acceptance.
 [IMPLEMENTATION.md](IMPLEMENTATION.md) records commands, counts and environments;
@@ -28,7 +28,7 @@ The next explicitly requested milestone is hosted **Supabase + Render staging**,
 with a scoped [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification)
 hosting decision. [Deployment preparation](../infra/staging/README.md), role/
 migration verification and the real-credential Flutter harness are implemented.
-Provider login is now available. The existing empty Mumbai project was selected
+Provider dashboard login enabled initial provisioning. The existing empty Mumbai project was selected
 and named `daily-motion-staging`; Render Singapore is live on `8e5af65`. Hosted
 Alembic `0003`, 11 forced-RLS tables, actual restricted-role owner/pool probes,
 runtime readiness, denied provider-role training grants and six public HTTPS/auth/
@@ -42,6 +42,13 @@ HTTP 200. This proves request acceptance, not delivery or verified distinct owne
 Mailbox access, SMTP code templates and restored provider-dashboard access are
 required. The resumed session cannot inspect hosted historical role-password
 logs/statistics or rotate credentials; that operator check remains explicit.
+
+**2026-10-15 qualification checkpoint:** provider/browser and mailbox control are
+still absent; SMTP/template readiness has not been re-observed. The prerequisite
+log inspection/rotation/reverification therefore blocks new OTP or authenticated
+sync attempts. Existing local staging checks **25/25 pass**; the hosted Flutter
+harness explicitly reports **0 executed / 1 skipped**. No delivery, verification,
+distinct-identity, custom-SMTP or hosted account-switch evidence was invented.
 
 Source `8e5af65` passed all three jobs in
 [actual run 38587594908](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908):

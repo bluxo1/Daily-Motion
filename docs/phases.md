@@ -1,6 +1,6 @@
 # Implementation phases
 
-Updated: 2026-10-14 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
+Updated: 2026-10-15 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
 
 **Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, interaction prototypes, Windows fault tests and native qualification harnesses are implemented. All three remote Linux/PostgreSQL/Android and macOS unsigned iOS jobs passed on `46f5d5a` after earlier `b8968ca`/`a27dfdd` proof; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope and the resolved ARM64 runner allocation failure. The [audited evidence matrix](PHASE0_EVIDENCE.md) reconciles foundation completion with the separate external acceptance. Hosted OTP/SMTP, managed-provider/operator review, signing, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
 
@@ -9,6 +9,12 @@ TLS/RLS/readiness evidence. Both controlled inbox requests returned 200; deliver
 verified identity/refresh/sync and historical credential-log audit/rotation remain
 operator boundaries. Client-side SCRAM provisioning is fixed in `6606db0`, with
 104 Python / 56 PostgreSQL and 148 Flutter + 9 live HTTP local tests passing.
+
+The 2026-10-15 hosted-auth checkpoint remains blocked before fresh OTP requests:
+restore protected dashboard/inbox control, confirm SMTP/code templates, finish
+historical credential-log inspection and rotation, then reverify hosted runtime
+isolation. Existing local operator suite **25 passed**; hosted Flutter **0 executed /
+1 skipped**. No additional Phase 0 checkbox is closed by this checkpoint.
 
 ## Phase summary
 
