@@ -25,7 +25,7 @@ Updated: 2026-10-14 (IST). This is the execution checklist for the accepted plan
 - [x] Prove aggregate CAS, exact retry receipts, commit-ordered pull and consistent bootstrap against real restricted-role PostgreSQL and live Flutter HTTP.
 - [x] Exercise account-disable races, erased feed/snapshot copies and additive local schema migration against real PostgreSQL/SQLite.
 - [ ] Measure durable set-save p95 against the 100 ms target on representative physical devices.
-- [x] Record checked OpenAPI/Dart contracts, shared fixtures, four-output reproduction and implementation/fault evidence; no ADR changed.
+- [x] Record checked OpenAPI/Dart contracts, shared fixtures, four-output reproduction and implementation/fault evidence; no transport version changed.
 - [x] Connect foreground Flutter HTTP push/pull/bootstrap to verified test authentication and restricted PostgreSQL; prove receipt, branch, erasure and cursor safety on desktop databases.
 - [x] Exercise foundation Drift version 1→3 and 2→3 upgrades with frozen outbox, active workout, timer and draft preserved; test file reopening in pending/conflict/bootstrap/cursor/deletion states.
 - [x] Connect the supported Supabase email OTP/refresh API to awaited platform-secure session persistence, verified idempotent application-account initialization and owner-scoped local unlocking; prove expiry/refresh failure, sign-out, restart, stale completions and A → B → A isolation on desktop SQLite/PostgreSQL.
@@ -35,7 +35,7 @@ Updated: 2026-10-14 (IST). This is the execution checklist for the accepted plan
 - [x] Compile unsigned iOS debug/release on hosted macOS and Android debug/profile/release on Linux through actual remote CI; this proves compilation only.
 - [ ] Install/run signed iOS on hardware; qualify physical Android/iPhone process loss, reboot, suspension, clock/timezone changes, disk-write failures, backup/restoration and native Keychain/protected storage.
 - [ ] Qualify hardware VoiceOver/TalkBack, native keyboard/back/sheets, large text and reduced motion; desktop widget semantics complement rather than close this gate.
-- [x] Run published remote CI for Linux/PostgreSQL/Android and macOS/iOS; all three jobs passed on `b8968ca`, `a27dfdd` and audit/runner recovery `46f5d5a`.
+- [x] Run published remote CI for Linux/PostgreSQL/Android and macOS/iOS; all three jobs passed on `b8968ca`, `a27dfdd`, audit/runner recovery `46f5d5a` and staging preparation `ef025c2` (run 38570967779). This does not qualify hosted provider behavior.
 - [x] Establish CI security basics: credential scan, synthetic-auth release rejection, logging hygiene and per-transaction restricted-role/forced-RLS validation; real PostgreSQL rejects privileged/owner-member roles and missing RLS policies.
 - [x] Exercise actual Android emulator protected session/SQLite seed, external force-stop/recover and full caller debug benchmark mechanics; retain raw evidence and exclude this from physical qualification.
 - [ ] Provision operator-managed Android/iOS signing and qualify signed installations; no store-ready signing is claimed.

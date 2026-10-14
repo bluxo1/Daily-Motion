@@ -32,6 +32,13 @@ Both dashboards require user login; no project/region, HTTPS deployment, hosted
 RLS, OTP/SMTP or live synchronization result has been established. This milestone
 remains open independently of the previous local/CI evidence.
 
+Staging preparation source `ef025c2` passed all three jobs in
+[actual CI run 38570967779](https://github.com/bluxo1/Daily-Motion/actions/runs/38570967779):
+**99 Python** (including **51 PostgreSQL** cases), **148 ordinary Flutter** with
+**10 explicit skips**, separate **9 live loopback Flutter HTTP** cases, Android
+debug/profile/release and unsigned iOS debug/release. The new hosted harness is
+one of the skips; no hosted qualification is inferred from these results.
+
 Older chronological evidence called interactive conflict resolution, public
 account export/deletion jobs, final account purge, backup deletion-ledger restore
 drills, scheduled production retention/abuse operations and full ten-year capacity
@@ -45,4 +52,5 @@ managed-provider backup/restore arrangements still require the operator project.
 No gate was reduced: the overall Phase 0 physical acceptance and external
 dependencies remain open. Historical MEMORY entries describe what was known then;
 the latest appended entry and this matrix resolve their scope/status ambiguity.
-No architectural decision changed.
+The foundation protocol and production hosting decision are unchanged. DM-018
+records the explicitly requested Render staging hosting exception.

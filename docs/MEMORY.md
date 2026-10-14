@@ -734,3 +734,37 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   refresh/account/sync checks remain unperformed until user provider access and
   inbox/operator configuration. Physical gates unchanged. Phase 0 in progress;
   Phase 1 not started. Final docs/commit/remote evidence follows when completed.
+
+## 2026-10-14, 18:53 IST — Staging preparation committed; provider access pending
+
+- Committed/pushed **ef025c2552122cb2a3727943f761a1602d5e6c56** on the qualification
+  branch. Commit unsigned because the configured SSH signing passphrase is
+  unavailable; signing configuration unchanged. The staged credential guard has
+  **203 files/0 findings**. Docs **30 files/294 links/5 JSON**, native guards and
+  generated hashes pass; working tree was clean after push.
+- [Actual CI run 38570967779](https://github.com/bluxo1/Daily-Motion/actions/runs/38570967779)
+  was triggered by the push. API job passed; Linux/macOS mobile jobs were still
+  running when this entry was written. Do not treat partial CI as all jobs green.
+  Provider dashboards still require login; zero hosted resources/OTP/SMTP/sync
+  qualifications. The live staging harness remains explicitly skipped.
+
+## 2026-10-14, 19:06 IST — Staging preparation CI passed; hosted boundary remains
+
+- Actual [run 38570967779](https://github.com/bluxo1/Daily-Motion/actions/runs/38570967779)
+  completed **successfully in all three jobs** on source **ef025c2**. API **99
+  passed/0 skipped** (18.59 s), including restricted PostgreSQL and **9 real
+  loopback Flutter HTTP** cases; Linux and Intel macOS each **148 Flutter passed/
+  10 skipped**. Android debug/profile/release and separate routine debug, unsigned
+  iOS debug/release, format/analyze, contracts/Drift, native guards, docs and
+  credential scan passed. Hosted credentials were absent; the new hosted test
+  remains an explicit skip. Unique executed Flutter cases remain **157**.
+- Reviewed operator credential separation, verified TLS, readiness/grant/RLS
+  enforcement, rollback-only synthetic probes and token-free harness configuration.
+  Corrected outdated blanket “no ADR changed” evidence to identify **DM-018**;
+  no transport revision or production hosting decision changed.
+- Supabase/Render still require login and staging organization/workspace selection;
+  test inboxes and optional SMTP configuration remain unavailable. **No project
+  created, API deployed, actual staging URL/key assigned or hosted OTP/SMTP/RLS/
+  synchronization qualified.** Resume from the staging runbook after direct
+  provider login; never request secrets in chat. Physical/operator gates remain
+  open. Phase 0 remains in progress and Phase 1 has not started.

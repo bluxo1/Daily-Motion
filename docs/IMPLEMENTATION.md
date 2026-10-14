@@ -777,8 +777,8 @@ resource was created or changed**. No production/workout data was used.
   `dm_staging_runtime` as non-owner/non-superuser/non-BYPASSRLS, without database,
   role or replication privileges. Grant the private tables and read-only migration
   metadata; revoke direct training access from PUBLIC/provider roles. No reset,
-  personal account seeding, public admin endpoint or credential output. Read-only
-  verification uses the runtime connection and rollback-only synthetic owner/RLS
+  personal account seeding, public admin endpoint or credential output.
+  Verification uses the runtime connection and rollback-only synthetic owner/RLS
   probes. An initial local test deliberately rebuilt the **dedicated test schema**
   and proved all migrations plus repeated setup with a quoted password safely.
 - Hosted configuration requires HTTPS issuer/project agreement, authenticated
@@ -870,3 +870,22 @@ links, 5 JSON examples**; native guards and **203 source files/0 credential
 findings** pass. Final Flutter analysis is clean (**13.3 s**); the focused hosted
 case explicitly reports **1 skipped, 0 executed** without credentials. All code
 changes are recorded as staging preparation, not hosted qualification.
+
+Preparation source committed/pushed as
+**`ef025c2552122cb2a3727943f761a1602d5e6c56`**.
+[Actual CI run 38570967779](https://github.com/bluxo1/Daily-Motion/actions/runs/38570967779)
+completed successfully on that exact source revision: **all three jobs passed**.
+The API ran **99 tests, 0 skipped, 18.59 s**, including the restricted PostgreSQL
+suite and **9 actual loopback Flutter HTTP cases**. Linux and Intel macOS each ran
+**148 Flutter tests, 10 skipped**, format/analyze and Drift reproduction. Linux
+compiled Android debug/profile/release plus the separate routine debug study;
+macOS/Xcode 26.3 compiled unsigned iOS debug/release. All checked contracts,
+documentation, native configuration and credential guards passed remotely.
+Ignored logs are `.tools/phase0-staging-api-ci.log`,
+`.tools/phase0-staging-linux-ci.log` and `.tools/phase0-staging-macos-ci.log`.
+This proves compilation/local-database behavior, not provider deployment or
+physical acceptance. The commit contains no real credentials and is unsigned
+because the configured signing-key passphrase is unavailable; no signing
+configuration was changed. Provider deployment remains blocked on
+login/workspace/inbox configuration. Final evidence documentation follows in a
+separate commit; the CI source revision remains `ef025c2`.
