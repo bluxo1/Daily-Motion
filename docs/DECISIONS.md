@@ -1,6 +1,6 @@
 # Architecture decision log
 
-Updated: 2026-10-12. All entries below are **Accepted for planning** on 2026-10-12. They define the implementation baseline, not a claim that feasibility spikes, security qualification or store approval have passed.
+Updated: 2026-10-14. DM-001–DM-017 are **Accepted for planning** on 2026-10-12; DM-018 records the explicitly requested Render staging exception. They define implementation choices, not claims that provider, security or store qualification passed.
 
 Propose a change through a reviewed documentation PR. Record the old decision as superseded and link its replacement; do not erase why a decision existed. Product constraints come from [PRODUCT.md](PRODUCT.md); authoritative behavior lives in the linked domain documents. Operational thresholds are configurable policies to validate, not exercise-science facts.
 
@@ -11,6 +11,7 @@ Propose a change through a reviewed documentation PR. Record the old decision as
 | DM-001 | Flutter with explicit platform adaptation | [ARCHITECTURE.md](ARCHITECTURE.md), [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) |
 | DM-002 | Modular Python API rather than microservices | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | DM-003 | Managed PostgreSQL/Auth, India-region default | [ARCHITECTURE.md](ARCHITECTURE.md), [SECURITY.md](SECURITY.md) |
+| DM-018 | Supabase Mumbai + Render Singapore for staging qualification only | [Staging runbook](../infra/staging/README.md) |
 | DM-004 | Durable local SQLite as mobile source of truth | [SYNC_PROTOCOL.md](SYNC_PROTOCOL.md) |
 | DM-005 | Aggregate revisions and explicit conflicts | [SYNC_PROTOCOL.md](SYNC_PROTOCOL.md) |
 | DM-006 | Commit-ordered owner feed and bounded bootstrap | [SYNC_PROTOCOL.md](SYNC_PROTOCOL.md) |
@@ -263,3 +264,30 @@ Propose a change through a reviewed documentation PR. Record the old decision as
 **Consequences:** Budget real iPhone/Android testing, macOS builds and controlled beta. Targets are not measurements already achieved.
 
 **Revisit when:** Actual device/cohort data supports changed thresholds; never replace durability guarantees with favorable engagement metrics.
+
+## DM-018 — Render staging provider qualification
+
+**Date:** 2026-10-14. **Status:** Accepted for staging by explicit user request; Mumbai/Singapore deployment observed on 2026-10-14. Email/account/sync qualification remains open.
+
+**Decision:** Use a separate Supabase staging project (specific Mumbai region
+`ap-south-1`) and a Render FastAPI web service in Singapore for Phase 0 hosted
+authentication/synchronization qualification. Keep the modular monolith,
+verified provider identity, forced RLS, restricted database role and local-first
+semantics. DM-003's production Cloud Run Mumbai default remains unchanged.
+
+**Alternatives:** Cloud Run Mumbai staging; leave all provider behavior simulated.
+
+**Reasoning:** The owner explicitly selected Supabase + Render for this milestone.
+Render's published regions include Singapore and no Mumbai option. Hosted
+functional tests need a real provider, independently of physical-device gates.
+[Render regions](https://render.com/docs/regions).
+
+**Consequences:** Staging API/database traffic crosses Singapore/Mumbai over
+verified TLS. Record actual regions, processors, backup plans and deployed commit;
+do not imply India-only processing or production latency/availability. Only
+synthetic staging data; no operator/admin secrets in the API runtime or mobile
+bundle. Operator login/billing/SMTP and hardware remain independent blockers.
+
+**Revisit when:** Moving to production, reviewing processor arrangements or actual
+cross-region latency/cost. This exception does not authorize Phase 1 or close the
+physical/provider qualification gates before evidence exists.

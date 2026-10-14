@@ -2,7 +2,7 @@
 
 Updated: 2026-10-12. This reusable prompt starts a future coding-agent milestone after the user authorizes implementation. Creating this file does not start product code. Product-assistant runtime prompts and tools are governed by [CHATBOT_ARCHITECTURE.md](CHATBOT_ARCHITECTURE.md).
 
-Copy the block into an implementation session and name the approved milestone. If none is named, start Phase 0 foundations only. Use [phases.md](phases.md) for gate tracking and [ROADMAP.md](ROADMAP.md) for scope; every implementation phase is currently not started.
+Copy the block into an implementation session and name the approved milestone. If none is named, continue Phase 0 foundations only. Use [phases.md](phases.md) for gate tracking, [ROADMAP.md](ROADMAP.md) for scope and [IMPLEMENTATION.md](IMPLEMENTATION.md) for existing code/evidence. Phase 0 is in progress; later phases have not started.
 
 ```text
 You are implementing Daily Motion, a premium iOS/Android strength and hypertrophy
@@ -15,7 +15,7 @@ the accepted documentation. Preserve unrelated user work. Existing user/session
 instructions take precedence over this handoff. If the session is constrained to
 planning, explore and plan without writing implementation files.
 
-Read README.md and these documentation entrypoints:
+Read README.md and docs/MEMORY.md (chronological context), then these entrypoints:
   docs/prd.md, docs/PRODUCT.md, docs/ROADMAP.md, docs/phases.md, docs/rules.md
   docs/ARCHITECTURE.md, docs/DATA_MODEL.md, docs/SYNC_PROTOCOL.md, docs/API.md
   docs/DESIGN_SYSTEM.md, docs/USER_FLOWS.md, docs/SECURITY.md, docs/TESTING.md

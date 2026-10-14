@@ -2,6 +2,10 @@
 
 Status: accepted planning baseline. Updated: 2026-10-12. Implementation and fault qualification are still required.
 
+Connected Phase 0 desktop implementation evidence is recorded in
+[IMPLEMENTATION.md](IMPLEMENTATION.md). Physical-device and release qualification
+remain required; the guarantees below are unchanged.
+
 This document owns the synchronization protocol. Domain meanings are in [DATA_MODEL.md](DATA_MODEL.md); representative envelopes and errors are in [API.md](API.md). The design deliberately supports independent devices without promising simultaneous editing of one workout.
 
 ## Guarantees and boundaries
@@ -116,6 +120,16 @@ Initial download, cursor expiry and feed-generation changes use a consistent boo
 Initial operating defaults are a 15-minute token expiry, approximately 512 KiB pages, a 64 MiB serialized snapshot ceiling and one in-progress snapshot per owner/device. These are bounded service policies, validated against a ten-year realistic history fixture and revisited from measurements. A capacity failure retains existing local state and returns actionable diagnostics; no silent historical truncation.
 
 Expired or invalid incomplete snapshots discard staging data only. Snapshots contain current domain projections, not old correction payloads, model datasets, conversations or raw health reads. Ownership, deletion cascade and expiry cleanup apply to their temporary pages. [PostgreSQL transaction isolation](https://www.postgresql.org/docs/current/transaction-iso.html)
+
+Snapshots also carry minimal retired root/child IDs, so bootstrap after feed
+pruning cannot reactivate erased identifiers. The connected implementation stages
+immutable raw pages durably, validates exact checksums before normalization, and
+rechecks owner/generation/epoch/expiry before one atomic activation. A page and
+cursor share a transaction; acknowledgement revisions, local sequence and owner
+feed positions remain distinct. Root revisions are not compared to feed positions.
+Pending branches retain their original bases during recovery. A final validation
+request reduces the activation race window but cannot recall already-issued
+responses; the next authenticated contact enforces any newer erasure epoch.
 
 ## Deletion, logout, and account lifecycle
 

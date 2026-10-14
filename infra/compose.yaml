@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:17.7
+    ports:
+      - "127.0.0.1:25432:5432"
+    environment:
+      POSTGRES_USER: dm_admin
+      POSTGRES_PASSWORD: local-development-only
+      POSTGRES_DB: daily_motion
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dm_admin -d daily_motion"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - daily_motion_pg:/var/lib/postgresql/data
+volumes:
+  daily_motion_pg:

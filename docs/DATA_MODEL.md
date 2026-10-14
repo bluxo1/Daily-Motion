@@ -1,6 +1,6 @@
 # Data model
 
-Status: accepted planning baseline. Updated: 2026-10-12. No schema has been implemented.
+Status: accepted planning baseline. Updated: 2026-10-12. A scoped Phase 0 schema is now implemented; [IMPLEMENTATION.md](IMPLEMENTATION.md) records its coverage and limitations. The complete domain model below remains the implementation target.
 
 This document owns domain vocabulary, measurement semantics, relationships, and historical retention rules. [SYNC_PROTOCOL.md](SYNC_PROTOCOL.md) owns synchronization. [API.md](API.md) owns transport examples. A future entity described here is not a requirement to create an unused MVP table.
 

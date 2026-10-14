@@ -1,6 +1,6 @@
 # Daily Motion design system
 
-Planning baseline: 2026-10-12. This is the intended first-release specification, not an implemented component library. Product boundaries are in [PRODUCT.md](PRODUCT.md); behavior is in [USER_FLOWS.md](USER_FLOWS.md); performance and accessibility qualification are in [TESTING.md](TESTING.md).
+Planning baseline: 2026-10-12. This is the intended first-release specification. Phase 0 implements initial themes and a representative set editor; [IMPLEMENTATION.md](IMPLEMENTATION.md) records coverage and pending platform/physical-device qualification. Product boundaries are in [PRODUCT.md](PRODUCT.md); behavior is in [USER_FLOWS.md](USER_FLOWS.md); performance and accessibility qualification are in [TESTING.md](TESTING.md).
 
 ## Visual philosophy and foundations
 

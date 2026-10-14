@@ -50,6 +50,16 @@ Migration/admin roles are separate, audited, and unavailable to request handlers
 
 Authorization applies to nested session/set IDs, routine versions, snapshots, exports, predictions, conversation IDs, tool proposals, and job polling. Return sanitized errors; possession of an opaque identifier or signed artifact token alone never proves ownership.
 
+The foundation now checks runtime-role metadata before every tenant transaction:
+superuser/BYPASSRLS credentials, table-owner role membership or training tables
+without enabled **and forced** RLS fail closed with a sanitized configuration
+error. Actual PostgreSQL tests attack and restore each condition. This detects
+unsafe deployment configuration; it is not protection against a malicious
+database administrator. Database URLs/signing material are excluded from settings
+representation. CI's credential guard reports only path/line/category, never the
+matched token. Hosted grants, TLS and processor settings still need operator
+qualification; see [the handoff](../infra/QUALIFICATION.md).
+
 ## Encryption, mobile controls, and API hardening
 
 Require HTTPS for every external call and encrypted database connections with verified transport configuration. Managed PostgreSQL/storage encryption at rest must be confirmed in provider settings. Keep secrets in environment-specific secret managers, inject them at runtime, rotate SMTP/database/provider credentials, and scan commits/CI artifacts for leaks. Separate development, synthetic staging, and production projects and credentials.
@@ -61,6 +71,105 @@ Hide private content from app-switcher previews where practical. Avoid sensitive
 Validate typed request bodies, sizes, enum values, owner references, and command schema versions. Bound sync batches, bootstrap snapshots, export size, conversation context, and job execution. Never concatenate user SQL. Apply per-user and per-IP budgets, stricter budgets for costly export/AI routes, and authentication-provider throttling. A per-process limiter alone is insufficient across autoscaled instances; use shared persisted budgets where needed. Limits must accommodate legitimate queued offline workouts and cannot block local logging.
 
 Restrict storage objects by owner and use short-lived authenticated download paths. Do not log signed URLs. Audit dependencies and release signing; keep mobile signing keys and production deployment authority separate from untrusted PR jobs.
+
+## Phase 0 development authentication boundary
+
+The requested hosted staging setup is documented in
+[the Supabase/Render runbook](../infra/staging/README.md). Render holds only the
+restricted runtime connection and synchronization signing key; migrations run
+in a separate operator process. Staging/production runtime connections require
+`sslmode=verify-full` and a trusted root certificate, HTTPS issuer/project agreement,
+the authenticated audience and a publishable client key. The configured session
+pooler uses port 5432; transaction-pooler compatibility is not silently assumed.
+Readiness rejects unready grants/schema or privileged roles. Database errors are
+sanitized and engine parameters hidden; provider/browser snapshots and real
+`.env.*` are excluded from version control. Provisioning never prints passwords.
+Hosted staging TLS/runtime/RLS setup is now verified separately in
+[the evidence](IMPLEMENTATION.md); SMTP, real identity lifecycle and device
+protection remain unqualified. Render
+Singapore staging crosses regions relative to Supabase Mumbai under DM-018;
+no India-only processing is claimed.
+
+The staging operator now generates SCRAM-SHA-256 password verifiers with libpq
+before executing role DDL. Plaintext passwords never enter that SQL, even when
+the server default is MD5; real PostgreSQL creation/rotation/login tests audit the
+driver boundary. Verifiers remain sensitive. Disable client SQL/exception output
+and restrict provider logs; client parameter hiding alone cannot protect server
+DDL logs. Earlier provisioning used plaintext password DDL: historical hosted
+log/statistics inspection and staging credential rotation remain required, and
+are not claimed complete while protected operator access is unavailable.
+
+The connected spike supports an explicitly configured **public** verification key
+for a synthetic signed ES256 test issuer. Signature, issuer, audience, expiry and
+subject validation still run; active-account checks and forced RLS still apply.
+The local setup script alone has migration/admin authority. The API uses a separate
+`NOSUPERUSER NOBYPASSRLS` runtime role. Mobile receives only a short-lived user JWT
+and origin; no private signing key, database credential or service/admin secret.
+Fixture/token flags are rejected in release builds. The API's public-key override
+requires explicit `DM_ENVIRONMENT=development` or `test`; staging/production use
+the trusted issuer's JWKS. This development path does not qualify hosted Supabase
+delivery, provider revocation or native storage.
+
+Foreground cycles freeze credentials through preflight/push/pull/bootstrap.
+Successful responses are checked against the database's owner. Account-disable
+errors carry a verified owner/version; mismatching/unbound responses cannot erase
+another owner's database. A missing account record pauses sync as
+`account_not_initialized`, not permanent erasure. Expired/invalid credentials keep
+local training available. HTTPS is required outside explicit emulator/loopback
+debug development; redirects do not forward credentials.
+
+## Phase 0 authentication implementation boundary
+
+The production-shaped path uses `supabase_flutter`'s supported SupabaseClient/Auth
+API for email OTP, verification, refresh and local-scope provider logout. Each
+bounded operation owns/disposes its SDK client. Automatic SDK refresh, URI login
+and its default SharedPreferences session/PKCE persistence are not enabled.
+Instead the account controller awaits the supported `LocalStorage` adapter and
+uses a secure PKCE adapter. A serialized lifecycle and invalidation epoch fence
+late verification/refresh results; they cannot persist credentials or unlock a
+new account after sign-out. SDK auth logging is disabled, and application errors
+expose safe codes without provider text, OTPs, tokens or authorization headers.
+HTTP is restricted to the configured auth origin, rejects redirects and bounds
+responses; disposable clients abort timed-out operations.
+
+Both sessions and the minimal verified local-owner grant use
+`flutter_secure_storage` 11.2.0. iOS requests non-synchronizing Keychain items with
+`unlocked_this_device` accessibility; Android uses the package's protected-storage
+defaults. Native bridge/option routing is desktop-tested; actual Keychain/Keystore,
+reinstall, backup, lock-screen and hardware behavior remain device qualification.
+Training databases remain OS-private SQLite, not independently encrypted by this
+milestone. Android disables backup and excludes cloud/device-transfer domains.
+iOS now guards and excludes the application-support directory before opening
+SQLite, with native file protection. Windows static checks and Android emulator
+package flags are configuration evidence; iOS compilation and physical backup,
+restore, Keychain/Keystore protection and transfer behavior remain unqualified.
+
+The protected owner grant restores only an existing matching, already-unlocked
+database. Missing/corrupt cloud session material does not remove that grant or its
+outbox. Missing/corrupt owner grants require verified sign-in; they never guess an
+owner. Reauthentication unlocks only after verified API initialization. Explicit
+sign-out writes a protected locked marker, drains the old coordinator, locks the
+SQLite owner and removes session material. Either durable lock prevents a stale
+cached session from reopening the database; storage failure reports attention.
+Cloud logout can fail offline after local locking and is not misreported as a
+confirmed provider revocation. Returning to the same account recovers pending
+work; a different verified account opens its own UUID-scoped file and UI/domain
+scope under the project's namespace.
+
+Migration `0003` forces owner RLS on profiles and immutable account-retirement
+markers. Runtime RLS allows retirement read/insert, with no update/delete policy.
+The marker must be recorded before final account removal, under the same
+initialization/retirement lock; restored-environment deletion-ledger replay remains
+a separate operational gate. Matching-owner remote disable applies the existing
+local erasure policy, including an already signed-out store. Ordinary auth errors
+never invoke erasure. No new public erasure/export endpoint ships here.
+
+Operators must configure separate projects, asymmetric signing/JWKS, confirmed
+six-digit email OTP templates, custom SMTP, sender-domain SPF/DKIM, delivery monitoring and
+provider resend/attempt limits. The UI's 60-second resend cooldown supplements
+provider limits and is not an abuse-control replacement. Keep SMTP, service/admin
+and signing secrets outside client-safe configuration. Hosted OTP/SMTP, urgent
+JWKS rotation and observable session revocation have not been qualified here.
 
 ## AI and health data boundaries
 
