@@ -78,22 +78,28 @@ def provision(admin: Engine, runtime_password: str) -> None:
             raise ValueError("Existing staging role belongs to a table owner")
         config.attributes["connection"] = connection
         command.upgrade(config, "head")
-        # psycopg quotes values/identifiers. Raw SQL/parameter representations are
-        # never logged. Admin engine must use hide_parameters=True and echo=False.
+        # Role DDL cannot bind parameters, and hosted DDL logging may be enabled.
+        # Use libpq's client-side SCRAM encryption: never send the plaintext
+        # password as SQL. Verifiers are sensitive too; do not log SQL/errors.
+        # Admin engine must use hide_parameters=True and echo=False.
         driver = connection.connection.driver_connection
         assert driver is not None
+        encoding = driver.info.encoding
+        verifier = driver.pgconn.encrypt_password(
+            runtime_password.encode(encoding), ROLE.encode(encoding), b"scram-sha-256"
+        ).decode("ascii")
         with driver.cursor() as cursor:
             if flags is None:
                 cursor.execute(
                     sql.SQL(
                         "CREATE ROLE {} LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB "
                         "NOCREATEROLE NOREPLICATION PASSWORD {}"
-                    ).format(sql.Identifier(ROLE), sql.Literal(runtime_password))
+                    ).format(sql.Identifier(ROLE), sql.Literal(verifier))
                 )
             else:
                 cursor.execute(
                     sql.SQL("ALTER ROLE {} LOGIN PASSWORD {}").format(
-                        sql.Identifier(ROLE), sql.Literal(runtime_password)
+                        sql.Identifier(ROLE), sql.Literal(verifier)
                     )
                 )
             cursor.execute(

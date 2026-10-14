@@ -1,5 +1,6 @@
 from uuid import UUID
 
+import psycopg
 import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
@@ -90,6 +91,74 @@ def test_provision_staging_is_repeatable_and_probe_rolls_back(
                     "IN SCHEMA training TO dm_test_runtime"
                 )
             )
+
+
+@pytest.mark.parametrize("server_algorithm", ["md5", "scram-sha-256"])
+def test_provision_sends_only_scram_verifiers_and_rotates_real_login(
+    database: Engine, admin_engine: Engine, server_algorithm: str
+) -> None:
+    statements: list[str] = []
+
+    class AuditCursor(psycopg.Cursor):
+        def execute(self, query, params=None, **kwargs):
+            # Observe the real driver boundary, then execute against PostgreSQL.
+            rendered = (
+                query.as_string(self.connection)
+                if isinstance(query, psycopg.sql.Composable)
+                else str(query)
+            )
+            if rendered.startswith(("CREATE ROLE", "ALTER ROLE")):
+                statements.append(rendered)
+            return super().execute(query, params, **kwargs)
+
+    operator = create_engine(
+        admin_engine.url,
+        hide_parameters=True,
+        connect_args={
+            "cursor_factory": AuditCursor,
+            "options": "-c password_encryption=" + server_algorithm,
+        },
+    )
+    passwords = [
+        "synthetic-first-password-'quoted'-32-characters",
+        "synthetic-rotated-password-with-unicode-λ-32-characters",
+    ]
+    try:
+        for password in passwords:
+            provision(operator, password)
+            runtime = create_engine(admin_engine.url.set(username=ROLE, password=password))
+            try:
+                assert verify_isolation(runtime)["owner_isolation"] is True
+            finally:
+                runtime.dispose()
+        assert len(statements) == 2
+        # Plaintext must never reach password DDL or its potential server logs.
+        assert all(password not in statement for password in passwords for statement in statements)
+        assert all("SCRAM-SHA-256$" in statement for statement in statements)
+        with admin_engine.connect() as connection:
+            stored = connection.scalar(
+                text("SELECT rolpassword FROM pg_authid WHERE rolname=:role"), {"role": ROLE}
+            )
+            assert stored.startswith("SCRAM-SHA-256$")
+        stale = create_engine(admin_engine.url.set(username=ROLE, password=passwords[0]))
+        try:
+            with pytest.raises(psycopg.OperationalError):
+                # Raw connect proves the replaced credential is rejected, without
+                # SQLAlchemy wrapping a credential-bearing URL in an exception.
+                psycopg.connect(
+                    host=stale.url.host,
+                    port=stale.url.port,
+                    dbname=stale.url.database,
+                    user=ROLE,
+                    password=passwords[0],
+                )
+        finally:
+            stale.dispose()
+    finally:
+        operator.dispose()
+        with admin_engine.begin() as connection:
+            connection.execute(text("DROP OWNED BY " + ROLE))
+            connection.execute(text("DROP ROLE " + ROLE))
 
 
 def test_readiness_uses_runtime_role_and_does_not_mutate_accounts(
