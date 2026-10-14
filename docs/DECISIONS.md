@@ -267,7 +267,7 @@ Propose a change through a reviewed documentation PR. Record the old decision as
 
 ## DM-018 — Render staging provider qualification
 
-**Date:** 2026-10-14. **Status:** Accepted for staging preparation by explicit user request; deployment pending provider access.
+**Date:** 2026-10-14. **Status:** Accepted for staging by explicit user request; Mumbai/Singapore deployment observed on 2026-10-14. Email/account/sync qualification remains open.
 
 **Decision:** Use a separate Supabase staging project (specific Mumbai region
 `ap-south-1`) and a Render FastAPI web service in Singapore for Phase 0 hosted

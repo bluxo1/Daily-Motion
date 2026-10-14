@@ -40,12 +40,20 @@ personal data or database, and is disabled in release builds. Full routine
 features remain Phase 1. Hosted project/region/backup/processor and named review
 prerequisites are in [the operator handoff](infra/QUALIFICATION.md).
 
-[Actual CI on `ef025c2`](https://github.com/bluxo1/Daily-Motion/actions/runs/38570967779)
-passed all three jobs: **148 ordinary Flutter + 9 live HTTP cases**, **99 Python
-including 51 PostgreSQL cases**, Android debug/profile/release and unsigned iOS
+[Actual CI on `8e5af65`](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908)
+passed all three jobs: **148 ordinary Flutter + 9 live HTTP cases**, **102 Python
+including 54 PostgreSQL cases**, Android debug/profile/release and unsigned iOS
 debug/release. The ordinary Flutter suite explicitly skipped **10** cases,
 including the unqualified hosted staging harness. Hardware and hosted-provider
 gates remain open; exact scope is recorded in the implementation evidence.
+
+The continued operator-security fix is committed as `6606db0`: runtime password
+DDL uses client-generated SCRAM verifiers. Latest local regressions pass **104
+Python / 56 PostgreSQL**, **148 Flutter / 10 skipped**, plus **9 live HTTP cases**.
+The [new CI run](https://github.com/bluxo1/Daily-Motion/actions/runs/38611404742)
+passed **all three jobs** after rerunning a pub.dev dependency-setup HTTP 403.
+Historical hosted credential-log inspection/rotation and real inbox verification
+require restored protected provider access. The deployed API remains `8e5af65`.
 
 ## Repository
 
@@ -129,9 +137,16 @@ The requested **Supabase + Render staging** path is prepared in
 It uses separate migration/runtime credentials, verified database TLS and a
 database/RLS-aware `/readyz` check. Copy only the four client-safe values from
 [the mobile example](infra/staging/mobile.example.json) into an ignored staging
-configuration file; real project/API URLs are not available yet. Both provider
-dashboards currently require login, so no hosted project/deployment or real
-OTP/SMTP result is claimed. See [DM-018](docs/DECISIONS.md#dm-018--render-staging-provider-qualification)
+configuration file. Staging is deployed: Supabase Mumbai
+`https://pulruylvpehwftwqcvct.supabase.co`, Render Singapore
+`https://daily-motion-staging-api.onrender.com`, revision `8e5af65`, Alembic `0003`.
+Hosted readiness, restricted role/forced RLS and public authentication-denial
+checks pass. No real OTP/SMTP or authenticated hosted sync result is claimed:
+the two controlled inboxes are now designated and both real email-auth requests
+returned HTTP 200, but delivery/verification and custom SMTP remain unqualified.
+The observed dashboard requires SMTP before applying the prepared code templates.
+See [hosted evidence](docs/evidence/phase0-hosted-staging-2026-10-14.json) and
+[DM-018](docs/DECISIONS.md#dm-018--render-staging-provider-qualification)
 for the staging hosting exception; production Cloud Run Mumbai is unchanged.
 
 Install [uv](https://docs.astral.sh/uv/) and start the synthetic database using

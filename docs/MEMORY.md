@@ -768,3 +768,102 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   synchronization qualified.** Resume from the staging runbook after direct
   provider login; never request secrets in chat. Physical/operator gates remain
   open. Phase 0 remains in progress and Phase 1 has not started.
+
+## 2026-10-14, 21:11 IST — Hosted staging live; real email/identity boundary
+
+- With user dashboard login, selected the empty Mumbai project, renamed
+  `daily-motion-staging`, ref `pulruylvpehwftwqcvct`, Free PostgreSQL **17.11**.
+  Applied **0003**, restricted `dm_staging_runtime`, actual verified TLS via
+  session pooler 5432 and server SSL enforcement. Three rollback-only owner/RLS/
+  pool probes pass; final verifier reads actual head and runtime readiness passes.
+  Provider roles have no training grants; unused Data API disabled, public REST
+  **401**, Auth settings with real publishable key **200**.
+- Render Free **Singapore**, service `srv-db7p5knavr4c7392dasg`, live at
+  `https://daily-motion-staging-api.onrender.com`; deployed **8e5af65**, ID
+  `dep-db7pugjrjlhs73cjobe0`. Only runtime credentials are on service. Passwords
+  remained in temporary authenticated localhost memory/provider storage, never
+  real `.env`/mobile defines/logs. Evidence contains public identifiers only.
+- Source fix **8e5af655112123cd9104f4b292e250b791363958** committed/pushed unsigned:
+  reject missing/stale runtime migration metadata and explicitly grant metadata
+  schema usage. **3 adversarial cases failed before fix**, then **23 staging
+  tests passed**. All **102 Python / 54 PostgreSQL / 148 ordinary Flutter + 9
+  loopback Flutter HTTP** pass, **10 ordinary skips**, 55 file-backed subset,
+  3 hard Windows kills. Format/analyze/Ruff/mypy pass, four artifacts unchanged.
+- Actual CI [38587594908](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908)
+  **all three jobs passed** on that source: API **102/0 skips** (14.43 s), Linux/
+  Mac **148/10 skips**, Android all modes and unsigned iOS debug/release. Local
+  unsigned **staging-configured release APK** compiled (58.7 MB), no device claim.
+  Actual hosted public suite **6/6 passed**, including known-public-key-ID bad
+  signature and unsupported contract; no real user token/session fabricated.
+- Initial missing-CA deployment timed out readiness; cancellation raced the next
+  queued attempt, then complete configuration redeploy succeeded. A follow-up
+  HTTP timeout is recorded without asserting cause; bounded public probes pass.
+- **Blocked:** no designated A/B inboxes/mail access. Supabase requires custom
+  SMTP before editing code templates; six-digit/600 s settings saved but prepared
+  templates unapplied, **0 OTP requests/deliveries/verified accounts qualified**.
+  Authenticated hosted Dart case remains **0 executed / 1 skipped**. Free project
+  has no managed backups. Resume SMTP/inbox → actual OTP/account/refresh/sync/
+  retry/sign-out/disable/A→B→A qualification; never use admin/synthetic identities
+  to close these gates. Physical/signing/backup/reviewer/store gates remain open.
+  DM-018 status updated, no new ADR. Phase 0 incomplete; Phase 1 not started.
+
+## 2026-10-14, 23:34 IST — Confirmed inboxes, real request acceptance, SCRAM fix
+
+- Owner designated controlled A and Gmail plus-alias B. One real public Auth OTP
+  request per address returned **200**. **No delivery/verification/session or
+  distinct B identity is qualified**; no code/token/inbox content was retained.
+  Custom SMTP/code templates remain open. Provider/browser tools disappeared in
+  this resumed environment; Supabase/Render/Gmail connectors are discoverable but
+  not connected. Restore dashboard/mailbox access; never paste OTPs/secrets.
+- Audit confirmed plaintext runtime passwords entered role DDL. Fixed with libpq
+  client-side **SCRAM-SHA-256**, regardless of server default, in unsigned source
+  commit **6606db060ec2a82db34d34ce94a92474e97d0bd4**, pushed to the qualification
+  branch. Two real PostgreSQL regressions fail before/pass after; they check real
+  create/rotation/login, quoted/Unicode passwords, SQL boundary and old-password
+  rejection. The old MD5-default case also failed initial SCRAM-required login;
+  Unicode password rotation passes after the fix.
+- Hosted `log_statement=ddl` was observed, but interrupted aggregate log/statistics
+  audit produced no recoverable result. **Historical password retention is not
+  ruled out and credentials have not been rotated.** Restore protected operator
+  access, inspect sanitized counts/settings, rotate with the fixed provisioner,
+  update Render secrets and recheck RLS/readiness. No admin/DB secret is available
+  in this resumed process; both temporary bridge listeners are absent. Hosted API
+  still runs **8e5af65**; no new deployment is claimed.
+- Full local **104 Python passed / 0 skipped / 152.37 s**, including **56 real
+  PostgreSQL** and **9 live loopback Flutter** cases; focused staging **25 passed**.
+  Full Flutter initial **147 passed / 10 skipped / 1 worker-boundary timeout**;
+  isolated hard kills **3/3 passed (26 s)**, full serial repeat **148 passed /
+  10 skipped / 0 failed (144 s)**. Unique executed Flutter remains **157**.
+  Ruff format/lint and strict mypy pass; regenerated OpenAPI/DTO/limits match after
+  required Dart formatting. Real public hosted checks again **6/6**, after two
+  bounded warm-up timeouts; no production availability inference.
+- Actual [CI run 38611404742](https://github.com/bluxo1/Daily-Motion/actions/runs/38611404742)
+  API passed; initial mobile dependency setup received pub.dev **403**, macOS
+  canceled by matrix fail-fast. Failed jobs rerun once; final outcome follows.
+  Earlier deployed **8e5af65** remains all-green. No new ADR; DM-018 staging scope
+  unchanged. Provider identity, hosted sync, managed backup/reviewer, physical
+  device and operator-signing gates remain open. Phase 1 not started.
+
+## 2026-10-14, 23:52 IST — Current-source CI green; protected operator boundary
+
+- [Run 38611404742](https://github.com/bluxo1/Daily-Motion/actions/runs/38611404742),
+  **attempt 2**, finished **successfully in all three jobs** on **6606db0**.
+  API **104 passed / 0 skipped / 19.71 s**, restricted PostgreSQL plus nine live
+  Flutter cases; Linux/Mac each **148 passed / 10 skipped**, Android all modes and
+  routine study, unsigned iOS debug/release. Initial pub.dev 403/matrix cancellation
+  is retained; no gate or dependency lock was weakened to recover.
+- Final local Dart format **53 / 0 changes**, analyze clean (**61.2 s**), Drift
+  **29 s / 77 same outputs**, all **four** generated artifacts identical. Docs
+  **30 files / 301 local links / 5 JSON examples** plus standalone hosted JSON;
+  native guards, **204 source files / 0 credential findings**, whitespace and
+  unchanged staging APK hash pass. New docs are a separate CI-skipped evidence
+  commit; source CI is 6606db0, hosted deployment is still **8e5af65**.
+- A/B actual requests accepted **200**, but delivery, verified distinct identities,
+  SMTP templates, hosted account/refresh/sync/retry/sign-out/disable remain open.
+  Restore protected dashboards/inbox; finish historical credential-log inspection,
+  rotate/reapply with fixed operator code, update Render secrets and reverify.
+  No user secrets/codes/tokens should enter chat or source. Both temporary bridge
+  listeners remain absent. Free managed-backup/restore, review/store, physical
+  device/signing/storage/accessibility/lifecycle/p95 gates remain external.
+  No new ADR; DM-018's observed staging status is documented. Phase 0 remains in
+  progress; Phase 1 has not started.

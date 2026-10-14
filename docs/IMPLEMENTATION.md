@@ -889,3 +889,183 @@ because the configured signing-key passphrase is unavailable; no signing
 configuration was changed. Provider deployment remains blocked on
 login/workspace/inbox configuration. Final evidence documentation follows in a
 separate commit; the CI source revision remains `ef025c2`.
+
+## Hosted staging provisioned; email boundary — 2026-10-14 IST
+
+User-provided dashboard login enabled actual provider setup. Selected the existing
+**empty** project in the Daily Motion organization, verified zero application
+tables/auth users before changes, and renamed it `daily-motion-staging`. No personal
+workout data was used. [Machine-readable evidence](evidence/phase0-hosted-staging-2026-10-14.json)
+contains public configuration and outcomes, never credentials/tokens/inbox contents.
+
+| Resource | Observed configuration |
+|---|---|
+| Supabase | `pulruylvpehwftwqcvct`, **Mumbai `ap-south-1`**, Free, PostgreSQL **17.11**; `https://pulruylvpehwftwqcvct.supabase.co` |
+| Render | `srv-db7p5knavr4c7392dasg`, **Singapore**, Free; `https://daily-motion-staging-api.onrender.com` |
+| Deployed API | **8e5af655112123cd9104f4b292e250b791363958**, deployment `dep-db7pugjrjlhs73cjobe0`, observed **Live** |
+| Database | Alembic **0003**, **11 forced-RLS tables**, `dm_staging_runtime`, session pooler `aws-0-ap-south-1.pooler.supabase.com:5432` |
+| Transport | Actual `sslmode=verify-full` with downloaded CA; server SSL enforcement enabled; Render certificate mounted at `/etc/secrets/supabase-root.crt` |
+| Provider auth | Public JWKS **ES256 / 1 key**; verified publishable key returns **200** from real Auth settings; email confirmation required, six-digit OTP, **600 s** expiry, no anonymous/social providers |
+
+Alembic ran through a separate administrator connection. Generated passwords stayed
+in temporary authenticated localhost bridge/process memory and provider storage;
+no real `.env`, privileged mobile define or secret-bearing output. The runtime role
+passed its per-transaction privilege/owner checks. Three successful rollback-only
+hosted probe invocations exercised two synthetic owner namespaces, missing-owner
+denial, cross-owner insert rejection (42501), all-table forced RLS and pooled-context
+reset. The final invocation reads actual migration metadata through the runtime
+role; the API's real readiness function also passed on that hosted connection.
+Dashboard catalog checks confirm `anon`, `authenticated` and `service_role` have
+**no training-schema/table grants**. Disabled the unused Data API; public REST now
+returns **401 / Secret API key required**, while Auth settings remain **200**.
+
+Render contains only its restricted connection, provider public identifiers and
+generated synchronization signing key; the observed eight variable names contain
+no migration/admin or synthetic-key override. Source access logging is disabled.
+Inspected startup/deploy output without printing credentials: no known database
+passwords were present. This is bounded evidence, not a comprehensive provider log
+audit. Temporary bridge credentials are cleared when qualification closes.
+
+### Actual hosted/public checks and limitations
+
+Six actual HTTPS checks pass on the deployed revision: `/healthz` **200**,
+`/readyz` **200**, missing authentication **401**, malformed authentication **401**,
+a forged ES256 signature using the project's actual public key ID **401**, and
+unsupported contract header **426**. The forgery uses a temporary attacker key,
+never a real user/session. It does not prove independent wrong-issuer/audience or
+expiry claims with valid signatures; existing local JWT/database tests cover those.
+
+**Two real email-authentication requests were accepted (HTTP 200), one each for
+the owner-controlled Account A and Gmail plus-alias Account B.** This is public
+Auth HTTP evidence, not the Flutter UI, delivered-email evidence or two verified
+distinct identities. No delivery, OTP verification, account initialization or
+authenticated hosted Flutter synchronization was qualified. Mailbox access and
+provider-dashboard control are unavailable in the resumed session. Live Supabase
+UI disables subject/body template editing until **custom
+SMTP is configured**; the prepared code templates remain unapplied. Do not force
+disabled controls, invent users, use admin-generated sessions, add magic-link UI,
+or claim fake-provider tests qualify this flow. Default email is limited to team
+addresses and provider throttles; SMTP/inbox qualification remains an operator
+boundary. [Provider SMTP requirements](https://supabase.com/docs/guides/auth/auth-smtp).
+Free-plan managed backups are absent; restore/processor/operator acceptance is open.
+
+### Exact regression/build results
+
+Windows 11, Flutter **3.47.7 / Dart 3.13.5**, Python **3.13.14**, local restricted-role
+Docker PostgreSQL **17.7**, plus separately verified hosted PostgreSQL **17.11**.
+
+| Check | Exact result |
+|---|---|
+| Full ordinary Flutter | **148 passed, 10 skipped**, **136 s**; nine loopback cases run separately, hosted case remains unqualified |
+| Separate actual Flutter HTTP | **9 passed** through the real local API/PostgreSQL harness; distinct executed Flutter count **157** |
+| Full Python | **102 passed, 0 skipped**, **47.56 s**; includes **54 PostgreSQL cases**, independently collected |
+| New adversarial cases | **3 failed before fix**, then focused staging suite **23 passed**; wrong metadata revision, missing metadata grant, restricted public schema |
+| Real SQLite recovery subset | **55 retained**, including **3 hard Windows process kills**; all ordinary tests passed |
+| Static checks | **53 Dart files** formatted, analysis clean (**35.1 s**); **33 Python files** formatted, Ruff and strict mypy **13 source files** clean |
+| Artifacts | **All 4** OpenAPI/DTO/limits/Drift outputs reproduce byte-for-byte |
+| Staging Android | Unsigned **release APK, 58.7 MB**, compiled with the actual four client-safe staging defines (**281.3 s** Gradle); signature verification correctly fails for unsigned output |
+| Hosted checks | **6/6 public HTTP assertions**, three rollback-only RLS/pool probe invocations, real restricted-connection readiness; authenticated hosted Dart case **0 executed / 1 skipped** |
+| Remote CI | [Run 38587594908](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908) **all three jobs passed** on `8e5af65`: API **102 / 0 skipped / 14.43 s**, Linux/Mac each **148 / 10 skipped**, Android debug/profile/release and routine study, unsigned iOS debug/release |
+
+Local staging file is ignored `.tools/staging/mobile.json`, containing **only**
+`DM_ENVIRONMENT=staging`, the public Supabase URL/publishable key and HTTPS API URL.
+Its unsigned APK is a compilation artifact, not signed installation, protected
+storage hardware evidence or physical durable-save latency. Existing release
+synthetic-auth rejection tests pass. Full logs stay in ignored `.tools/phase0-hosted-*`.
+
+### Defects and deployment recovery
+
+The existing verify-only probe returned a constant revision without checking
+runtime-readable metadata. It now reads and validates the real head, rejecting
+missing grants/stale metadata safely. Provisioning explicitly grants schema usage
+for the read-only public migration table; a real restricted-public-schema test
+proved the old grant omission. These defects were reproduced before fixing and
+the fixes were also applied/verified on hosted PostgreSQL. No schema/transport
+version or synchronization semantics changed.
+
+Initial blueprint deployment preceded CA attachment and timed out its readiness
+check. A cancellation raced the next queued attempt and canceled that attempt;
+explicitly deploying the complete configuration recovered the service. The
+runbook now records this initial-deploy boundary. A later operator HTTP read
+timeout is recorded; its cause was not established. Bounded warm-up followed by
+all six public checks succeeded. Free-service cold starts are not production
+availability/latency qualification. Normal training remains network-independent.
+
+**Remaining boundary:** restore provider-dashboard control and mailbox access;
+configure a sender through Supabase's protected SMTP settings before applying
+code templates and proving delivery. Then execute actual OTP/refresh/restart,
+verified account initialization, hosted frozen retry/lost response, sign-out/
+pending outbox, disable and A→B→A cases. Hardware, signed installation, native
+secure storage/backup/accessibility, phone lifecycle/storage/power, physical p95,
+managed backup/restore, named privacy/security reviewer and store prerequisites
+remain open. **No new ADR:** DM-018's status reflects observed staging deployment;
+production DM-003 is unchanged. Phase 0 remains in progress; Phase 1 has not started.
+
+### Continued inbox checks and credential audit — 2026-10-14, 23:30 IST
+
+The owner designated two controlled inboxes; one actual public `/auth/v1/otp`
+request per address returned **200**. Request response bodies and inbox contents
+were not recorded. No resend loop ran. The default delivery route, inbox receipt,
+alias identity distinction and code verification remain unqualified; request
+acceptance must not be inferred to prove those. Custom SMTP/template configuration
+has not been re-observed or changed. Dashboard/browser tools from the provisioning
+session are no longer available; discoverable Supabase/Render/Gmail connectors
+are not connected. No provider session/cookie/secret was recovered from disk.
+
+Adversarial review confirmed that the earlier role provisioner inserted plaintext
+passwords into PostgreSQL role DDL. `hide_parameters=True` only protects client
+logging, not that SQL. Source **6606db0** now uses libpq's **client-side
+SCRAM-SHA-256** verifier generation, independent of server encryption defaults.
+Two real PostgreSQL tests observe driver SQL while still executing actual create,
+rotation, isolation and login; both fail on the old code and pass on the fix.
+The old MD5-default case also fails initial login against SCRAM-required host
+authentication; explicit SCRAM fixes that compatibility failure. Unicode rotation
+passes after the fix. Stored passwords are SCRAM and replaced passwords cannot log in.
+Verifiers themselves are sensitive and are never printed by the operator script.
+[PostgreSQL password-DDL warning](https://www.postgresql.org/docs/17/sql-createrole.html),
+[supported libpq encryption](https://www.psycopg.org/psycopg3/docs/api/pq.html).
+
+The hosted logging audit observed `log_statement=ddl` and utility-statistics
+tracking. Its aggregate-only historical query did **not** produce recoverable
+results before browser access was lost. **Historical hosted password retention
+has not been ruled out; no credential rotation is claimed.** Restore protected
+operator/dashboard access, inspect counts/settings without returning query text,
+rotate the staging runtime credential with the fixed provisioner, update Render
+secret storage and reverify readiness/RLS. Do not copy credentials or database
+logs into chat. The new helper cannot retroactively erase provider logs. Both
+temporary localhost bridge listeners are now absent; credentials are unavailable
+to this resumed process. Render remains on **8e5af65**: this source-only operator
+fix has not been redeployed or reapplied to hosted credentials.
+
+Follow-up full Python: **104 passed, 0 skipped, 152.37 s**, including **56** actual
+PostgreSQL cases and **9** live loopback Flutter cases; focused staging suite
+**25 passed, 26.81 s**. Collection independently confirms **104 / 56**. Ruff
+format/lint (**33 files**) and strict mypy (**13 source files**) pass.
+The public hosted suite again passes **6/6**, after two bounded warm-up timeouts;
+their cause was not established and no availability qualification is claimed.
+First follow-up Flutter run: **147 passed, 10 skipped, 1 failed** at a 90-second
+process-worker boundary timeout; isolated hard-kill retry **3/3 passed, 26 s**.
+The full repeat with `--concurrency=1` passed **148 / 10 skipped / 0 failed,
+144 s**, preserving every test including the three actual hard-kill cases. No
+application durability failure was demonstrated by the initial timeout; its
+specific cause was not established. All four generated artifacts again reproduce;
+final format/analyze/docs checks follow below.
+
+Final local checks: Dart format **53 files / 0 changes**, Flutter analyze clean
+(**61.2 s**), Drift regeneration (**29 s / 77 same outputs**) and all **four**
+checked artifacts unchanged. Documentation: **30 Markdown / 301 local links /
+5 fenced JSON examples**, standalone hosted evidence JSON parsed; native guards,
+**204 source files / 0 credential findings** and `git diff --check` pass. The
+staging APK hash is unchanged. These are Windows/desktop evidence only.
+
+Source fix **6606db060ec2a82db34d34ce94a92474e97d0bd4** is committed/pushed unsigned
+without changing signing configuration. Actual [CI run 38611404742](https://github.com/bluxo1/Daily-Motion/actions/runs/38611404742)
+passed its API job. Initial mobile setup failed on **pub.dev HTTP 403 fetching
+advisories** and the matrix canceled macOS; no mobile tests/builds ran in that
+attempt. Failed jobs were rerun once: **attempt 2 completed successfully in all
+three jobs**. API **104 passed / 0 skipped / 19.71 s**, including restricted-role
+PostgreSQL and nine live Flutter cases; Linux/Mac each **148 passed / 10 skipped**.
+Android debug/profile/release and the routine study, plus unsigned iOS debug/release,
+compiled. This source is separate from the **deployed 8e5af65**; compilation does
+not qualify physical behavior. Final evidence documentation is committed separately
+with CI skipped after local documentation/security checks.

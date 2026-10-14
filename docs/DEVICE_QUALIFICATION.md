@@ -7,7 +7,8 @@ report. See [IMPLEMENTATION.md](IMPLEMENTATION.md), [TESTING.md](TESTING.md) and
 ## Available and blocked environments
 
 The current workspace is Windows. The user confirmed no physical Android phone,
-iPhone, Mac test host, hosted Supabase project or real test inbox is available.
+iPhone or Mac test host is available. Supabase/Render staging was deployed on
+2026-10-14; controlled inboxes and real OTP/SMTP qualification remain unavailable.
 Windows SQLite kills, controlled auth responses, static native checks and emulator
 results cannot close those gates. Record each unavailable case as **blocked**,
 not passed, skipped successfully or inferred from another platform.
@@ -181,8 +182,10 @@ long history; record those workloads separately. Current physical sample count i
 
 ## Hosted provider qualification
 
-Blocked until an operator supplies a development/staging project, HTTPS API,
-publishable configuration and controlled inbox. Configure six-digit OTP templates,
+Hosted staging project, HTTPS API and publishable configuration are now available;
+two controlled inboxes are designated and both real requests returned HTTP 200.
+Inbox delivery/verification, restored dashboard access and SMTP configuration
+remain required. Configure six-digit OTP templates,
 custom SMTP/domain authentication and provider limits outside the app. Verify real
 request/delivery/resend/expiry/incorrect code/refresh/revocation/account guards and
 restart/A → B → A with pending work. Record delivery timing and safe statuses,

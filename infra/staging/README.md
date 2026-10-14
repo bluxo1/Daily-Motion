@@ -1,9 +1,20 @@
 # Supabase + Render staging
 
-Requested Phase 0 provider qualification target; **not deployed yet**. Supabase
-and Render both require provider login in the available browser. No organization,
-project, billing plan, inbox or SMTP credentials have been selected. Do not infer
-actual resources or URLs from the names/placeholders below.
+Requested Phase 0 provider qualification target, deployed **2026-10-14**:
+Supabase `daily-motion-staging`, Mumbai `ap-south-1`, project
+`pulruylvpehwftwqcvct`; Render `daily-motion-staging-api`, Singapore, both free
+plans. API [HTTPS readiness](https://daily-motion-staging-api.onrender.com/readyz)
+passed on `8e5af65`. PostgreSQL **17.11**, Alembic **0003**, restricted runtime,
+11 forced-RLS tables and rolled-back owner/pool probes are verified. These
+resources are staging only. [Evidence](../../docs/evidence/phase0-hosted-staging-2026-10-14.json).
+
+**Email/account/sync qualification remains blocked**: A/B controlled inboxes are
+now designated and both real requests returned HTTP 200, without claiming delivery
+or verified distinct identities. Mailbox access and restored dashboard control
+are required; the live dashboard requires custom SMTP before
+subjects/bodies can be edited. Six-digit
+OTP and 600-second expiry are configured; prepared code templates remain unapplied.
+The free project has **no managed backups**; plan/restore qualification is open.
 
 ## Provisioning order
 
@@ -11,7 +22,9 @@ actual resources or URLs from the names/placeholders below.
    `daily-motion-staging` in the **specific Mumbai `ap-south-1` region**, using a
    generated database password entered directly into provider/secret storage.
    Record project reference, actual PostgreSQL version, plan and backup settings.
-2. Enable confirmed email and six-digit email OTP; set the Magic Link email
+2. Enable confirmed email and six-digit email OTP. Configure custom SMTP directly
+   in the provider before editing templates: the observed staging dashboard
+   disables subject/body editing without it. Then set the Magic Link email
    subject to `Your Daily Motion staging code` and use
    [email-otp.html](email-otp.html) containing `{{ .Token }}`. Use the same OTP
    content for confirmation emails where the provider's signup flow uses that
@@ -40,8 +53,13 @@ actual resources or URLs from the names/placeholders below.
    It checks project/transport before changing anything, applies Alembic through
    `0003` on one supplied administrator connection, provisions only the named
    staging runtime role, grants the private schema and read-only migration
-   metadata, and revokes direct training access from provider/public roles.
-   It never resets schemas, seeds personal accounts or prints credentials.
+   metadata (including explicit `public` schema usage), and revokes direct
+   training access from provider/public roles. Verification reads the actual
+   migration revision through the runtime role; missing/stale metadata fails.
+   Password DDL uses client-generated **SCRAM-SHA-256 verifiers**, regardless of
+   the server password-encryption default; plaintext never enters that SQL.
+   Verifiers are sensitive credential material too: suppress SQL/exception output
+   and restrict provider logs. It never resets schemas, seeds personal accounts or prints credentials.
    Repeated setup retains accounts/workouts. The runtime probe uses fresh
    synthetic owners, checks forced RLS/isolation and rolls the entire probe back.
    Only safe booleans/count/revision reach stdout. For later verification use
@@ -52,6 +70,10 @@ actual resources or URLs from the names/placeholders below.
    boundary still belongs to the account owner. Render currently lists Singapore
    but no Mumbai region. This staging exception is [DM-018](../../docs/DECISIONS.md#dm-018--render-staging-provider-qualification).
    The production Cloud Run Mumbai decision is unchanged.
+   Blueprint creation starts an initial deploy before the secret file can be
+   added. Treat that attempt as unready; attach the certificate and deploy again.
+   Do not infer readiness from resource creation or cancel a queued attempt
+   using a stale selected deployment row. Record the exact deployment ID/revision.
 7. Add a Render secret file `supabase-root.crt` with the project certificate.
    Set `DM_DATABASE_URL` to the **runtime** connection URL with
    `sslrootcert=/etc/secrets/supabase-root.crt`. Enter the prompted values below
@@ -92,6 +114,21 @@ flutter run --dart-define-from-file=../../.tools/staging/mobile.json
 ```
 
 ## Provider qualification and safe evidence
+
+The continuation accepted one real request for each owner-designated inbox A/B,
+but mailbox receipt and verified identity are still unqualified. A 200 request
+response does not establish that the alias is a distinct verified identity or
+that it needs no team invitation. Do not substitute uncontrolled addresses.
+
+Before more qualification, restore dashboard/operator access and finish the
+historical credential audit: earlier provisioning sent a plaintext role password
+in DDL on a project with DDL logging enabled. The fixed provisioner sends only
+SCRAM verifiers; it does not remove historical logs or rotate existing secrets
+automatically. Inspect aggregate counts/log settings, never raw query text or
+passwords; rotate staging runtime credentials through protected operator input,
+update Render `DM_DATABASE_URL`, and rerun readiness/RLS. Keep access to logs and
+SCRAM verifiers restricted. If retention/purge requires provider support, record
+that boundary rather than claiming logs are clean.
 
 Use two owner-controlled **staging test inboxes**, A and B, without personal
 training data. With default Supabase email delivery, recipients must be authorized
@@ -135,7 +172,9 @@ with pending work, sign-out locking and A→B→A recovery. Disable only a delib
 selected synthetic staging account through a separate operator action and prove
 server denial; do not expose a public administrator route. Record rollback-only
 hosted RLS probe results separately from Flutter HTTP behavior and physical-device
-qualification. Until these run, hosted OTP/sync/RLS evidence remains **unperformed**.
+qualification. Hosted rollback-only database RLS/owner/pool probes have passed;
+authenticated hosted Flutter sync and OTP lifecycle remain **unperformed** until
+real credentials and mailbox evidence exist.
 
 Record: UTC/local date, project/API URLs, actual Supabase/Render regions and plans,
 PostgreSQL version, Alembic revision, API deployed commit, HTTPS/readiness/auth

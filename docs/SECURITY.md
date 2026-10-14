@@ -84,9 +84,20 @@ pooler uses port 5432; transaction-pooler compatibility is not silently assumed.
 Readiness rejects unready grants/schema or privileged roles. Database errors are
 sanitized and engine parameters hidden; provider/browser snapshots and real
 `.env.*` are excluded from version control. Provisioning never prints passwords.
-These are locally tested controls, not hosted/TLS/SMTP qualification. Render
+Hosted staging TLS/runtime/RLS setup is now verified separately in
+[the evidence](IMPLEMENTATION.md); SMTP, real identity lifecycle and device
+protection remain unqualified. Render
 Singapore staging crosses regions relative to Supabase Mumbai under DM-018;
 no India-only processing is claimed.
+
+The staging operator now generates SCRAM-SHA-256 password verifiers with libpq
+before executing role DDL. Plaintext passwords never enter that SQL, even when
+the server default is MD5; real PostgreSQL creation/rotation/login tests audit the
+driver boundary. Verifiers remain sensitive. Disable client SQL/exception output
+and restrict provider logs; client parameter hiding alone cannot protect server
+DDL logs. Earlier provisioning used plaintext password DDL: historical hosted
+log/statistics inspection and staging credential rotation remain required, and
+are not claimed complete while protected operator access is unavailable.
 
 The connected spike supports an explicitly configured **public** verification key
 for a synthetic signed ES256 test issuer. Signature, issuer, audience, expiry and
