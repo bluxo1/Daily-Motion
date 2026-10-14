@@ -105,6 +105,9 @@ def provision(admin: Engine, runtime_password: str) -> None:
                 ).format(sql.Identifier(ROLE))
             )
             cursor.execute(
+                sql.SQL("GRANT USAGE ON SCHEMA public TO {}").format(sql.Identifier(ROLE))
+            )
+            cursor.execute(
                 sql.SQL("GRANT SELECT ON public.alembic_version TO {}").format(sql.Identifier(ROLE))
             )
             for name in ("PUBLIC", "anon", "authenticated", "service_role"):
@@ -134,6 +137,14 @@ def verify_isolation(runtime: Engine) -> dict[str, object]:
         try:
             assert_runtime_role(session)
             session.execute(text("SELECT set_config('app.owner_id', '', true)"))
+            try:
+                revisions = session.scalars(
+                    text("SELECT version_num FROM public.alembic_version")
+                ).all()
+            except SQLAlchemyError:
+                raise ValueError("Runtime migration metadata is unavailable") from None
+            if revisions != [HEAD]:
+                raise ValueError("Runtime migration metadata does not match the staging target")
             if session.scalar(text("SELECT count(*) FROM training.owner_state")) != 0:
                 raise ValueError("Missing owner context did not fail closed")
             for owner in (first, second):
@@ -182,7 +193,7 @@ def verify_isolation(runtime: Engine) -> dict[str, object]:
         ):
             raise ValueError("Pooled owner context leaked")
     return {
-        "migration_revision": HEAD,
+        "migration_revision": revisions[0],
         "training_tables": 11,
         "forced_rls": True,
         "owner_isolation": True,

@@ -109,6 +109,54 @@ def test_readiness_uses_runtime_role_and_does_not_mutate_accounts(
     assert response.json() == {"detail": {"code": "database_unavailable"}}
 
 
+@pytest.mark.parametrize("fault", ["revision", "grant"])
+def test_runtime_probe_checks_actual_migration_metadata(
+    database: Engine, admin_engine: Engine, fault: str
+) -> None:
+    password = "synthetic-runtime-metadata-probe-password-32-characters"
+    provision(admin_engine, password)
+    runtime = create_engine(admin_engine.url.set(username=ROLE, password=password))
+    try:
+        with admin_engine.begin() as connection:
+            if fault == "revision":
+                connection.execute(text("UPDATE public.alembic_version SET version_num='0002'"))
+            else:
+                connection.execute(text("REVOKE SELECT ON public.alembic_version FROM " + ROLE))
+        with pytest.raises(ValueError, match="migration metadata"):
+            verify_isolation(runtime)
+        with admin_engine.connect() as connection:
+            assert connection.scalar(text("SELECT count(*) FROM training.owner_state")) == 0
+    finally:
+        runtime.dispose()
+        with admin_engine.begin() as connection:
+            connection.execute(text("UPDATE public.alembic_version SET version_num='0003'"))
+            connection.execute(text("DROP OWNED BY " + ROLE))
+            connection.execute(text("DROP ROLE " + ROLE))
+
+
+def test_provision_grants_metadata_access_with_restricted_public_schema(
+    database: Engine, admin_engine: Engine
+) -> None:
+    password = "synthetic-runtime-schema-probe-password-32-characters"
+    with admin_engine.begin() as connection:
+        connection.execute(text("REVOKE USAGE ON SCHEMA public FROM PUBLIC"))
+    runtime = None
+    try:
+        provision(admin_engine, password)
+        runtime = create_engine(admin_engine.url.set(username=ROLE, password=password))
+        with runtime.connect() as connection:
+            assert (
+                connection.scalar(text("SELECT version_num FROM public.alembic_version")) == "0003"
+            )
+    finally:
+        if runtime is not None:
+            runtime.dispose()
+        with admin_engine.begin() as connection:
+            connection.execute(text("GRANT USAGE ON SCHEMA public TO PUBLIC"))
+            connection.execute(text("DROP OWNED BY " + ROLE))
+            connection.execute(text("DROP ROLE " + ROLE))
+
+
 def test_database_error_response_does_not_log_or_return_sql_payload(
     monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
