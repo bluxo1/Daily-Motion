@@ -890,3 +890,47 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
 - Delivery/verification/distinct A/B/authenticated hosted sync/refresh/account
   switching remain **unqualified**. Restore provider/inbox access and confirm
   SMTP/templates before continuing. No new ADR or completed Phase 0 gate.
+
+## 2026-10-15 — Merged baseline, native audit confirms credential retention
+
+- PR #2 was normally merged to `main` **9669fa2**, retaining original commit dates;
+  the old remote qualification branch was deleted. Continued on new branch
+  `phase0-hosted-auth-2026-10-15`. Configuration repair **69b929e** is committed and
+  pushed: Render blueprint tracks `main`; runbook requires independently checking
+  Blueprint/service branches and fresh runtime connections after rotation. Actual
+  hosted branch settings were not changed. Last observed deployment **8e5af65**.
+- Native Brave/Supabase access recovered via the cached GitHub session. A real
+  aggregate-only hosted statistics query confirmed **2 role statements / 2
+  plaintext-password statements** for the staging runtime role. No credential or
+  historical query text returned. Historical Render application/deploy logs remain
+  uninspected in this continuation. **Rotation has not occurred.**
+- Browser keyboard input reports `window_not_focused` even after the supported
+  restoration attempt. Asked the operator to foreground Brave; stop focus retries
+  until that action. No provider credential/environment/deployment changed and no
+  fresh OTP requested. Resume: review logs without secret output, rotate affected
+  credentials using fixed SCRAM code, update Render secrets, close old sessions,
+  verify fresh restricted role/RLS/pool/reset/readiness; then SMTP/template/inbox
+  inspection and actual A/B qualification. Do not paste codes or secrets in chat.
+  The unused temporary operator context was cleared, its process exited and its
+  localhost listener is absent; create a fresh protected context when input works.
+- Full ordinary Flutter **148 passed / 10 skipped / 198 s**, including three hard
+  OS kills; hosted case **0 executed / 1 skipped**. Python was serialized around
+  Flutter: **103 passed / 1 deselected / 40.61 s**, then connected case **1 passed /
+  28.86 s** with **9 live Flutter HTTP cases**. Combined **104 Python / 56 real
+  PostgreSQL**, **157 distinct Flutter**; dedicated local test database only.
+  Ruff format/lint, strict mypy, Dart format and official Render schema pass.
+  Current three test logs have **0 JWT-shaped values** (not provider-log clearance).
+- Analyze clean **57.0 s**, Dart format **53 / 0 changes**; clean Drift rebuild
+  **55 s / 105 outputs**, all **four artifacts byte-identical**. Docs **30 files /
+  303 links / 5 JSON examples**, **3 standalone evidence JSON**; native guards,
+  **205 source files / 0 credential findings**, whitespace checks pass. The first
+  cached Drift run wrote nothing; forced clean regeneration provided actual proof.
+- Hosted public checks **6/6**, after one unclassified warm-up read timeout. No
+  delivery, verification, refresh, distinct A/B identities or authenticated hosted
+  sync is qualified. SMTP/templates have not been re-observed. Actual source CI
+  [38665949212](https://github.com/bluxo1/Daily-Motion/actions/runs/38665949212)
+  passed all three jobs on **69b929e**: API **104 / 0 skipped / 19.49 s**,
+  Linux/Mac each **148 / 10 skipped**, Android all modes/routine study and unsigned
+  iOS debug/release. Evidence-only follow-up skips duplicate CI after local checks.
+  No Phase 0 gate/ADR change
+  or Phase 1 work. All previously open physical/provider/operator gates remain.

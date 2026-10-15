@@ -10,8 +10,9 @@ resources are staging only. [Evidence](../../docs/evidence/phase0-hosted-staging
 
 **Email/account/sync qualification remains blocked**: A/B controlled inboxes are
 now designated and both real requests returned HTTP 200, without claiming delivery
-or verified distinct identities. Mailbox access and restored dashboard control
-are required; the live dashboard requires custom SMTP before
+or verified distinct identities. Native Supabase dashboard access was restored,
+but keyboard input requires the operator to foreground Brave; mailbox access
+remains unavailable. The last observed dashboard requires custom SMTP before
 subjects/bodies can be edited. Six-digit
 OTP and 600-second expiry are configured; prepared code templates remain unapplied.
 The free project has **no managed backups**; plan/restore qualification is open.
@@ -123,7 +124,7 @@ but mailbox receipt and verified identity are still unqualified. A 200 request
 response does not establish that the alias is a distinct verified identity or
 that it needs no team invitation. Do not substitute uncontrolled addresses.
 
-Before more qualification, restore dashboard/operator access and finish the
+Before more qualification, restore reliable operator input and finish the
 historical credential audit: earlier provisioning sent a plaintext role password
 in DDL on a project with DDL logging enabled. The fixed provisioner sends only
 SCRAM verifiers; it does not remove historical logs or rotate existing secrets
@@ -136,6 +137,8 @@ Verify a fresh runtime connection, owner isolation and pooled owner-context rese
 a readiness response from an old connection pool alone does not prove rotation.
 Keep access to logs and SCRAM verifiers restricted. If retention/purge requires
 provider support, record that boundary rather than claiming logs are clean.
+[PostgreSQL connection authentication](https://www.postgresql.org/docs/17/auth-pg-hba-conf.html),
+[session termination controls](https://www.postgresql.org/docs/17/functions-admin.html#FUNCTIONS-ADMIN-SIGNAL).
 
 Use two owner-controlled **staging test inboxes**, A and B, without personal
 training data. With default Supabase email delivery, recipients must be authorized

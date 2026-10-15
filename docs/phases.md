@@ -10,11 +10,16 @@ verified identity/refresh/sync and historical credential-log audit/rotation rema
 operator boundaries. Client-side SCRAM provisioning is fixed in `6606db0`, with
 104 Python / 56 PostgreSQL and 148 Flutter + 9 live HTTP local tests passing.
 
-The 2026-10-15 hosted-auth checkpoint remains blocked before fresh OTP requests:
-restore protected dashboard/inbox control, confirm SMTP/code templates, finish
-historical credential-log inspection and rotation, then reverify hosted runtime
-isolation. Existing local operator suite **25 passed**; hosted Flutter **0 executed /
-1 skipped**. No additional Phase 0 checkbox is closed by this checkpoint.
+The 2026-10-15 continuation restored native Supabase dashboard access. An
+aggregate-only hosted query confirmed **2 historical runtime-role statements
+containing plaintext password literals**; no password/query payload was returned.
+Credential rotation is **not yet performed**. Native browser input then reported
+`window_not_focused` even after restoration, requiring a manual foreground change.
+No fresh OTP request is permitted before rotation, Render secret update and fresh
+runtime/RLS verification. SMTP/templates, inbox access and authenticated hosted
+Flutter qualification remain open. The checked blueprint now tracks `main` after
+PR #2 merged/deleted the old branch; existing provider branch settings have not
+been verified or changed. No additional Phase 0 checkbox is closed.
 
 ## Phase summary
 
@@ -47,7 +52,7 @@ isolation. Existing local operator suite **25 passed**; hosted Flutter **0 execu
 - [x] Compile unsigned iOS debug/release on hosted macOS and Android debug/profile/release on Linux through actual remote CI; this proves compilation only.
 - [ ] Install/run signed iOS on hardware; qualify physical Android/iPhone process loss, reboot, suspension, clock/timezone changes, disk-write failures, backup/restoration and native Keychain/protected storage.
 - [ ] Qualify hardware VoiceOver/TalkBack, native keyboard/back/sheets, large text and reduced motion; desktop widget semantics complement rather than close this gate.
-- [x] Run published remote CI for Linux/PostgreSQL/Android and macOS/iOS; all three jobs passed on `b8968ca`, `a27dfdd`, audit/runner recovery `46f5d5a`, staging preparation `ef025c2` (run 38570967779), deployed `8e5af65` (run 38587594908) and operator SCRAM fix `6606db0` (run 38611404742, attempt 2). This does not qualify hosted provider behavior.
+- [x] Run published remote CI for Linux/PostgreSQL/Android and macOS/iOS; all three jobs passed on `b8968ca`, `a27dfdd`, audit/runner recovery `46f5d5a`, staging preparation `ef025c2` (run 38570967779), deployed `8e5af65` (run 38587594908), operator SCRAM fix `6606db0` (run 38611404742, attempt 2) and merged-branch repair `69b929e` (run 38665949212). This does not qualify hosted provider behavior.
 - [x] Establish CI security basics: credential scan, synthetic-auth release rejection, logging hygiene and per-transaction restricted-role/forced-RLS validation; real PostgreSQL rejects privileged/owner-member roles and missing RLS policies.
 - [x] Exercise actual Android emulator protected session/SQLite seed, external force-stop/recover and full caller debug benchmark mechanics; retain raw evidence and exclude this from physical qualification.
 - [ ] Provision operator-managed Android/iOS signing and qualify signed installations; no store-ready signing is claimed.
@@ -55,7 +60,7 @@ isolation. Existing local operator suite **25 passed**; hosted Flutter **0 execu
 - [x] Complete public-source region feasibility and backup/processor prerequisite desk review: published Mumbai availability, backup/object/custom-role limits and current DPA/subprocessor source inventory. This is not live project, restore or legal/provider qualification.
 - [x] Prepare the requested Supabase/Render staging deployment, separate Alembic/runtime-role setup, verified TLS/readiness guards, OTP template and credential-gated Flutter qualification harness. Local preparation is distinct from hosting evidence.
 - [x] Select/configure the actual Mumbai Supabase staging project, deploy Render Singapore, apply Alembic 0003 and verify hosted restricted-role/forced RLS, owner/pool isolation, TLS/readiness and public auth/contract denial. Actual deployment `8e5af65` and [hosted evidence](evidence/phase0-hosted-staging-2026-10-14.json); no personal data or admin credentials on the API/mobile app.
-- [ ] Run real OTP/refresh/account/sync/restart qualification with controlled inboxes. A/B inboxes are designated and both real requests returned HTTP 200; mailbox delivery, verified distinct identities and authenticated hosted tests remain unproven. The provider requires custom SMTP before editing code templates; dashboard access must be restored. Historical credential-log inspection/rotation and managed backup/restore qualification remain open. [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification) records the staging hosting exception.
+- [ ] Run real OTP/refresh/account/sync/restart qualification with controlled inboxes. A/B inboxes are designated and both earlier real requests returned HTTP 200; mailbox delivery, verified distinct identities and authenticated hosted tests remain unproven. Supabase dashboard access was restored, but native input needs manual foreground focus; SMTP/code templates have not been re-observed. Two historical plaintext-password statements are confirmed by counts only. Rotation, Render log inspection/secret update/branch retargeting and fresh runtime verification remain open before further OTP tests. Managed backup/restore qualification remains open. [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification) records the staging hosting exception.
 
 All remaining Phase 0 rows require external hardware, provider, signing or operator/reviewer resources. Full public routine features, conflict-resolution UI, export/deletion jobs, production retention/restore operations and long-history release qualification remain Phase 1 work under the roadmap; their foundation safety primitives above are exercised. This scope clarification does not close physical Phase 0 acceptance or reduce any public-release requirement.
 

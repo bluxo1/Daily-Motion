@@ -52,8 +52,13 @@ DDL uses client-generated SCRAM verifiers. Latest local regressions pass **104
 Python / 56 PostgreSQL**, **148 Flutter / 10 skipped**, plus **9 live HTTP cases**.
 The [new CI run](https://github.com/bluxo1/Daily-Motion/actions/runs/38611404742)
 passed **all three jobs** after rerunning a pub.dev dependency-setup HTTP 403.
-Historical hosted credential-log inspection/rotation and real inbox verification
-require restored protected provider access. The deployed API remains `8e5af65`.
+The continued native Supabase audit confirmed **two retained plaintext-password
+statements**, using counts only. Rotation is still required before fresh OTP
+tests; browser input currently needs a manual foreground focus change. Real
+inbox/SMTP and authenticated hosted sync remain unqualified. The last observed
+deployed API remains `8e5af65`. The checked Render blueprint now tracks `main`
+after PR #2; existing hosted branch settings still need verification. See the
+[staging runbook](infra/staging/README.md) for the protected recovery procedure.
 
 ## Repository
 

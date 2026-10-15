@@ -1,6 +1,7 @@
 # Phase 0 evidence reconciliation
 
-Audited 2026-10-15 (IST) on `phase0-qualification-2026-10-13`.
+Audited 2026-10-15 (IST); continuation on `phase0-hosted-auth-2026-10-15`
+from merged `main` (`9669fa2`).
 [ROADMAP.md](ROADMAP.md) remains the scope authority. This matrix distinguishes
 implemented foundation work from its separate physical/provider acceptance.
 [IMPLEMENTATION.md](IMPLEMENTATION.md) records commands, counts and environments;
@@ -39,16 +40,41 @@ reachable. Free-plan managed backups are absent. Real OTP/SMTP, verified-account
 initialization, refresh and authenticated Flutter sync remain unperformed.
 The owner designated controlled A/B inboxes; both real email-auth requests returned
 HTTP 200. This proves request acceptance, not delivery or verified distinct owners.
-Mailbox access, SMTP code templates and restored provider-dashboard access are
-required. The resumed session cannot inspect hosted historical role-password
-logs/statistics or rotate credentials; that operator check remains explicit.
+Mailbox access and SMTP code templates remain required. Initial provider access
+was unavailable at the earlier checkpoint below; the later native dashboard audit
+confirmed historical credential retention without retrieving credential values.
 
 **2026-10-15 qualification checkpoint:** provider/browser and mailbox control are
-still absent; SMTP/template readiness has not been re-observed. The prerequisite
+absent at **00:04 IST**; SMTP/template readiness has not been re-observed. The prerequisite
 log inspection/rotation/reverification therefore blocks new OTP or authenticated
 sync attempts. Existing local staging checks **25/25 pass**; the hosted Flutter
 harness explicitly reports **0 executed / 1 skipped**. No delivery, verification,
 distinct-identity, custom-SMTP or hosted account-switch evidence was invented.
+
+**2026-10-15 continuation:** native Supabase dashboard access was restored through
+the existing GitHub session. An aggregate-only query of hosted query statistics
+returned **2 role statements / 2 plaintext-password statements** for the staging
+runtime role. No credential or raw historical query text was returned. Rotation
+has **not** occurred; no fresh OTP was requested. Browser keyboard input then
+failed with `window_not_focused` after restoration; manual foreground focus is
+required. Render deploy/application log review, credential rotation/secret update,
+fresh runtime verification, SMTP/templates and inbox access remain open. Public
+HTTPS checks passed **6/6** after one warm-up read timeout; they do not prove
+rotation, email delivery or authenticated hosted synchronization.
+
+Committed configuration repair **69b929e** replaces the deleted qualification
+branch with `main` in the Render blueprint. The runbook requires checking both
+Blueprint source and linked service branches, replacing old database sessions
+after rotation, and verifying a fresh restricted connection. Hosted settings have
+not been changed. No product/protocol feature or acceptance gate changed.
+See the [continuation evidence](evidence/phase0-hosted-auth-2026-10-15.json) for
+separate observed, unperformed and blocked results.
+Actual [CI run 38665949212](https://github.com/bluxo1/Daily-Motion/actions/runs/38665949212)
+passed all three jobs on `69b929e`: **104 Python / 0 skipped**, Linux/Mac each
+**148 Flutter / 10 skipped**, Android all modes and unsigned iOS debug/release.
+Local serialized execution again covered **104 Python / 56 PostgreSQL**, **148
+ordinary Flutter + 9 live loopback cases** and four identical generated artifacts.
+This does not qualify real hosted OTP/sync or physical hardware.
 
 Source `8e5af65` passed all three jobs in
 [actual run 38587594908](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908):
