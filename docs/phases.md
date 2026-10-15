@@ -1,6 +1,6 @@
 # Implementation phases
 
-Updated: 2026-10-15 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
+Updated: 2026-10-16 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
 
 **Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, interaction prototypes, Windows fault tests and native qualification harnesses are implemented. All three remote Linux/PostgreSQL/Android and macOS unsigned iOS jobs passed on `46f5d5a` after earlier `b8968ca`/`a27dfdd` proof; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope and the resolved ARM64 runner allocation failure. The [audited evidence matrix](PHASE0_EVIDENCE.md) reconciles foundation completion with the separate external acceptance. Hosted OTP/SMTP, managed-provider/operator review, signing, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
 
@@ -20,6 +20,13 @@ text or verifier was returned and no purge is claimed. SMTP was re-observed **of
 code templates remain locked/unapplied. The actual service branch is `main`, while
 Blueprint source-branch verification remains separate. Real OTP/inbox/refresh and
 authenticated hosted Flutter gates remain open.
+
+On 2026-10-16 the operator reports SMTP configured. Saved SMTP and code-template
+verification remain pending because native browser navigation returns
+`window_not_focused`, including a supported restore attempt; manual foreground
+focus was requested. No fresh OTP request or delivery/identity claim is made.
+Public HTTPS checks again pass **6/6**; Auth settings return **200** with email
+authentication enabled. These do not close SMTP or authenticated-sync acceptance.
 
 ## Phase summary
 
@@ -46,7 +53,7 @@ authenticated hosted Flutter gates remain open.
 - [x] Connect foreground Flutter HTTP push/pull/bootstrap to verified test authentication and restricted PostgreSQL; prove receipt, branch, erasure and cursor safety on desktop databases.
 - [x] Exercise foundation Drift version 1→3 and 2→3 upgrades with frozen outbox, active workout, timer and draft preserved; test file reopening in pending/conflict/bootstrap/cursor/deletion states.
 - [x] Connect the supported Supabase email OTP/refresh API to awaited platform-secure session persistence, verified idempotent application-account initialization and owner-scoped local unlocking; prove expiry/refresh failure, sign-out, restart, stale completions and A → B → A isolation on desktop SQLite/PostgreSQL.
-- [ ] Qualify real hosted Supabase/custom SMTP/inbox delivery, rate limits, revocation and trusted signing-key rotation. Staging project/publishable-key configuration is verified; controlled inbox access and SMTP code-template configuration remain unavailable.
+- [ ] Qualify real hosted Supabase/custom SMTP/inbox delivery, rate limits, revocation and trusted signing-key rotation. Staging project/publishable-key configuration is verified. SMTP is operator-reported configured on 2026-10-16; saved configuration/code templates and controlled inbox access still require verification.
 - [x] Prepare native storage/recovery and full caller durable-save benchmark entrypoints; compile Android debug/profile and exercise unconfigured startup on a Windows Android emulator, without claiming physical-device evidence.
 - [x] Exercise hard Windows process kills before/during/after real SQLite commits, SQLite capacity failure, additive schema 2→3 timer migration and controlled monotonic/clock-change recovery.
 - [x] Compile unsigned iOS debug/release on hosted macOS and Android debug/profile/release on Linux through actual remote CI; this proves compilation only.
@@ -60,7 +67,7 @@ authenticated hosted Flutter gates remain open.
 - [x] Complete public-source region feasibility and backup/processor prerequisite desk review: published Mumbai availability, backup/object/custom-role limits and current DPA/subprocessor source inventory. This is not live project, restore or legal/provider qualification.
 - [x] Prepare the requested Supabase/Render staging deployment, separate Alembic/runtime-role setup, verified TLS/readiness guards, OTP template and credential-gated Flutter qualification harness. Local preparation is distinct from hosting evidence.
 - [x] Select/configure the actual Mumbai Supabase staging project, deploy Render Singapore, apply Alembic 0003 and verify hosted restricted-role/forced RLS, owner/pool isolation, TLS/readiness and public auth/contract denial. Initial deployment `8e5af65`; continued **c5d5414 / dep-db8efpon74is73epb8ng** passes after actual credential rotation, protected provider read-back and fresh-connection probes. See [hosted evidence](evidence/phase0-hosted-staging-2026-10-14.json) and [rotation evidence](evidence/phase0-hosted-rotation-2026-10-15.json). No personal workout data or admin credentials on the API/mobile app.
-- [ ] Run real OTP/refresh/account/sync/restart qualification with controlled inboxes. A/B inboxes are designated and both earlier real requests returned HTTP 200; delivery, verified distinct identities and authenticated hosted tests remain unproven. Credential rotation/log inspection/runtime verification are performed; retained legacy statistics were not purged. Custom SMTP is off and code templates are locked, pending protected operator configuration and inbox access. Blueprint source-branch and managed backup/restore qualification remain open. [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification) records the staging hosting exception.
+- [ ] Run real OTP/refresh/account/sync/restart qualification with controlled inboxes. A/B inboxes are designated and both earlier real requests returned HTTP 200; delivery, verified distinct identities and authenticated hosted tests remain unproven. Credential rotation/log inspection/runtime verification are performed; retained legacy statistics were not purged. The operator reports SMTP configured; native saved-setting/template verification currently needs manual browser focus, then controlled inbox access. Blueprint source-branch and managed backup/restore qualification remain open. [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification) records the staging hosting exception.
 
 All remaining Phase 0 rows require external hardware, provider, signing or operator/reviewer resources. Full public routine features, conflict-resolution UI, export/deletion jobs, production retention/restore operations and long-history release qualification remain Phase 1 work under the roadmap; their foundation safety primitives above are exercised. This scope clarification does not close physical Phase 0 acceptance or reduce any public-release requirement.
 

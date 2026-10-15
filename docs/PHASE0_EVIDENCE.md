@@ -1,6 +1,6 @@
 # Phase 0 evidence reconciliation
 
-Audited 2026-10-15 (IST); continuation on `phase0-hosted-auth-2026-10-15`
+Audited through 2026-10-16 (IST); continuation on `phase0-hosted-auth-2026-10-15`
 from merged `main` (`9669fa2`).
 [ROADMAP.md](ROADMAP.md) remains the scope authority. This matrix distinguishes
 implemented foundation work from its separate physical/provider acceptance.
@@ -101,6 +101,21 @@ configuration is requested in the protected provider page; **0 new OTP requests,
 0 deliveries/verified accounts and 0 authenticated hosted Flutter cases** are
 claimed. Existing deployed-source CI **38710259066** is green in all three jobs
 and was rechecked, not rerun. No physical/provider gate or ADR changed.
+
+**2026-10-16 continuation:** the operator reports custom SMTP configured. This
+does not contradict the dated off-state above or establish delivery. Native
+browser navigation returns `window_not_focused`, including a supported restore
+attempt; manual foreground focus was requested. Saved SMTP and subject/body
+activation remain unverified. No fresh OTP request was sent before those checks;
+delivered/verified identities and executed authenticated hosted Flutter cases
+remain **0**. No provider credential was requested or exposed.
+
+Fresh public HTTPS checks pass **6/6**, after two warm-up read timeouts. The actual
+Auth settings endpoint returns **200**, email auth enabled, using the four-key
+client-safe staging configuration. These are public/configuration checks, not
+SMTP, refresh, A/B switching or authenticated hosted-sync proof. Current
+regression and boundary evidence is recorded in
+[the continuation checkpoint](evidence/phase0-hosted-auth-2026-10-16.json).
 
 Source `8e5af65` passed all three jobs in
 [actual run 38587594908](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908):

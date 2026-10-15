@@ -1025,3 +1025,31 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   Flutter case skipped until real inbox delivery and verified identities are
   available. Existing deployed-source CI was rechecked, not rerun; the current
   changes record operational evidence and strengthen the staging rotation runbook.
+
+## 2026-10-16, 04:45 IST — SMTP reported configured; native verification blocked
+
+- Continued the existing PR branch from **d16eb71**. The owner reports SMTP
+  configured in staging. Keep that report distinct from observed saved settings,
+  active code templates, actual delivery and verified identity; none is newly
+  proven. Do not repeat the prior off-state as a current observation.
+- Native Brave navigation returns `window_not_focused`, including its supported
+  restore attempt. Requested manual foreground focus and the controlled Gmail
+  inbox. No screenshots, raw provider snapshots, OTP requests or secret entry
+  occurred. Do not retry window restoration in a loop or ask for OTPs in chat.
+- Public hosted checks **6/6 pass**, after **2 warm-up read timeouts**; real Auth
+  settings **200**, email auth enabled, four-key client-safe staging config valid.
+  Previous hosted rotation/RLS remains separate; no new authenticated DB probe.
+- Fresh local results: **104 Python / 0 skipped / 75.59 s**, independently collected
+  **56 PostgreSQL** cases; **148 Flutter passed / 10 skipped / 0 failed / 03:47**,
+  plus **9 live loopback Flutter** cases (**157 distinct executed**). Actual hosted
+  case still **0 executed / 1 skipped**. Ruff **33**, strict mypy **13**, native
+  guards pass; current test logs have **0 JWT-shaped values**.
+- Dart format **53 / 0 changed**, analyze **0 issues / 54.5 s**. No new remote CI
+  or artifact regeneration; application/generated source is unchanged. Corrected
+  the security note to distinguish completed rotation from retained historical
+  statements; no purge claim or policy change.
+- Docs **30 / 309 links / 5 JSON examples**, **5 standalone evidence JSON**,
+  credential guard **207 / 0 findings** and whitespace checks pass.
+- Next: verify saved SMTP and both relevant code templates, establish actual
+  controlled inbox delivery, verify A/B, then run hosted credentials through the
+  existing Flutter harness. No app/protocol change, new ADR or Phase 0 gate closed.

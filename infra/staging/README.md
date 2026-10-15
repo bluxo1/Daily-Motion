@@ -11,12 +11,14 @@ PostgreSQL **17.11**, Alembic **0003**, restricted runtime,
 resources are staging only. [Evidence](../../docs/evidence/phase0-hosted-staging-2026-10-14.json).
 
 **Email/account/sync qualification remains blocked**: A/B controlled inboxes are
-now designated and both real requests returned HTTP 200, without claiming delivery
-or verified distinct identities. Native Supabase dashboard access is restored;
-mailbox access remains unqualified. Custom SMTP was re-observed **off** on
-2026-10-15, and the dashboard requires it before
-subjects/bodies can be edited. Six-digit
-OTP and 600-second expiry are configured; prepared code templates remain unapplied.
+now designated and both earlier real requests returned HTTP 200, without claiming delivery
+or verified distinct identities. The operator reports custom SMTP configured on
+**2026-10-16**. Saved settings and code-template activation have not been verified:
+native navigation currently returns `window_not_focused`, including its supported
+restore attempt, and controlled mailbox access is not established. The previous
+2026-10-15 observation was SMTP off with template editing locked. Six-digit
+OTP and 600-second expiry were verified previously; prepared template application
+has not been reverified after the reported SMTP configuration.
 The free project has **no managed backups**; plan/restore qualification is open.
 
 ## Provisioning order

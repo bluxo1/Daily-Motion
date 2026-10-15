@@ -95,9 +95,11 @@ before executing role DDL. Plaintext passwords never enter that SQL, even when
 the server default is MD5; real PostgreSQL creation/rotation/login tests audit the
 driver boundary. Verifiers remain sensitive. Disable client SQL/exception output
 and restrict provider logs; client parameter hiding alone cannot protect server
-DDL logs. Earlier provisioning used plaintext password DDL: historical hosted
-log/statistics inspection and staging credential rotation remain required, and
-are not claimed complete while protected operator access is unavailable.
+DDL logs. Earlier provisioning used plaintext password DDL. The bounded hosted
+audit and affected staging credential rotation were performed on 2026-10-15,
+including saved-secret read-back and fresh restricted-runtime verification. Two
+legacy plaintext statements remain retained; neither historical purge nor
+comprehensive log clearance is claimed. See [the operational evidence](IMPLEMENTATION.md).
 
 The connected spike supports an explicitly configured **public** verification key
 for a synthetic signed ES256 test issuer. Signature, issuer, audience, expiry and

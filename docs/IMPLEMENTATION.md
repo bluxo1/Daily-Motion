@@ -1272,3 +1272,59 @@ exited successfully and its localhost listener was absent. Actual saved
 credentials remain in provider storage. Documentation-only changes are
 committed separately from the already-green deployed source; no new remote CI or
 physical-device evidence is inferred.
+
+### Hosted SMTP continuation — 2026-10-16
+
+Continued on `phase0-hosted-auth-2026-10-15` from **d16eb71**, preserving the
+current PR and all application/protocol source. The operator reports staging SMTP
+configured. That report is separate from saved-setting, template and actual
+delivery qualification: the last successful native observation on 2026-10-15
+was SMTP off with code-template editing locked.
+
+The current Brave window was identified without screenshots. Native navigation
+returns **`window_not_focused`**, including a supported restore attempt. Manual
+foreground focus and the controlled Gmail inbox were requested; no credentials
+or codes were requested in chat. No repeated restore loop was used, and no raw
+provider snapshot was printed or retained. Saved SMTP configuration and active
+subject/body remain unverified.
+**No fresh OTP request was sent before those prerequisite checks.**
+
+Fresh real public HTTPS checks pass **6/6** after **2 warm-up read timeouts** and
+a successful third warm-up. The real Supabase Auth settings endpoint returns
+**200**, with email auth enabled. The ignored Flutter configuration contains
+exactly four client-safe staging keys and a publishable key. This proves neither
+email delivery nor authenticated account/sync behavior. No hosted role/credential
+change or new authenticated hosted database probe occurred in this continuation;
+the previous rotation/RLS evidence above remains separate.
+
+Windows regressions rerun against the dedicated local Docker PostgreSQL **17.7**:
+
+- **104 Python passed / 0 skipped / 75.59 s**, with **56 actual PostgreSQL cases**
+  independently collected and **9 separate live loopback Flutter HTTP cases**.
+- Ordinary Flutter **148 passed / 10 skipped / 0 failed**, runner elapsed
+  **03:47**, serialized. Combined with the loopback cases, **157 distinct Flutter
+  cases executed**. Slow startup progressed to a passing run; no test failure is
+  hidden. The credential-gated hosted case remains **0 executed / 1 skipped**.
+- Ruff format/lint **33 files**, strict mypy **13 source files** and native
+  configuration guards pass. Current Python/Flutter test logs contain **0
+  JWT-shaped values**; no comprehensive provider-log clearance is inferred.
+- Dart format **53 files / 0 changed**, Flutter analyze **0 issues / 54.5 s**.
+  Application/generated source is unchanged; four-output reproduction was not
+  rerun in this documentation-only continuation. No new remote CI was launched.
+- Docs validate **30 Markdown files / 309 local links / 5 fenced JSON examples**;
+  all **5 standalone evidence JSON** parse. Credential guard **207 files / 0
+  findings**, whitespace checks pass.
+
+Confirmed inbox deliveries **0**, successful OTP verifications **0**, verified
+distinct A/B identities **0**, real account initializations **0**, hosted Flutter
+sync/refresh/sign-out/account-switch qualifications **0**. Wrong-code, resend,
+expiry and hosted idempotency/isolation exercises await real provider access and
+credentials. Local regression coverage is not substituted for these results.
+No new functional defect, architectural decision, Phase 1 work or Phase 0 exit
+claim. See [the continuation evidence](evidence/phase0-hosted-auth-2026-10-16.json).
+
+Immediate next action is manual foreground access to the saved Supabase SMTP
+page and controlled inbox, followed by code-template verification and actual
+delivery/verification. Hardware, signing, native protected-storage/backup,
+accessibility, phone lifecycle/storage/p95, managed restore and operator/reviewer
+acceptance remain open. SMTP is reported configured, not declared absent.
