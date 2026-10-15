@@ -1185,3 +1185,90 @@ hosted Flutter harness. Hardware/signing/secure storage/backup/accessibility/pho
 lifecycle/physical p95, managed backup/restore and reviewer/store gates remain open.
 No new ADR; DM-018 and the production hosting decision are unchanged. Phase 0 is
 not complete and Phase 1 has not started.
+
+### Hosted rotation, saved-secret defect and recovery — 2026-10-15
+
+The prerequisite credential work is now applied to the actual Mumbai staging
+database. A fresh generated administrator password was verified over TLS, and the
+fixed client-SCRAM provisioner rotated the runtime role without exposing password
+or verifier values. A credential supplied insecurely during the session was
+replaced; neither that value nor its replacement appears in repository evidence.
+Administrator credentials remain absent from Render and Flutter.
+
+The initial native entry/save action did **not** prove the matching value was
+persisted in Render. Protected inspection found correct driver/role/host/TLS
+metadata but actual PostgreSQL credential rejection. Explicit deployment
+**dep-db8e3s8n74is73eo7000**, source **c5d5414**, built and started but failed
+readiness. Two bounded public warm-up runs each had **5 read timeouts**; those
+failed runs are retained without claiming every timeout has an established cause.
+
+A protected read-back after another save/reload still differed from the active
+rotation. Focusing the exact value field, entering through stdin, triggering its
+normal blur, saving and reloading fixed persistence. Protected comparison then
+returned **full URL match = true / password match = true**, and the secret display
+was hidden again. Only then was the runtime credential applied. This is an
+operator/configuration defect and repair, with no application/protocol change.
+The runbook now requires provider-persisted comparison before database rotation.
+
+At **14:49:22 UTC**, explicit retry **dep-db8efpon74is73epb8ng** started on
+**c5d5414fef28a4a5170d605b61d878797786acbd**. It reached **Live** with startup
+and internal readiness passing. This main revision adds only the separately
+merged contributor guide to 9669fa2; that work was inspected and preserved.
+All three jobs in its existing [CI run 38710259066](https://github.com/bluxo1/Daily-Motion/actions/runs/38710259066)
+were rechecked successful, not rerun. PR #3's configuration/evidence branch remains
+open and was not merged here. The actual service branch is `main`; Blueprint
+source-branch verification remains separate from that observation.
+
+By **14:51:45 UTC**:
+
+- Two runtime-session closure operations each terminated **1 connection**.
+  A fresh restricted connection after final closure passed **Alembic 0003, all
+  11 forced-RLS tables, owner isolation and pooled owner-context reset**. Across
+  this continuation, **3 new hosted probes passed**, each rolling its synthetic
+  work back. No destructive local pytest fixture targeted the hosted database.
+- Public HTTPS checks passed **6/6**, with first warm-up returning **200**:
+  health/readiness, missing/malformed auth, wrong signature using an actual public
+  key identifier, and unsupported contract. This does not independently qualify
+  valid-signature wrong issuer/audience or revoked-user behavior on hosting.
+- Aggregate statistics reported **4 runtime-role statements: 2 legacy plaintext
+  and 2 new SCRAM**; the stored runtime verifier is SCRAM and `log_statement=ddl`.
+  No historical query text/verifier was returned. Four available historical Render
+  deployment views and a seven-day application view showed no matches for the
+  checked credential patterns. **No purge or comprehensive log clearance claimed.**
+- The ignored Flutter configuration contains exactly **4 client-safe keys**;
+  its publishable key reaches real Auth settings with **200**. No mobile token,
+  database, administrator or signing secret was added.
+
+Custom SMTP was re-observed **off**. The Magic-link/OTP template explicitly says
+custom SMTP is required before editing its subject/body; prepared code templates
+remain unapplied. The operator was asked to configure a staging sender directly
+in Supabase, without sharing credentials in chat. No new OTP request, inbox receipt,
+code verification, distinct A/B identity, refresh or authenticated hosted Flutter
+case has been qualified. These remain the immediate external boundary.
+
+The evidence is [recorded separately](evidence/phase0-hosted-rotation-2026-10-15.json)
+from the earlier unrotated checkpoint. Real provider configuration, prior failures
+and eventual recovery are distinguished from desktop tests. No new ADR, Phase 1
+feature or Phase 0 completion claim.
+
+Validation rerun on Windows with Flutter **3.47.7 / Dart 3.13.5**, Python **3.13.14**
+and the dedicated local Docker PostgreSQL **17.7** database:
+
+| Check | Exact result |
+|---|---|
+| Full Python with connected harness enabled | **104 passed / 0 skipped / 79.95 s**, including **56 real PostgreSQL cases** independently collected and **9 actual loopback Flutter HTTP cases** |
+| Full ordinary Flutter, serialized | **148 passed / 10 skipped / 0 failed / 133 s**; **157 distinct Flutter cases executed** when combined with the separate HTTP cases |
+| Real SQLite recovery | All **55 retained cases** remain in the passing suite, including **3 hard Windows process kills**; hosted case remains **0 executed / 1 skipped** |
+| Static checks | Dart format **53 / 0 changes**, analyze **0 issues / 53.1 s**; Ruff format/lint **33 files** and strict mypy **13 source files** pass |
+| Generated artifacts | OpenAPI, DTO, limits and Drift reproduce **all 4 byte-for-byte**; clean Drift build **72 s / 105 outputs** |
+| Docs/security | **30 Markdown / 306 local links / 5 fenced JSON**, **4 standalone evidence JSON**, native guards, **206 source files / 0 credential findings**, whitespace checks pass |
+| Captured test-output scan | **0 JWT-shaped values** in both current test logs; this is not provider-log clearance |
+
+An earlier native diagnostic screenshot captured an occluding window. That
+generated file was removed; subsequent sensitive provider checks used protected
+helpers with screenshots disabled. No private content is reproduced in evidence.
+At **15:18 UTC**, the temporary operator context acknowledged shutdown, its process
+exited successfully and its localhost listener was absent. Actual saved
+credentials remain in provider storage. Documentation-only changes are
+committed separately from the already-green deployed source; no new remote CI or
+physical-device evidence is inferred.

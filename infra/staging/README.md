@@ -4,15 +4,17 @@ Requested Phase 0 provider qualification target, deployed **2026-10-14**:
 Supabase `daily-motion-staging`, Mumbai `ap-south-1`, project
 `pulruylvpehwftwqcvct`; Render `daily-motion-staging-api`, Singapore, both free
 plans. API [HTTPS readiness](https://daily-motion-staging-api.onrender.com/readyz)
-passed on `8e5af65`. PostgreSQL **17.11**, Alembic **0003**, restricted runtime,
+passed again on **`c5d5414`**, deployment **`dep-db8efpon74is73epb8ng`**, after
+credential rotation and protected saved-value verification on **2026-10-15**.
+PostgreSQL **17.11**, Alembic **0003**, restricted runtime,
 11 forced-RLS tables and rolled-back owner/pool probes are verified. These
 resources are staging only. [Evidence](../../docs/evidence/phase0-hosted-staging-2026-10-14.json).
 
 **Email/account/sync qualification remains blocked**: A/B controlled inboxes are
 now designated and both real requests returned HTTP 200, without claiming delivery
-or verified distinct identities. Native Supabase dashboard access was restored,
-but keyboard input requires the operator to foreground Brave; mailbox access
-remains unavailable. The last observed dashboard requires custom SMTP before
+or verified distinct identities. Native Supabase dashboard access is restored;
+mailbox access remains unqualified. Custom SMTP was re-observed **off** on
+2026-10-15, and the dashboard requires it before
 subjects/bodies can be edited. Six-digit
 OTP and 600-second expiry are configured; prepared code templates remain unapplied.
 The free project has **no managed backups**; plan/restore qualification is open.
@@ -124,13 +126,30 @@ but mailbox receipt and verified identity are still unqualified. A 200 request
 response does not establish that the alias is a distinct verified identity or
 that it needs no team invitation. Do not substitute uncontrolled addresses.
 
-Before more qualification, restore reliable operator input and finish the
-historical credential audit: earlier provisioning sent a plaintext role password
+The prerequisite historical audit found that earlier provisioning sent a plaintext role password
 in DDL on a project with DDL logging enabled. The fixed provisioner sends only
 SCRAM verifiers; it does not remove historical logs or rotate existing secrets
 automatically. Inspect aggregate counts/log settings, never raw query text or
-passwords; rotate staging runtime credentials through protected operator input,
-update Render `DM_DATABASE_URL`, and rerun readiness/RLS. Password changes do not
+passwords. Rotation was applied on 2026-10-15; **two legacy plaintext statements
+remain retained**, while the two new role statements use SCRAM. No historical
+purge or comprehensive log clearance is claimed. For subsequent rotations:
+
+1. Generate credentials in a protected operator process. Enter only the runtime
+   URL into Render. Keep administrator credentials off the service/mobile app.
+2. Focus the exact value field before entry and trigger its normal blur. A native
+   set-value call or closed save form is insufficient evidence: this qualification
+   found a saved credential that still differed and was rejected by PostgreSQL.
+3. Save and reload the provider page. Compare the saved URL/password to the current
+   rotation **inside the protected process**, returning only equality booleans.
+   Hide the field afterward. Never capture screenshots, export it to ordinary
+   logs, or include its value in CLI arguments.
+4. Apply the fixed SCRAM provisioner, verify a fresh restricted connection and
+   rollback-only isolation probe, then deploy the exact tested API revision.
+5. Verify the actual deployment reaches Live and HTTPS readiness passes. Keep the
+   protected context alive until recovery is proven; an interrupted/expired
+   context must not be replaced by recovering secrets from process memory/logs.
+
+Password changes do not
 invalidate already authenticated database sessions: replace the API process and
 close old runtime-role sessions through protected provider/operator controls.
 Verify a fresh runtime connection, owner isolation and pooled owner-context reset;

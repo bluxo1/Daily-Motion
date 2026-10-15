@@ -50,14 +50,17 @@ gates remain open; exact scope is recorded in the implementation evidence.
 The continued operator-security fix is committed as `6606db0`: runtime password
 DDL uses client-generated SCRAM verifiers. Latest local regressions pass **104
 Python / 56 PostgreSQL**, **148 Flutter / 10 skipped**, plus **9 live HTTP cases**.
-The [new CI run](https://github.com/bluxo1/Daily-Motion/actions/runs/38611404742)
-passed **all three jobs** after rerunning a pub.dev dependency-setup HTTP 403.
-The continued native Supabase audit confirmed **two retained plaintext-password
-statements**, using counts only. Rotation is still required before fresh OTP
-tests; browser input currently needs a manual foreground focus change. Real
-inbox/SMTP and authenticated hosted sync remain unqualified. The last observed
-deployed API remains `8e5af65`. The checked Render blueprint now tracks `main`
-after PR #2; existing hosted branch settings still need verification. See the
+The deployed source's [existing CI run](https://github.com/bluxo1/Daily-Motion/actions/runs/38710259066)
+passed **all three jobs**; its status was rechecked rather than rerun.
+The hosted audit confirmed **two retained historical plaintext-password
+statements**, using counts only. Affected staging credentials are now rotated;
+Render's saved runtime secret was verified after reload and a new process passed
+readiness, restricted-role/RLS and owner/pool checks. Deployment **`c5d5414`** is
+live, with **6/6 public checks passing**. Historical statistics were not purged.
+Real inbox/SMTP and authenticated hosted sync remain unqualified: custom SMTP is
+off and Supabase locks code-template editing until it is configured. The checked
+blueprint and actual service branch target `main`; Blueprint source-branch
+verification is separate. See the
 [staging runbook](infra/staging/README.md) for the protected recovery procedure.
 
 ## Repository

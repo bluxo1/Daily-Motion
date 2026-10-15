@@ -30,7 +30,8 @@ with a scoped [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualificatio
 hosting decision. [Deployment preparation](../infra/staging/README.md), role/
 migration verification and the real-credential Flutter harness are implemented.
 Provider dashboard login enabled initial provisioning. The existing empty Mumbai project was selected
-and named `daily-motion-staging`; Render Singapore is live on `8e5af65`. Hosted
+and named `daily-motion-staging`; Render Singapore initially deployed `8e5af65`
+and now runs **c5d5414** after the verified rotation/recovery below. Hosted
 Alembic `0003`, 11 forced-RLS tables, actual restricted-role owner/pool probes,
 runtime readiness, denied provider-role training grants and six public HTTPS/auth/
 contract checks pass. See [hosted evidence](evidence/phase0-hosted-staging-2026-10-14.json).
@@ -76,6 +77,31 @@ Local serialized execution again covered **104 Python / 56 PostgreSQL**, **148
 ordinary Flutter + 9 live loopback cases** and four identical generated artifacts.
 This does not qualify real hosted OTP/sync or physical hardware.
 
+**Later 2026-10-15 recovery:** affected staging credentials were rotated using
+the fixed provisioner. A protected saved-setting check first reproduced actual
+credential rejection, then a mismatch after save/reload. Focused field entry and
+normal blur fixed persistence; protected comparison after reload proved the saved
+URL/password matched the current rotation before applying it. The first deployment
+failed readiness; explicit retry **dep-db8efpon74is73epb8ng / c5d5414** is **Live**.
+After terminating the remaining runtime session, a fresh connection again passed
+**0003 / 11 forced-RLS / owner isolation / pooled context reset**, and public HTTPS
+checks passed **6/6**. Three new rollback-only hosted probes passed across the
+continuation; no personal workout/account data was seeded.
+
+Aggregate audit is now **4 role statements: 2 retained legacy plaintext and 2 new
+SCRAM**, with a SCRAM runtime verifier. Four available historical Render deployment
+views and the seven-day application view had no matches for the checked credential
+patterns; this is bounded inspection, not comprehensive log clearance or purge.
+The current four-key client configuration reaches actual Auth settings (200).
+See [rotation evidence](evidence/phase0-hosted-rotation-2026-10-15.json).
+
+SMTP was re-observed **off**; Supabase explicitly locks subject/body editing until
+custom SMTP is configured. Prepared code templates remain unapplied. Operator
+configuration is requested in the protected provider page; **0 new OTP requests,
+0 deliveries/verified accounts and 0 authenticated hosted Flutter cases** are
+claimed. Existing deployed-source CI **38710259066** is green in all three jobs
+and was rechecked, not rerun. No physical/provider gate or ADR changed.
+
 Source `8e5af65` passed all three jobs in
 [actual run 38587594908](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908):
 **102 Python**, including **54 PostgreSQL** cases; **148 ordinary Flutter passed/
@@ -90,7 +116,8 @@ match. Two new real database attacks fail before/pass after the fix. The initial
 Flutter full run had one worker-boundary timeout; three isolated kill cases and
 the full serial repeat passed. [IMPLEMENTATION.md](IMPLEMENTATION.md) retains the
 failed run and current CI attempt, rather than suppressing failures. Historical
-hosted credential-log inspection/rotation remains a protected operator boundary.
+hosted rotation was subsequently applied as documented above; retained historical
+statistics remain unpurged.
 
 Staging preparation source `ef025c2` passed all three jobs in
 [actual CI run 38570967779](https://github.com/bluxo1/Daily-Motion/actions/runs/38570967779):

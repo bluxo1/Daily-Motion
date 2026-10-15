@@ -4,22 +4,22 @@ Updated: 2026-10-15 (IST). This is the execution checklist for the accepted plan
 
 **Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, interaction prototypes, Windows fault tests and native qualification harnesses are implemented. All three remote Linux/PostgreSQL/Android and macOS unsigned iOS jobs passed on `46f5d5a` after earlier `b8968ca`/`a27dfdd` proof; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope and the resolved ARM64 runner allocation failure. The [audited evidence matrix](PHASE0_EVIDENCE.md) reconciles foundation completion with the separate external acceptance. Hosted OTP/SMTP, managed-provider/operator review, signing, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
 
-Mumbai Supabase / Singapore Render **staging is now live on `8e5af65`**, with real
-TLS/RLS/readiness evidence. Both controlled inbox requests returned 200; delivery,
-verified identity/refresh/sync and historical credential-log audit/rotation remain
-operator boundaries. Client-side SCRAM provisioning is fixed in `6606db0`, with
+Mumbai Supabase / Singapore Render **staging is live on `c5d5414`**, with real
+TLS/RLS/readiness evidence after credential rotation. Both earlier controlled inbox
+requests returned 200; delivery and verified identity/refresh/sync remain open.
+Client-side SCRAM provisioning is fixed in `6606db0` and applied to hosting, with
 104 Python / 56 PostgreSQL and 148 Flutter + 9 live HTTP local tests passing.
 
-The 2026-10-15 continuation restored native Supabase dashboard access. An
-aggregate-only hosted query confirmed **2 historical runtime-role statements
-containing plaintext password literals**; no password/query payload was returned.
-Credential rotation is **not yet performed**. Native browser input then reported
-`window_not_focused` even after restoration, requiring a manual foreground change.
-No fresh OTP request is permitted before rotation, Render secret update and fresh
-runtime/RLS verification. SMTP/templates, inbox access and authenticated hosted
-Flutter qualification remain open. The checked blueprint now tracks `main` after
-PR #2 merged/deleted the old branch; existing provider branch settings have not
-been verified or changed. No additional Phase 0 checkbox is closed.
+The 2026-10-15 continuation rotated affected credentials, verified Render's saved
+value after reload, deployed **dep-db8efpon74is73epb8ng**, closed remaining runtime
+connections and passed fresh **0003 / 11 forced-RLS / owner/pool** probes plus
+**6/6 public HTTPS checks**. An earlier saved-value mismatch and failed readiness
+deployment were reproduced and repaired. The aggregate audit retains **2 legacy
+plaintext statements**, alongside **2 new SCRAM statements**; no historical query
+text or verifier was returned and no purge is claimed. SMTP was re-observed **off**;
+code templates remain locked/unapplied. The actual service branch is `main`, while
+Blueprint source-branch verification remains separate. Real OTP/inbox/refresh and
+authenticated hosted Flutter gates remain open.
 
 ## Phase summary
 
@@ -59,8 +59,8 @@ been verified or changed. No additional Phase 0 checkbox is closed.
 - [ ] Confirm managed backup/recovery and processor arrangements; commission a named India privacy/security reviewer and developer/store accounts. Actual staging Mumbai region is verified; the free project has no managed backups, and restore/contract/reviewer/store acceptance remains unavailable. Preparation is in [the operator handoff](../infra/QUALIFICATION.md).
 - [x] Complete public-source region feasibility and backup/processor prerequisite desk review: published Mumbai availability, backup/object/custom-role limits and current DPA/subprocessor source inventory. This is not live project, restore or legal/provider qualification.
 - [x] Prepare the requested Supabase/Render staging deployment, separate Alembic/runtime-role setup, verified TLS/readiness guards, OTP template and credential-gated Flutter qualification harness. Local preparation is distinct from hosting evidence.
-- [x] Select/configure the actual Mumbai Supabase staging project, deploy Render Singapore, apply Alembic 0003 and verify hosted restricted-role/forced RLS, owner/pool isolation, TLS/readiness and public auth/contract denial. Actual deployment `8e5af65` and [hosted evidence](evidence/phase0-hosted-staging-2026-10-14.json); no personal data or admin credentials on the API/mobile app.
-- [ ] Run real OTP/refresh/account/sync/restart qualification with controlled inboxes. A/B inboxes are designated and both earlier real requests returned HTTP 200; mailbox delivery, verified distinct identities and authenticated hosted tests remain unproven. Supabase dashboard access was restored, but native input needs manual foreground focus; SMTP/code templates have not been re-observed. Two historical plaintext-password statements are confirmed by counts only. Rotation, Render log inspection/secret update/branch retargeting and fresh runtime verification remain open before further OTP tests. Managed backup/restore qualification remains open. [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification) records the staging hosting exception.
+- [x] Select/configure the actual Mumbai Supabase staging project, deploy Render Singapore, apply Alembic 0003 and verify hosted restricted-role/forced RLS, owner/pool isolation, TLS/readiness and public auth/contract denial. Initial deployment `8e5af65`; continued **c5d5414 / dep-db8efpon74is73epb8ng** passes after actual credential rotation, protected provider read-back and fresh-connection probes. See [hosted evidence](evidence/phase0-hosted-staging-2026-10-14.json) and [rotation evidence](evidence/phase0-hosted-rotation-2026-10-15.json). No personal workout data or admin credentials on the API/mobile app.
+- [ ] Run real OTP/refresh/account/sync/restart qualification with controlled inboxes. A/B inboxes are designated and both earlier real requests returned HTTP 200; delivery, verified distinct identities and authenticated hosted tests remain unproven. Credential rotation/log inspection/runtime verification are performed; retained legacy statistics were not purged. Custom SMTP is off and code templates are locked, pending protected operator configuration and inbox access. Blueprint source-branch and managed backup/restore qualification remain open. [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification) records the staging hosting exception.
 
 All remaining Phase 0 rows require external hardware, provider, signing or operator/reviewer resources. Full public routine features, conflict-resolution UI, export/deletion jobs, production retention/restore operations and long-history release qualification remain Phase 1 work under the roadmap; their foundation safety primitives above are exercised. This scope clarification does not close physical Phase 0 acceptance or reduce any public-release requirement.
 
