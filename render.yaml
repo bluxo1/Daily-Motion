@@ -6,7 +6,7 @@ services:
     region: singapore
     plan: free
     repo: https://github.com/bluxo1/Daily-Motion
-    branch: phase0-qualification-2026-10-13
+    branch: main
     rootDir: services/api
     autoDeployTrigger: "off"
     buildCommand: pip install uv==0.13.0 && uv sync --frozen --no-dev
