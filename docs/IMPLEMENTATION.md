@@ -1328,3 +1328,22 @@ page and controlled inbox, followed by code-template verification and actual
 delivery/verification. Hardware, signing, native protected-storage/backup,
 accessibility, phone lifecycle/storage/p95, managed restore and operator/reviewer
 acceptance remain open. SMTP is reported configured, not declared absent.
+
+### Browser reattachment after manual foreground — 2026-10-16, 18:49 IST
+
+The operator confirmed Brave foregrounded on the staging SMTP page and controlled
+Gmail signed in. The previous window reference had expired; read-only discovery
+identified the current window and refreshed the ignored qualification helper.
+Observation succeeded, but its first navigation attempt returned
+**`window_not_focused`**. The current Windows bridge explicitly reports
+**`supports.windows.focus=false`**. No restore attempt or further browser action
+followed that error, as instructed.
+
+No credential rotation, database re-verification, OTP request, inbox/code read or
+token handling was repeated. Saved SMTP/templates, delivery, verified distinct
+A/B identities and authenticated hosted Flutter/sync remain **unproven**. This
+attempt adds a browser-control diagnostic, not hosted-auth qualification. The
+manual foreground report did not restore usable automation; the browser-control
+connection needs repair before continuing. Application/protocol source is
+unchanged, so the earlier regression results above are retained without rerunning
+or relabeling them as new results. No Phase 0 gate or ADR changed.

@@ -1053,3 +1053,18 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
 - Next: verify saved SMTP and both relevant code templates, establish actual
   controlled inbox delivery, verify A/B, then run hosted credentials through the
   existing Flutter harness. No app/protocol change, new ADR or Phase 0 gate closed.
+
+## 2026-10-16, 18:49 IST — Foreground confirmed; input bridge still blocked
+
+- Owner confirmed Brave on staging SMTP and controlled Gmail signed in. The old
+  window ID was stale; read-only discovery and a fresh inspection recovered the
+  current reference. The first navigation still returned `window_not_focused`.
+  Current Windows bridge reports `supports.windows.focus=false`.
+- Stopped browser actions immediately, with **no restore attempt**. Do not ask
+  for another identical foreground retry or silently rerun rotation/database
+  verification. The browser-control connection needs repair before real provider
+  qualification can proceed.
+- New hosted-auth proof **none**: no request, delivery/code read, verification,
+  distinct A/B identity or authenticated Flutter case. No secret handling occurred.
+  Earlier regression results remain historical; application/protocol source is
+  unchanged. No Phase 0 checkbox or ADR changed; Phase 1 remains unstarted.

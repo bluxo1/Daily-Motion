@@ -117,6 +117,15 @@ SMTP, refresh, A/B switching or authenticated hosted-sync proof. Current
 regression and boundary evidence is recorded in
 [the continuation checkpoint](evidence/phase0-hosted-auth-2026-10-16.json).
 
+**2026-10-16, 18:49 IST reattachment:** the operator confirmed manual foreground
+and signed-in Gmail. After refreshing a stale browser-window reference, the first
+navigation still returned `window_not_focused`; the current bridge advertises
+`supports.windows.focus=false`. Browser actions stopped immediately without a
+restore attempt. No rotation/database verification, new OTP request, inbox/code
+read, authenticated harness case or hosted-auth result was added. Repair of the
+browser-control connection remains the immediate boundary; SMTP is still
+reported configured and its saved settings/templates remain unverified.
+
 Source `8e5af65` passed all three jobs in
 [actual run 38587594908](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908):
 **102 Python**, including **54 PostgreSQL** cases; **148 ordinary Flutter passed/
