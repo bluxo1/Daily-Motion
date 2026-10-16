@@ -890,3 +890,181 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
 - Delivery/verification/distinct A/B/authenticated hosted sync/refresh/account
   switching remain **unqualified**. Restore provider/inbox access and confirm
   SMTP/templates before continuing. No new ADR or completed Phase 0 gate.
+
+## 2026-10-15 — Merged baseline, native audit confirms credential retention
+
+- PR #2 was normally merged to `main` **9669fa2**, retaining original commit dates;
+  the old remote qualification branch was deleted. Continued on new branch
+  `phase0-hosted-auth-2026-10-15`. Configuration repair **69b929e** is committed and
+  pushed: Render blueprint tracks `main`; runbook requires independently checking
+  Blueprint/service branches and fresh runtime connections after rotation. Actual
+  hosted branch settings were not changed. Last observed deployment **8e5af65**.
+- Native Brave/Supabase access recovered via the cached GitHub session. A real
+  aggregate-only hosted statistics query confirmed **2 role statements / 2
+  plaintext-password statements** for the staging runtime role. No credential or
+  historical query text returned. Historical Render application/deploy logs remain
+  uninspected in this continuation. **Rotation has not occurred.**
+- Browser keyboard input reports `window_not_focused` even after the supported
+  restoration attempt. Asked the operator to foreground Brave; stop focus retries
+  until that action. No provider credential/environment/deployment changed and no
+  fresh OTP requested. Resume: review logs without secret output, rotate affected
+  credentials using fixed SCRAM code, update Render secrets, close old sessions,
+  verify fresh restricted role/RLS/pool/reset/readiness; then SMTP/template/inbox
+  inspection and actual A/B qualification. Do not paste codes or secrets in chat.
+  The unused temporary operator context was cleared, its process exited and its
+  localhost listener is absent; create a fresh protected context when input works.
+- Full ordinary Flutter **148 passed / 10 skipped / 198 s**, including three hard
+  OS kills; hosted case **0 executed / 1 skipped**. Python was serialized around
+  Flutter: **103 passed / 1 deselected / 40.61 s**, then connected case **1 passed /
+  28.86 s** with **9 live Flutter HTTP cases**. Combined **104 Python / 56 real
+  PostgreSQL**, **157 distinct Flutter**; dedicated local test database only.
+  Ruff format/lint, strict mypy, Dart format and official Render schema pass.
+  Current three test logs have **0 JWT-shaped values** (not provider-log clearance).
+- Analyze clean **57.0 s**, Dart format **53 / 0 changes**; clean Drift rebuild
+  **55 s / 105 outputs**, all **four artifacts byte-identical**. Docs **30 files /
+  303 links / 5 JSON examples**, **3 standalone evidence JSON**; native guards,
+  **205 source files / 0 credential findings**, whitespace checks pass. The first
+  cached Drift run wrote nothing; forced clean regeneration provided actual proof.
+- Hosted public checks **6/6**, after one unclassified warm-up read timeout. No
+  delivery, verification, refresh, distinct A/B identities or authenticated hosted
+  sync is qualified. SMTP/templates have not been re-observed. Actual source CI
+  [38665949212](https://github.com/bluxo1/Daily-Motion/actions/runs/38665949212)
+  passed all three jobs on **69b929e**: API **104 / 0 skipped / 19.49 s**,
+  Linux/Mac each **148 / 10 skipped**, Android all modes/routine study and unsigned
+  iOS debug/release. Evidence-only follow-up skips duplicate CI after local checks.
+  No Phase 0 gate/ADR change
+  or Phase 1 work. All previously open physical/provider/operator gates remain.
+
+## 2026-10-15, 19:54 IST — Rotation applied; Render deployment in progress
+
+- At **09:16:47 UTC**, a fresh TLS administrator connection verified a newly
+  rotated staging database administrator password. At **09:24:18 UTC**, the fixed
+  SCRAM provisioner rotated the restricted runtime credential and verified hosted
+  **0003 / 11 forced-RLS tables / owner isolation / pooled owner reset** with its
+  synthetic probe fully rolled back. No password/verifier was printed or committed.
+- A replacement runtime URL was entered in Render's protected `DM_DATABASE_URL`
+  field; the save form closed, but correct persistence was not yet verified.
+  The next checkpoint records the failed read-back and repair. **One old runtime database connection was
+  terminated.** Render's linked service branch was observed as `main`; Blueprint
+  source-branch verification remains separate. Four available deployment log
+  views plus the seven-day application-log view had no matches for the checked
+  credential patterns. This is a bounded inspection, not historical-log purge.
+- The user interrupted before deployment was confirmed. The temporary operator
+  context has since expired; its localhost listener is absent. Do not try to
+  recover passwords from process memory, query history or chat. New credential
+  material remains in provider storage. No OTP request was sent.
+- On continuation, five bounded `/healthz` warm-up probes timed out; cause is not
+  established and service recovery is not yet proven. Native desktop focus was
+  changing during pointer actions; avoid background pointer input. One supported
+  focus restoration after a new focus error recovered the Render menu.
+- At **14:24:43 UTC**, Render showed **Building** for explicit deployment
+  **dep-db8e3s8n74is73eo7000**, revision **c5d5414fef28a4a5170d605b61d878797786acbd**.
+  All three jobs in existing main CI **38710259066** were rechecked successful.
+  This main revision adds only the separately merged contributor guide to 9669fa2;
+  that work is preserved. Local PR #3 remains open (now marked ready by the owner),
+  with configuration/evidence commits **69b929e / d15c1da**; it was not merged here.
+- **Next:** confirm this exact Render deployment reaches Live and `/readyz`
+  succeeds on the new process, then inspect actual Supabase SMTP/code templates
+  and controlled inbox access before real A/B OTP/refresh/hosted Flutter tests.
+  No real delivery, verified identity or hosted-auth qualification is claimed.
+
+## 2026-10-15, 20:21 IST — Saved-credential defect repaired; staging recovered
+
+- The protected saved-setting check proved valid URL/role/host/TLS metadata but
+  actual **credential rejection**. First deployment **dep-db8e3s8n74is73eo7000**
+  failed readiness. Two bounded public warm-up runs each had five read timeouts;
+  do not attribute every timeout to a proven cause or suppress those failed runs.
+- A fresh generated administrator credential was verified after an operator
+  credential was shared insecurely; no supplied/replacement value is recorded.
+  Keep replacements in provider storage, never chat/source/logs. The first Render
+  save/read-back still did **not** match the current rotation. Focusing the exact
+  value field before entry, triggering its normal blur, saving and reloading fixed
+  persistence. Protected comparison then proved both full URL and password match;
+  the displayed secret was hidden again. Only then was runtime rotation applied.
+- At **14:44:34 UTC**, the fixed SCRAM provisioner passed the actual hosted
+  **0003 / 11 forced RLS / owner isolation / pooled reset / rolled-back probe**.
+  At **14:49:22 UTC**, explicit retry **dep-db8efpon74is73epb8ng** started on
+  CI-green **c5d5414**. It reached **Live**, with startup and readiness passing.
+- At **14:51:45 UTC**, one remaining runtime session had been terminated and a
+  fresh restricted probe again passed. Public HTTPS checks passed **6/6**, with
+  first warm-up returning 200. Aggregate audit: **4 runtime-role statements = 2
+  retained historical plaintext + 2 new SCRAM**, stored runtime verifier is SCRAM,
+  `log_statement=ddl`. No historical query text or verifier returned; no purge
+  claimed. The two session-closure operations each terminated one connection.
+- Real SMTP UI is **off**. Magic-link/OTP template says custom SMTP is required
+  to edit subject/body; prepared code templates remain unapplied. Asked the owner
+  to configure SMTP directly in the provider page without pasting credentials.
+  No fresh OTP request, inbox receipt, verified A/B account, refresh or authenticated
+  hosted Flutter qualification is claimed. Client-safe four-key configuration and
+  its real Auth settings request pass (200). Regression results follow separately.
+
+- Final regressions: **104 Python / 0 skipped / 79.95 s**, independently collected
+  **56 real PostgreSQL** cases, including **9 live loopback Flutter**. Ordinary
+  Flutter **148 passed / 10 skipped / 0 failed / 133 s**, yielding **157 distinct
+  executed Flutter cases**. All **55 retained SQLite recovery** cases and **3 hard
+  OS kills** remain covered. Actual hosted auth case is still **0 executed / 1 skipped**.
+- Format **53 Dart / 33 Python**, analyze **0 issues / 53.1 s**, Ruff and strict
+  mypy **13 files** pass. Four generated outputs reproduce byte-for-byte; clean
+  Drift **72 s / 105 outputs**. Docs **30 / 306 local links / 5 JSON examples**,
+  **4 evidence JSON**, native guards, **206 source files / 0 credential findings**
+  and whitespace pass. Current Python/Flutter logs contain **0 JWT-shaped values**.
+- One native diagnostic screenshot caught an occluding window; its generated file
+  was removed. Sensitive provider operations subsequently used protected
+  no-screenshot helpers. No unrelated content is reproduced in repository evidence.
+  Next human boundary is actual SMTP setup in Supabase, then controlled inbox/code
+  templates and real hosted qualification. No ADR or Phase 1 change.
+
+## 2026-10-15, 20:48 IST — Operator context cleared; provider boundary preserved
+
+- Protected operator shutdown returned `cleared`, the process exited successfully
+  and its localhost listener was absent. No replacement credential is retained in
+  ordinary application configuration, repository evidence or this memory file.
+  Runtime credentials are saved in Render; administrator credentials stay off the
+  service and mobile app.
+- SMTP setup remains the next operator action. Keep the credential-gated hosted
+  Flutter case skipped until real inbox delivery and verified identities are
+  available. Existing deployed-source CI was rechecked, not rerun; the current
+  changes record operational evidence and strengthen the staging rotation runbook.
+
+## 2026-10-16, 04:45 IST — SMTP reported configured; native verification blocked
+
+- Continued the existing PR branch from **d16eb71**. The owner reports SMTP
+  configured in staging. Keep that report distinct from observed saved settings,
+  active code templates, actual delivery and verified identity; none is newly
+  proven. Do not repeat the prior off-state as a current observation.
+- Native Brave navigation returns `window_not_focused`, including its supported
+  restore attempt. Requested manual foreground focus and the controlled Gmail
+  inbox. No screenshots, raw provider snapshots, OTP requests or secret entry
+  occurred. Do not retry window restoration in a loop or ask for OTPs in chat.
+- Public hosted checks **6/6 pass**, after **2 warm-up read timeouts**; real Auth
+  settings **200**, email auth enabled, four-key client-safe staging config valid.
+  Previous hosted rotation/RLS remains separate; no new authenticated DB probe.
+- Fresh local results: **104 Python / 0 skipped / 75.59 s**, independently collected
+  **56 PostgreSQL** cases; **148 Flutter passed / 10 skipped / 0 failed / 03:47**,
+  plus **9 live loopback Flutter** cases (**157 distinct executed**). Actual hosted
+  case still **0 executed / 1 skipped**. Ruff **33**, strict mypy **13**, native
+  guards pass; current test logs have **0 JWT-shaped values**.
+- Dart format **53 / 0 changed**, analyze **0 issues / 54.5 s**. No new remote CI
+  or artifact regeneration; application/generated source is unchanged. Corrected
+  the security note to distinguish completed rotation from retained historical
+  statements; no purge claim or policy change.
+- Docs **30 / 309 links / 5 JSON examples**, **5 standalone evidence JSON**,
+  credential guard **207 / 0 findings** and whitespace checks pass.
+- Next: verify saved SMTP and both relevant code templates, establish actual
+  controlled inbox delivery, verify A/B, then run hosted credentials through the
+  existing Flutter harness. No app/protocol change, new ADR or Phase 0 gate closed.
+
+## 2026-10-16, 18:49 IST — Foreground confirmed; input bridge still blocked
+
+- Owner confirmed Brave on staging SMTP and controlled Gmail signed in. The old
+  window ID was stale; read-only discovery and a fresh inspection recovered the
+  current reference. The first navigation still returned `window_not_focused`.
+  Current Windows bridge reports `supports.windows.focus=false`.
+- Stopped browser actions immediately, with **no restore attempt**. Do not ask
+  for another identical foreground retry or silently rerun rotation/database
+  verification. The browser-control connection needs repair before real provider
+  qualification can proceed.
+- New hosted-auth proof **none**: no request, delivery/code read, verification,
+  distinct A/B identity or authenticated Flutter case. No secret handling occurred.
+  Earlier regression results remain historical; application/protocol source is
+  unchanged. No Phase 0 checkbox or ADR changed; Phase 1 remains unstarted.

@@ -50,10 +50,19 @@ gates remain open; exact scope is recorded in the implementation evidence.
 The continued operator-security fix is committed as `6606db0`: runtime password
 DDL uses client-generated SCRAM verifiers. Latest local regressions pass **104
 Python / 56 PostgreSQL**, **148 Flutter / 10 skipped**, plus **9 live HTTP cases**.
-The [new CI run](https://github.com/bluxo1/Daily-Motion/actions/runs/38611404742)
-passed **all three jobs** after rerunning a pub.dev dependency-setup HTTP 403.
-Historical hosted credential-log inspection/rotation and real inbox verification
-require restored protected provider access. The deployed API remains `8e5af65`.
+The deployed source's [existing CI run](https://github.com/bluxo1/Daily-Motion/actions/runs/38710259066)
+passed **all three jobs**; its status was rechecked rather than rerun.
+The hosted audit confirmed **two retained historical plaintext-password
+statements**, using counts only. Affected staging credentials are now rotated;
+Render's saved runtime secret was verified after reload and a new process passed
+readiness, restricted-role/RLS and owner/pool checks. Deployment **`c5d5414`** is
+live, with **6/6 public checks passing**. Historical statistics were not purged.
+Real inbox/SMTP and authenticated hosted sync remain unqualified. The operator
+reports SMTP configured on 2026-10-16; saved settings and code templates still
+need native verification, currently blocked by browser focus. The checked
+blueprint and actual service branch target `main`; Blueprint source-branch
+verification is separate. See the
+[staging runbook](infra/staging/README.md) for the protected recovery procedure.
 
 ## Repository
 
@@ -139,12 +148,13 @@ database/RLS-aware `/readyz` check. Copy only the four client-safe values from
 [the mobile example](infra/staging/mobile.example.json) into an ignored staging
 configuration file. Staging is deployed: Supabase Mumbai
 `https://pulruylvpehwftwqcvct.supabase.co`, Render Singapore
-`https://daily-motion-staging-api.onrender.com`, revision `8e5af65`, Alembic `0003`.
+`https://daily-motion-staging-api.onrender.com`, last verified revision `c5d5414`, Alembic `0003`.
 Hosted readiness, restricted role/forced RLS and public authentication-denial
 checks pass. No real OTP/SMTP or authenticated hosted sync result is claimed:
 the two controlled inboxes are now designated and both real email-auth requests
 returned HTTP 200, but delivery/verification and custom SMTP remain unqualified.
-The observed dashboard requires SMTP before applying the prepared code templates.
+The operator now reports SMTP configured; saved templates, actual inbox delivery
+and verified identities still require qualification.
 See [hosted evidence](docs/evidence/phase0-hosted-staging-2026-10-14.json) and
 [DM-018](docs/DECISIONS.md#dm-018--render-staging-provider-qualification)
 for the staging hosting exception; production Cloud Run Mumbai is unchanged.

@@ -4,16 +4,21 @@ Requested Phase 0 provider qualification target, deployed **2026-10-14**:
 Supabase `daily-motion-staging`, Mumbai `ap-south-1`, project
 `pulruylvpehwftwqcvct`; Render `daily-motion-staging-api`, Singapore, both free
 plans. API [HTTPS readiness](https://daily-motion-staging-api.onrender.com/readyz)
-passed on `8e5af65`. PostgreSQL **17.11**, Alembic **0003**, restricted runtime,
+passed again on **`c5d5414`**, deployment **`dep-db8efpon74is73epb8ng`**, after
+credential rotation and protected saved-value verification on **2026-10-15**.
+PostgreSQL **17.11**, Alembic **0003**, restricted runtime,
 11 forced-RLS tables and rolled-back owner/pool probes are verified. These
 resources are staging only. [Evidence](../../docs/evidence/phase0-hosted-staging-2026-10-14.json).
 
 **Email/account/sync qualification remains blocked**: A/B controlled inboxes are
-now designated and both real requests returned HTTP 200, without claiming delivery
-or verified distinct identities. Mailbox access and restored dashboard control
-are required; the live dashboard requires custom SMTP before
-subjects/bodies can be edited. Six-digit
-OTP and 600-second expiry are configured; prepared code templates remain unapplied.
+now designated and both earlier real requests returned HTTP 200, without claiming delivery
+or verified distinct identities. The operator reports custom SMTP configured on
+**2026-10-16**. Saved settings and code-template activation have not been verified:
+native navigation currently returns `window_not_focused`, including its supported
+restore attempt, and controlled mailbox access is not established. The previous
+2026-10-15 observation was SMTP off with template editing locked. Six-digit
+OTP and 600-second expiry were verified previously; prepared template application
+has not been reverified after the reported SMTP configuration.
 The free project has **no managed backups**; plan/restore qualification is open.
 
 ## Provisioning order
@@ -65,7 +70,10 @@ The free project has **no managed backups**; plan/restore qualification is open.
    Only safe booleans/count/revision reach stdout. For later verification use
    `--verify-only` with no admin/password environment variables.
 6. Connect the repository to Render and create the blueprint from
-   [render.yaml](../../render.yaml), on the qualification branch, **Singapore**.
+   [render.yaml](../../render.yaml), from **main**, **Singapore**. The original
+   qualification branch was merged by PR #2 and deleted. Both the Blueprint's
+   tracked source branch and the service's linked branch must point to `main`;
+   changing this YAML alone does not prove the existing provider settings changed.
    Plan `free` avoids selecting a paid compute tier; any provider billing/card
    boundary still belongs to the account owner. Render currently lists Singapore
    but no Mumbai region. This staging exception is [DM-018](../../docs/DECISIONS.md#dm-018--render-staging-provider-qualification).
@@ -120,15 +128,38 @@ but mailbox receipt and verified identity are still unqualified. A 200 request
 response does not establish that the alias is a distinct verified identity or
 that it needs no team invitation. Do not substitute uncontrolled addresses.
 
-Before more qualification, restore dashboard/operator access and finish the
-historical credential audit: earlier provisioning sent a plaintext role password
+The prerequisite historical audit found that earlier provisioning sent a plaintext role password
 in DDL on a project with DDL logging enabled. The fixed provisioner sends only
 SCRAM verifiers; it does not remove historical logs or rotate existing secrets
 automatically. Inspect aggregate counts/log settings, never raw query text or
-passwords; rotate staging runtime credentials through protected operator input,
-update Render `DM_DATABASE_URL`, and rerun readiness/RLS. Keep access to logs and
-SCRAM verifiers restricted. If retention/purge requires provider support, record
-that boundary rather than claiming logs are clean.
+passwords. Rotation was applied on 2026-10-15; **two legacy plaintext statements
+remain retained**, while the two new role statements use SCRAM. No historical
+purge or comprehensive log clearance is claimed. For subsequent rotations:
+
+1. Generate credentials in a protected operator process. Enter only the runtime
+   URL into Render. Keep administrator credentials off the service/mobile app.
+2. Focus the exact value field before entry and trigger its normal blur. A native
+   set-value call or closed save form is insufficient evidence: this qualification
+   found a saved credential that still differed and was rejected by PostgreSQL.
+3. Save and reload the provider page. Compare the saved URL/password to the current
+   rotation **inside the protected process**, returning only equality booleans.
+   Hide the field afterward. Never capture screenshots, export it to ordinary
+   logs, or include its value in CLI arguments.
+4. Apply the fixed SCRAM provisioner, verify a fresh restricted connection and
+   rollback-only isolation probe, then deploy the exact tested API revision.
+5. Verify the actual deployment reaches Live and HTTPS readiness passes. Keep the
+   protected context alive until recovery is proven; an interrupted/expired
+   context must not be replaced by recovering secrets from process memory/logs.
+
+Password changes do not
+invalidate already authenticated database sessions: replace the API process and
+close old runtime-role sessions through protected provider/operator controls.
+Verify a fresh runtime connection, owner isolation and pooled owner-context reset;
+a readiness response from an old connection pool alone does not prove rotation.
+Keep access to logs and SCRAM verifiers restricted. If retention/purge requires
+provider support, record that boundary rather than claiming logs are clean.
+[PostgreSQL connection authentication](https://www.postgresql.org/docs/17/auth-pg-hba-conf.html),
+[session termination controls](https://www.postgresql.org/docs/17/functions-admin.html#FUNCTIONS-ADMIN-SIGNAL).
 
 Use two owner-controlled **staging test inboxes**, A and B, without personal
 training data. With default Supabase email delivery, recipients must be authorized
