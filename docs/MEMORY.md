@@ -1068,3 +1068,31 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   distinct A/B identity or authenticated Flutter case. No secret handling occurred.
   Earlier regression results remain historical; application/protocol source is
   unchanged. No Phase 0 checkbox or ADR changed; Phase 1 remains unstarted.
+
+## 2026-10-17, 10:26 IST — Browser access recovered; saved SMTP is absent
+
+- PR #3 is merged; fetched `origin/main` **c9a8370**. Only the contributor guide
+  differs from prior checkout; preserve it. Started a focused documentation
+  branch from merged main for this materially changed provider boundary.
+- Supported Playwright page automation now reaches the authenticated staging
+  Supabase dashboard. Prior native-focus failure is **bypassed**, not repaired.
+  An initial fresh-form probe timed out; two protected authenticated config
+  readbacks subsequently returned **200**.
+- Actual persisted SMTP host/user/password, sender email/name and port are absent.
+  Do not count the enabled form checkbox or entered sender fields as saved setup.
+  No incomplete form was submitted and no credential value was emitted.
+- Magic-link and confirmation contents still use confirmation URLs, without a
+  Token marker or nonempty custom override; prepared code subjects do not match.
+  Real SMTP credentials must be entered and saved directly by the operator.
+- New OTP requests/deliveries/verifications, distinct app owners and executed
+  hosted Flutter cases remain **0**. No rotation/database probe repeated. Do not
+  equate authenticated dashboard operator access with verified training owners.
+- Current main is distinct from last verified deployment **c5d5414 (Oct 15)**;
+  Render revision was not reverified. Recheck it before real hosted tests. No app
+  source change, regression rerun, new remote CI, ADR or Phase 0 closure.
+- Next: saved SMTP → apply/verify prepared code templates → actual A/B inbox
+  delivery/verification → hosted Flutter sync/retry/restart/refresh/sign-out and
+  isolation. Physical/operator gates remain open. No Phase 1.
+- Evidence-only validation: docs **30 / 311 links / 5 fenced JSON**, **6 evidence
+  JSON**, credential guard **209 / 0 findings**, whitespace and unchanged app/source
+  checks pass. No repeated full tests/artifact regeneration or new CI claim.

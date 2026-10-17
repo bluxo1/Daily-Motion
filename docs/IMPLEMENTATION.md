@@ -1347,3 +1347,49 @@ manual foreground report did not restore usable automation; the browser-control
 connection needs repair before continuing. Application/protocol source is
 unchanged, so the earlier regression results above are retained without rerunning
 or relabeling them as new results. No Phase 0 gate or ADR changed.
+
+### Authenticated page access; saved SMTP absent — 2026-10-17
+
+Direct observation found PR #3 **merged**, with `origin/main` at **c9a8370**.
+Its only additional file relative to the previous checkout is the contributor
+guide; application/protocol source is unchanged. The continuation uses a focused
+documentation branch from that merged main, preserving the guide.
+
+A supported Playwright page connection is now available and can access the
+authenticated staging Supabase dashboard. This **bypasses** the prior desktop
+focus blocker; it does not claim to repair native focus support. An initial
+fresh-page input probe timed out. Two later explicit authenticated reads of
+`GET /platform/auth/pulruylvpehwftwqcvct/config` returned **200**, with only safe
+presence/template flags emitted:
+
+- Persisted SMTP host, username, password, sender email/name and port are **absent**.
+  The editable form's enabled checkbox or partially populated sender fields are
+  not proof of saved provider configuration. No incomplete settings were saved.
+- Saved magic-link and confirmation templates contain `{{ .ConfirmationURL }}`,
+  lack `{{ .Token }}`, have no nonempty custom overrides and do not match the
+  prepared staging subject. OTP/code templates are **not active**.
+
+This materially changes the blocker: browser access works, but a real SMTP sender
+must be configured and saved by the operator using provider-managed credentials.
+No SMTP credential was supplied to the app, printed or written into evidence.
+The ignored current browser artifacts had **14 files / 0 credential-pattern
+findings** in a limited scan; no comprehensive log clearance is claimed.
+
+No new OTP request, delivered message, code verification, verified distinct A/B
+app owner or authenticated hosted Flutter case was produced. Dashboard operator
+access is not app-owner verification. Credential rotation and database probes
+were not repeated. Render's deployed revision was not reverified: **c5d5414 on
+2026-10-15** remains the last observed deployment, separately from current Git
+main. Recheck the actual deployed revision before the eventual hosted auth suite.
+
+No application/source change requires a regression rerun, and earlier test counts
+are retained as dated evidence. No new remote CI, hardware result, ADR or Phase 0
+exit claim. [Safe provider evidence](evidence/phase0-hosted-smtp-2026-10-17.json).
+After SMTP is saved, apply/verify prepared code templates, then qualify real
+controlled A/B delivery, identity and the existing hosted Flutter lifecycle path.
+
+Documentation checks pass **30 Markdown files / 311 local links / 5 fenced JSON**;
+all **6 evidence JSON** parse. Credential guard passes **209 files / 0 findings**;
+whitespace and unchanged application/generated-source checks pass. Full application
+tests, artifact regeneration and remote CI were not rerun for this evidence-only
+change.
