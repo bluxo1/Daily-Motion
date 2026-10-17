@@ -55,11 +55,13 @@ passed **all three jobs**; its status was rechecked rather than rerun.
 The hosted audit confirmed **two retained historical plaintext-password
 statements**, using counts only. Affected staging credentials are now rotated;
 Render's saved runtime secret was verified after reload and a new process passed
-readiness, restricted-role/RLS and owner/pool checks. Deployment **`c5d5414`** is
-live, with **6/6 public checks passing**. Historical statistics were not purged.
-Real inbox/SMTP and authenticated hosted sync remain unqualified. The operator
-reports SMTP configured on 2026-10-16; saved settings and code templates still
-need native verification, currently blocked by browser focus. The checked
+readiness, restricted-role/RLS and owner/pool checks. Deployment **`c5d5414`** was
+verified on Oct 15, with **6/6 public checks passing**; it has not been reverified
+against current Git main. Historical statistics were not purged.
+Real inbox/SMTP and authenticated hosted sync remain unqualified. On Oct 17,
+authenticated page automation bypassed the focus blocker, but actual saved SMTP
+settings are absent and code templates still use confirmation links. A real SMTP
+sender must be entered and saved directly in Supabase before qualification. The checked
 blueprint and actual service branch target `main`; Blueprint source-branch
 verification is separate. See the
 [staging runbook](infra/staging/README.md) for the protected recovery procedure.
@@ -153,8 +155,8 @@ Hosted readiness, restricted role/forced RLS and public authentication-denial
 checks pass. No real OTP/SMTP or authenticated hosted sync result is claimed:
 the two controlled inboxes are now designated and both real email-auth requests
 returned HTTP 200, but delivery/verification and custom SMTP remain unqualified.
-The operator now reports SMTP configured; saved templates, actual inbox delivery
-and verified identities still require qualification.
+Authenticated Oct 17 readback finds SMTP settings absent and code templates
+inactive; operator setup, actual inbox delivery and verified identities remain open.
 See [hosted evidence](docs/evidence/phase0-hosted-staging-2026-10-14.json) and
 [DM-018](docs/DECISIONS.md#dm-018--render-staging-provider-qualification)
 for the staging hosting exception; production Cloud Run Mumbai is unchanged.

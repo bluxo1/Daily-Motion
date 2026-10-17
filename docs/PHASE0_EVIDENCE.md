@@ -1,7 +1,7 @@
 # Phase 0 evidence reconciliation
 
-Audited through 2026-10-16 (IST); continuation on `phase0-hosted-auth-2026-10-15`
-from merged `main` (`9669fa2`).
+Audited through 2026-10-17 (IST); latest continuation on
+`docs/phase0-hosted-smtp-2026-10-17` from merged `main` (`c9a8370`).
 [ROADMAP.md](ROADMAP.md) remains the scope authority. This matrix distinguishes
 implemented foundation work from its separate physical/provider acceptance.
 [IMPLEMENTATION.md](IMPLEMENTATION.md) records commands, counts and environments;
@@ -125,6 +125,22 @@ restore attempt. No rotation/database verification, new OTP request, inbox/code
 read, authenticated harness case or hosted-auth result was added. Repair of the
 browser-control connection remains the immediate boundary; SMTP is still
 reported configured and its saved settings/templates remain unverified.
+
+**2026-10-17 provider readback:** supported Playwright page access now bypasses
+the desktop-focus boundary. Two explicit authenticated staging configuration
+reads returned **200**. Saved SMTP host/user/password, sender email/name and port
+are absent. Both saved auth templates still use confirmation links without a
+Token marker or nonempty custom override; prepared subjects do not match.
+The operator's earlier configuration report and an enabled editable form are not
+saved-provider proof. No incomplete configuration was submitted.
+
+The immediate human boundary is now entering/saving a real staging SMTP sender
+directly in Supabase. No new OTP request, delivery, verification, distinct A/B
+owner or authenticated hosted Flutter case occurred. Dashboard operator access
+does not verify app owners. No rotation/database probe or unchanged regression
+suite was repeated. Current Git main is **c9a8370**; deployment was not reverified
+and its last observed revision remains separately dated **c5d5414 / Oct 15**.
+See [the safe readback evidence](evidence/phase0-hosted-smtp-2026-10-17.json).
 
 Source `8e5af65` passed all three jobs in
 [actual run 38587594908](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908):

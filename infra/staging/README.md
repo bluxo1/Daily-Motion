@@ -12,13 +12,14 @@ resources are staging only. [Evidence](../../docs/evidence/phase0-hosted-staging
 
 **Email/account/sync qualification remains blocked**: A/B controlled inboxes are
 now designated and both earlier real requests returned HTTP 200, without claiming delivery
-or verified distinct identities. The operator reports custom SMTP configured on
-**2026-10-16**. Saved settings and code-template activation have not been verified:
-native navigation currently returns `window_not_focused`, including its supported
-restore attempt, and controlled mailbox access is not established. The previous
-2026-10-15 observation was SMTP off with template editing locked. Six-digit
-OTP and 600-second expiry were verified previously; prepared template application
-has not been reverified after the reported SMTP configuration.
+or verified distinct identities. **2026-10-17** authenticated page access bypasses
+the desktop-focus blocker. Actual saved-provider readback returns **200** but has
+no SMTP host/user/password, sender or port. Both auth templates contain confirmation
+links without a Token marker or nonempty custom override. The earlier operator
+configuration report and an enabled editable form are insufficient. Enter and save
+a real staging SMTP sender directly in provider storage, then apply the prepared
+code templates. No incomplete settings were submitted. Six-digit OTP/600-second
+expiry were verified previously; real delivery and verified identities remain open.
 The free project has **no managed backups**; plan/restore qualification is open.
 
 ## Provisioning order
