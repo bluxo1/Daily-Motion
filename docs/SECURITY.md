@@ -74,6 +74,25 @@ Restrict storage objects by owner and use short-lived authenticated download pat
 
 ## Phase 0 development authentication boundary
 
+The Oct 18 connection review found that a database-name suffix check could let
+the destructive test fixture reach a remote host or another database. The fixture
+now validates the parsed local target before engine creation and rejects query
+and ambient libpq routing overrides. Separately, hosted API/operator validation
+now shares a strict TLS query allowlist: additional parameters cannot replace the
+confirmed host, database or role. SQLAlchemy's effective-host override was
+reproduced without opening a connection; three fixture regressions and eight
+initial hosted regressions fail before the fixes. Focused tests pass afterward.
+The runtime fix is local and **not deployed**; publication/deployment and the
+destructive local PostgreSQL regression need explicit authorization.
+[Security and recovery evidence](evidence/phase0-recovery-and-connection-guards-2026-10-18.json).
+
+The same review queries OSV with all 47 registry packages in the frozen Python
+lock and 135 hosted Pub packages. It returns zero advisories, with all responses
+present and no pending pagination. Known affected PyPI/Pub versions return 13/2
+advisories as positive controls. This is a dated package-advisory check, excluding
+native libraries, SDK internals and unknown/unreported issues; no dependency
+version changed and no comprehensive security certification is claimed.
+
 The requested hosted staging setup is documented in
 [the Supabase/Render runbook](../infra/staging/README.md). Render holds only the
 restricted runtime connection and synchronization signing key; migrations run

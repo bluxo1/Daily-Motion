@@ -60,6 +60,16 @@ raw headers or credentials were retained. Sender-capacity acceptance remains
 open. [Support submission](evidence/phase0-render-support-submission-2026-10-18.json),
 [sender authentication](evidence/phase0-smtp-authentication-headers-2026-10-18.json).
 
+**Recovery/security continuation:** an isolated real local PostgreSQL logical
+restore preserves nonempty workout/receipt/feed data, constraints, indexes and
+forced RLS; missing-role and truncated-archive attacks roll back atomically.
+This does not qualify hosted Auth, off-site custody or managed recovery.
+Connection-target defects in the destructive fixture and hosted API/operator
+validation are fixed locally; 59 focused tests pass. Hosted deployment and full
+local PostgreSQL regression authorization are pending. The sender-limit reduction
+is proposed, not applied or accepted. [Results and limitations](evidence/phase0-recovery-and-connection-guards-2026-10-18.json),
+[hosted recovery approval package](../infra/RECOVERY.md).
+
 The next explicitly requested milestone is hosted **Supabase + Render staging**,
 with a scoped [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification)
 hosting decision. [Deployment preparation](../infra/staging/README.md), role/

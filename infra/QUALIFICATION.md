@@ -28,6 +28,9 @@ external dependency; software tests cannot provide that approval.
 - Provide an approved managed or separately arranged backup/recovery route and
   processor acceptance. The current backup dashboard still shows Free, no
   scheduled backup rows and no restore control. No paid upgrade was attempted.
+  [Recovery preparation](RECOVERY.md) now includes an actual isolated local
+  logical restore and the concrete hosted approval package; it does not close
+  managed recovery or operator acceptance.
 - Supply Android/iPhone hardware, signing/install access, developer/store
   prerequisites, named privacy/security and incident ownership, and operator
   acceptance. Physical/native/accessibility/p95 evidence remains mandatory.

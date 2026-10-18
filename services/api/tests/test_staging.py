@@ -60,6 +60,45 @@ def test_hosted_configuration_accepts_verified_session_connection() -> None:
         validate_admin_url(admin, "xxxxxxxxxxxxxxxxxxxx")
 
 
+@pytest.mark.parametrize(
+    "override",
+    [
+        "host=other-project.example.test",
+        "hostaddr=192.0.2.10",
+        "dbname=other_database",
+        "user=other_role",
+        "service=other_project",
+        "options=-crole=postgres",
+        "sslrootcert=/tmp/another-root.crt",
+    ],
+)
+def test_hosted_project_confirmation_rejects_query_routing_overrides(override: str) -> None:
+    values = hosted()
+    values["database_url"] += "&" + override
+    with pytest.raises(HTTPException) as error:
+        Settings(**values).validate_hosted()
+    assert error.value.detail == {"code": "service_not_configured"}
+    assert "synthetic" not in str(error.value)
+    assert override not in str(error.value)
+    admin = values["database_url"].replace("dm_staging_runtime:", "postgres:")
+    with pytest.raises(ValueError, match="Staging project/TLS configuration is invalid"):
+        validate_admin_url(admin, "abcdefghijklmnopqrst")
+
+
+@pytest.mark.parametrize("name", ["PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE"])
+def test_hosted_project_confirmation_rejects_ambient_routing_overrides(
+    monkeypatch: pytest.MonkeyPatch, name: str
+) -> None:
+    monkeypatch.setenv(name, "synthetic-routing-override")
+    values = hosted()
+    with pytest.raises(HTTPException) as error:
+        Settings(**values).validate_hosted()
+    assert error.value.detail == {"code": "service_not_configured"}
+    admin = values["database_url"].replace("dm_staging_runtime:", "postgres:")
+    with pytest.raises(ValueError, match="Staging project/TLS configuration is invalid"):
+        validate_admin_url(admin, "abcdefghijklmnopqrst")
+
+
 def test_provision_staging_is_repeatable_and_probe_rolls_back(
     database: Engine, admin_engine: Engine, owner: UUID
 ) -> None:

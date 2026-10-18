@@ -13,6 +13,7 @@ from sqlalchemy.engine import make_url
 from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from daily_motion.config import validate_database_transport
 from daily_motion.db import assert_runtime_role
 
 ROLE = "dm_staging_runtime"
@@ -23,6 +24,7 @@ def validate_admin_url(value: str, project_ref: str) -> None:
     """Confirm the operator-selected project and TLS before any remote mutation."""
     try:
         url = make_url(value)
+        validate_database_transport(url)
         host = url.host or ""
         direct = host == f"db.{project_ref}.supabase.co" and url.username == "postgres"
         pool = host.endswith(".pooler.supabase.com") and url.username == f"postgres.{project_ref}"
@@ -33,8 +35,6 @@ def validate_admin_url(value: str, project_ref: str) -> None:
             or url.database != "postgres"
             or url.port not in {None, 5432}
             or not url.password
-            or url.query.get("sslmode") != "verify-full"
-            or not url.query.get("sslrootcert")
         ):
             raise ValueError()
     except (ValueError, SQLAlchemyError):

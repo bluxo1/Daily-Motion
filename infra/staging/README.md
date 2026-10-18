@@ -72,6 +72,10 @@ sender arrangement remains necessary. See [Gmail limits](https://support.google.
    `dm_staging_runtime.PROJECT_REF`. For a reachable direct connection the login
    has no suffix. Use `postgresql+psycopg` URLs, URL-escaped passwords,
    `sslmode=verify-full` and the downloaded certificate in `sslrootcert`.
+   These are the only accepted connection-query keys. Project/transport
+   validation rejects routing, role, service and other query overrides, duplicate
+   root-certificate values, and nonempty `PGHOSTADDR`, `PGSERVICE` or
+   `PGSERVICEFILE` environment overrides before opening a connection.
    [Supabase connections](https://supabase.com/docs/guides/database/connecting-to-postgres),
    [certificate verification](https://supabase.com/docs/guides/database/psql).
 5. In an operator process, supply the environment names below from protected

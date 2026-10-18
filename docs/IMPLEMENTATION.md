@@ -1526,3 +1526,60 @@ Hook invalidation, source repair, sender acceptance and approved trusted-key
 rehearsal remain provider/operator dependencies. Phase 0 stays **in progress**;
 Phase 1 has not started. No final independent release approval is claimed.
 [Safe new provider evidence](evidence/phase0-provider-qualification-2026-10-18.json).
+
+### Connection security and isolated recovery preparation — 2026-10-18 IST
+
+The destructive PostgreSQL fixture's string-suffix guard allowed remote hosts,
+query suffixes disguising another database and ambient `PGHOSTADDR` routing.
+Three regression cases fail before any real engine is opened, then pass after
+parsed exact database/driver/loopback validation and query/environment checks.
+The same review found hosted API/operator validation accepted libpq overrides;
+five operator query variants and an actual changed SQLAlchemy connection-argument
+hostname reproduce the mismatch without a connection. Eight initial hosted
+regressions fail before the fix. A shared transport validator now permits only
+`sslmode=verify-full` and one nonempty `sslrootcert`, with no ambient routing
+overrides. Provider configuration, credentials and deployments were not changed.
+
+Final affected validation from `services/api`:
+
+```sh
+uv run --no-sync pytest -q tests/test_database_target.py tests/test_auth.py tests/test_credential_guard.py tests/test_staging.py -k "not provision and not readiness and not runtime_probe"
+uv run --no-sync ruff check . ../../tools
+uv run --no-sync ruff format --check . ../../tools
+uv run --no-sync mypy --strict src scripts
+```
+
+Results: **59 passed / 0 skipped / 12 database cases deselected**; Ruff passes,
+35 files already formatted, strict mypy passes for 13 source files. A preceding
+selection had **57 passed / 8 explicit database skips / 4 deselected**. No full
+PostgreSQL, Flutter or remote CI rerun is claimed. Explicit authorization was
+requested before resetting the existing local synthetic test schema; it remains
+pending. Publication/deployment are separately unauthorized.
+
+A real custom-format dump of the existing local synthetic database is restored
+into a new network-isolated tmpfs PostgreSQL 17.7 container. All 11 tables,
+Alembic `0003`, row/policy/constraint/index fingerprints and forced RLS match.
+The fixture contains one workout, three sets, one receipt and one feed change;
+empty profile/observation/retirement/snapshot tables provide no nonempty coverage.
+Missing ACL role and truncated-archive attempts fail with zero training tables
+left behind. Restricted `NOLOGIN` roles preserve own-owner visibility, deny
+other/unset owners and owner reassignment; duplicate receipt insertion fails.
+The source is unchanged and temporary-container removal is confirmed. The
+first helper failure and cleanup-inspection race remain in the evidence.
+
+No hosted archive, Auth restoration, credential restoration, retained/off-site
+backup, hardware or operator approval is inferred. [Recovery preparation](../infra/RECOVERY.md)
+now provides the concrete approval package. A 30-to-10/hour staging sender limit
+reduction was requested as a conservative mitigation; no setting was saved or
+operator capacity acceptance claimed. Render incident **215476446235862** remains
+OPEN without reinvestigation. No migration, contract or ADR changed. Phase 0
+remains **in progress** and Phase 1 unstarted.
+[New evidence](evidence/phase0-recovery-and-connection-guards-2026-10-18.json).
+
+The bounded locked-dependency review also completes: OSV returns **0 advisories**
+for **47 PyPI / 135 hosted Pub packages**, with exact result counts and complete
+pagination. Known affected control versions return **13 PyPI / 2 Pub advisories**.
+Both lock hashes are retained; no versions were changed. SDK/native dependency
+internals and unknown advisories are outside this result. Final repository checks:
+**31 Markdown / 355 local links / 5 fenced JSON**, credential guard **264 files /
+0 findings**, new evidence JSON/six tested source hashes and whitespace pass.

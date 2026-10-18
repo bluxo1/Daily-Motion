@@ -1214,3 +1214,31 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   `git diff --check` pass. No application regression or remote CI rerun.
   [Support evidence](evidence/phase0-render-support-submission-2026-10-18.json),
   [header evidence](evidence/phase0-smtp-authentication-headers-2026-10-18.json).
+
+## 2026-10-18, 15:57 IST — Connection guards and real local recovery preparation
+
+- Reproduced and fixed the destructive fixture's remote-target/name-suffix and
+  ambient-routing bypasses; three failing-before cases never opened an engine.
+  Added 19 local-target cases. Hosted API/operator guards also allowed connection
+  overrides; SQLAlchemy's changed effective host is proven without a connection.
+  Shared strict transport validation fixes both paths; runtime fix is not deployed.
+- **59 focused Python tests pass**, no skips, 12 DB cases deliberately deselected;
+  Ruff and strict mypy pass. Full existing local-schema reset authorization was
+  requested, not received. No new CI, hosted mutation or Flutter change.
+- Real local custom-format dump/restore preserves 11 forced-RLS tables, revision
+  `0003`, nonempty workout/set/receipt/feed data, constraints, indexes and owner
+  isolation. Missing-role/truncated archives roll back; duplicate receipt insert
+  and cross-owner reassignment fail. Source unchanged; temporary network-none,
+  tmpfs container cleanup confirmed. This is not hosted/Auth/off-site recovery.
+- Prepared [the hosted recovery approval package](../infra/RECOVERY.md). Requested
+  explicit approval for a 30-to-10/hour staging sender mitigation; no provider
+  setting or operator acceptance changed. Trusted key, deployment/publication,
+  hardware/signing, recovery/custody and named reviewer/operator gates remain.
+  Render **215476446235862** stays **OPEN**, without repeating its investigation.
+- No schema, contract or ADR change; Phase 0 in progress, Phase 1 unstarted.
+  [New results](evidence/phase0-recovery-and-connection-guards-2026-10-18.json).
+- OSV returns **0 advisories** for **47 locked PyPI / 135 hosted Pub** packages;
+  all results/pagination complete and positive controls return **13 / 2** actual
+  advisories. No dependency change or native/SDK coverage claim. Repository checks:
+  **31 Markdown / 355 links / 5 fenced JSON**, **264 source files / 0 credential
+  findings**, six tested source hashes/new evidence JSON and whitespace pass.
