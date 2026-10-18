@@ -34,6 +34,27 @@ external dependency; software tests cannot provide that approval.
 
 See [the safe provider audit](../docs/evidence/phase0-provider-qualification-2026-10-18.json).
 
+#### Prepared private Render Support request
+
+Submit through the Render Dashboard support portal or the support address on
+[Render's contact page](https://render.com/contact). No message has been sent by
+the agent. Omit hook URLs and secret values:
+
+> Please invalidate/disable or rotate in place the potentially compromised
+> Blueprint Sync Hook for `daily-motion-staging` / `exs-db7otpl9fdbs73f0qaqg`.
+> Preserve existing service `srv-db7p5knavr4c7392dasg`, deployed revision,
+> credentials and external Supabase PostgreSQL. Enqueue no sync/deploy and
+> create/delete no resources. Confirm old credentials are rejected before
+> enqueueing, using redacted provider-side evidence or a supported auth-only check.
+> If direct invalidation is unavailable, document disconnection's revocation
+> semantics and a same-resource reattachment plan without duplication, deployment
+> or credential reset; obtain owner approval before disconnecting. Keep secrets
+> and hook URLs out of the reply.
+
+Auto Sync off is verified; revocation is not. The published Blueprint update API
+accepts only name, Auto Sync and path. The separate service deploy-hook control
+does not rotate a Blueprint sync hook. [Current evidence](../docs/evidence/phase0-render-hook-investigation-2026-10-18.json).
+
 ## Hosted staging prerequisites
 
 ### Public feasibility desk review — 2026-10-14 IST

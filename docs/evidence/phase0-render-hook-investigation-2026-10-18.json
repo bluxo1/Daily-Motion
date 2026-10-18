@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-10-18T08:49:43Z",
+  "incident_status": "OPEN: server-side hook invalidation unverified",
+  "source_revision": "b06747f",
+  "blueprint": {
+    "name": "daily-motion-staging",
+    "id": "exs-db7otpl9fdbs73f0qaqg",
+    "auto_sync_disabled_after_reload": true,
+    "source_branch": "phase0-qualification-2026-10-13",
+    "source_branch_is_previously_deleted_branch": true,
+    "service_branch": "main",
+    "saved_source_branch_does_not_match_reported_main": true,
+    "exposed_hook_unchanged_by_private_comparison": true,
+    "private_hook_value_returned_in_this_investigation": false
+  },
+  "supported_controls": {
+    "blueprint_ui_rotation_or_revocation_controls": 0,
+    "blueprint_ui_disconnect_controls": 1,
+    "service_ui_regenerate_hook_controls": 1,
+    "service_deploy_hook_control_is_not_blueprint_sync_hook_control": true,
+    "published_spec": "https://api-docs.render.com/openapi/render-public-api-1.json",
+    "blueprint_operations": [
+      "GET /blueprints",
+      "POST /blueprints/validate",
+      "GET /blueprints/{blueprintId}",
+      "PATCH /blueprints/{blueprintId}",
+      "DELETE /blueprints/{blueprintId}",
+      "GET /blueprints/{blueprintId}/syncs"
+    ],
+    "blueprint_patch_properties": [
+      "name",
+      "autoSync",
+      "path"
+    ],
+    "supported_hook_rotation_revocation_or_auth_only_check_found": false
+  },
+  "fallback_review": {
+    "disconnect_documented_to_preserve_existing_resources": true,
+    "disconnect_documentation_proves_old_hook_revocation": false,
+    "disconnect_approval_received": false,
+    "disconnect_performed": false,
+    "new_blueprint_created": false,
+    "creation_flow_documents_possible_duplicate_resources": true,
+    "adding_existing_resources_requires_complete_configuration_and_sync": true,
+    "no_deploy_no_duplicate_same_id_recreation_path_proven": false,
+    "required_before_fallback": "Render-supported revocation and same-resource migration guarantees, explicit owner approval and a zero-create/delete/deploy change plan"
+  },
+  "infrastructure": {
+    "linked_service_ids": [
+      "srv-db7p5knavr4c7392dasg"
+    ],
+    "live_service_same_id": true,
+    "service_displayed_revision": "c5d5414",
+    "service_live_label": true,
+    "blueprint_yaml_declares_render_database": false,
+    "postgresql_provider": "Existing external Supabase staging project pulruylvpehwftwqcvct",
+    "initial_health_request_timed_out_seconds": 45,
+    "subsequent_health_http_status": 200,
+    "subsequent_readiness_http_status": 200,
+    "readiness_includes_existing_database_guards": true,
+    "service_database_credential_or_deployment_mutations_performed": 0,
+    "old_hook_invoked": false
+  },
+  "support_action": {
+    "channel": "Private Render Dashboard support request, or support@render.com",
+    "subject": "Security: invalidate exposed Blueprint Sync Hook for daily-motion-staging",
+    "request": [
+      "Server-side revoke/disable the existing Blueprint sync-hook credential, or rotate it in place",
+      "Preserve Blueprint association, existing service ID, deployed revision, environment credentials and external Supabase database; enqueue no sync or deploy",
+      "Confirm all previously issued hook credentials are rejected before enqueueing, with redacted non-disruptive provider-side authentication evidence or a supported auth-only verification method",
+      "If direct invalidation is unavailable, document whether disconnection invalidates old hooks and provide a same-resource-ID reattachment plan without duplication, deployment or secret reset; obtain account-owner approval before disconnecting",
+      "Keep hook URLs and secret values out of ticket replies and evidence"
+    ],
+    "support_contacted_by_agent": false
+  },
+  "meaningful_change_since_prior_evidence": "Auto Sync is now independently verified disabled; full published API investigation establishes no supported hook revocation control and narrows the dependency to Render Support",
+  "documentation": [
+    "https://api-docs.render.com/reference/update-blueprint",
+    "https://api-docs.render.com/reference/disconnect-blueprint",
+    "https://render.com/docs/infrastructure-as-code",
+    "https://render.com/docs/deploy-hooks",
+    "https://render.com/contact"
+  ],
+  "phase0_complete": false,
+  "phase1_started": false
+}

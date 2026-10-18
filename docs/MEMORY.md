@@ -1172,3 +1172,19 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   managed recovery/processor arrangements and named review/operator acceptance.
   Phase 0 remains **in progress**; Phase 1 has not started.
   [New provider audit](evidence/phase0-provider-qualification-2026-10-18.json).
+
+## 2026-10-18, 14:18 IST — Render hook supported-control audit
+
+- Auto Sync is now verified disabled after reload; protected comparison shows the
+  hook unchanged. Current Blueprint UI/full published API expose no supported
+  hook rotation/revocation or auth-only check. Disconnection preserves resources,
+  but its hook-revocation semantics and a safe recreation path are not established.
+- Same existing service is Live on `c5d5414`; health/readiness **200** after an
+  initial timeout. Saved Blueprint source still references the deleted branch;
+  the service uses `main`. No infrastructure/credential/deployment mutation or
+  old-hook request occurred. No secret value was returned in this investigation.
+- Prepared the exact private Support request; none was sent. Incident stays
+  **OPEN** pending server-side invalidation and non-triggering proof. Owner
+  approval is still required before any fallback disconnection. Phase 0 remains
+  **in progress**; Phase 1 has not started.
+  [New evidence](evidence/phase0-render-hook-investigation-2026-10-18.json).

@@ -181,6 +181,19 @@ provider/operator invalidation is confirmed; no tool-log purge is claimed.
 Source scanning now rejects Render deploy/sync hook credentials without printing
 values. This guard does not invalidate an already disclosed credential.
 
+**Later Oct 18 supported-control audit:** Auto Sync is verified disabled after
+reload, while the hook is unchanged by private comparison. The Blueprint UI and
+full published API expose no supported rotation/revocation or auth-only check.
+Disconnection preserves resources but does not document hook revocation;
+recreation can duplicate resources and adoption can apply configuration changes.
+No hook request, disconnection, recreation, deployment or credential change was
+performed. The same service remains Live on `c5d5414`; health/readiness return 200.
+The saved Blueprint source still references the deleted branch, while the service
+uses `main`. Incident status remains **OPEN** pending Render Support's server-side
+invalidation and redacted non-triggering proof. Any fallback disconnection needs
+owner approval plus confirmed revocation/migration semantics.
+[Investigation and sources](evidence/phase0-render-hook-investigation-2026-10-18.json).
+
 ## AI and health data boundaries
 
 No AI or health integration ships in MVP. Future LLM context is minimized to authorized training facts required for the request; provider retention/training settings and subprocessors require documented review. Imported HealthKit/Health Connect data remains local by default and is excluded from cloud sync, global model datasets, and LLM context. Permission to read a device store does not authorize onward sharing. See [HEALTH_INTEGRATIONS.md](HEALTH_INTEGRATIONS.md).
