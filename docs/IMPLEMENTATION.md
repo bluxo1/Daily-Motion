@@ -1,9 +1,9 @@
 # Phase 0 implementation evidence
 
-Updated: 2026-10-14 (IST). **Phase 0 is in progress. Phase 1 has not started.** This
-milestone adds Windows-executable native qualification, fault tests and device
-harnesses to the connected synchronization/authentication foundation.
-Physical-device, hosted-provider delivery and release gates in
+Updated: 2026-10-18 (IST). **Phase 0 is in progress. Phase 1 has not started.**
+The foundation now includes real hosted SMTP/OTP and authenticated Flutter
+functional proof, alongside the earlier Windows/native/fault harnesses.
+Physical-device, remaining provider/operator and release gates in
 [ROADMAP.md](ROADMAP.md) remain open. Earlier results are retained in [MEMORY.md](MEMORY.md).
 
 ## Implemented
@@ -1347,3 +1347,280 @@ manual foreground report did not restore usable automation; the browser-control
 connection needs repair before continuing. Application/protocol source is
 unchanged, so the earlier regression results above are retained without rerunning
 or relabeling them as new results. No Phase 0 gate or ADR changed.
+
+### Authenticated page access; saved SMTP absent — 2026-10-17
+
+Direct observation found PR #3 **merged**, with `origin/main` at **c9a8370**.
+Its only additional file relative to the previous checkout is the contributor
+guide; application/protocol source is unchanged. The continuation uses a focused
+documentation branch from that merged main, preserving the guide.
+
+A supported Playwright page connection is now available and can access the
+authenticated staging Supabase dashboard. This **bypasses** the prior desktop
+focus blocker; it does not claim to repair native focus support. An initial
+fresh-page input probe timed out. Two later explicit authenticated reads of
+`GET /platform/auth/pulruylvpehwftwqcvct/config` returned **200**, with only safe
+presence/template flags emitted:
+
+- Persisted SMTP host, username, password, sender email/name and port are **absent**.
+  The editable form's enabled checkbox or partially populated sender fields are
+  not proof of saved provider configuration. No incomplete settings were saved.
+- Saved magic-link and confirmation templates contain `{{ .ConfirmationURL }}`,
+  lack `{{ .Token }}`, have no nonempty custom overrides and do not match the
+  prepared staging subject. OTP/code templates are **not active**.
+
+This materially changes the blocker: browser access works, but a real SMTP sender
+must be configured and saved by the operator using provider-managed credentials.
+No SMTP credential was supplied to the app, printed or written into evidence.
+The ignored current browser artifacts had **14 files / 0 credential-pattern
+findings** in a limited scan; no comprehensive log clearance is claimed.
+
+No new OTP request, delivered message, code verification, verified distinct A/B
+app owner or authenticated hosted Flutter case was produced. Dashboard operator
+access is not app-owner verification. Credential rotation and database probes
+were not repeated. Render's deployed revision was not reverified: **c5d5414 on
+2026-10-15** remains the last observed deployment, separately from current Git
+main. Recheck the actual deployed revision before the eventual hosted auth suite.
+
+No application/source change requires a regression rerun, and earlier test counts
+are retained as dated evidence. No new remote CI, hardware result, ADR or Phase 0
+exit claim. [Safe provider evidence](evidence/phase0-hosted-smtp-2026-10-17.json).
+After SMTP is saved, apply/verify prepared code templates, then qualify real
+controlled A/B delivery, identity and the existing hosted Flutter lifecycle path.
+
+Documentation checks pass **30 Markdown files / 311 local links / 5 fenced JSON**;
+all **6 evidence JSON** parse. Credential guard passes **209 files / 0 findings**;
+whitespace and unchanged application/generated-source checks pass. Full application
+tests, artifact regeneration and remote CI were not rerun for this evidence-only
+change.
+
+### Saved SMTP and code templates; SMTP authentication rejected — 2026-10-17
+
+Fresh authenticated provider readback verifies saved SMTP fields. Both
+Confirmation and Magic Link templates were saved with `{{ .Token }}` and the
+prepared staging subject, then verified after reload; OTP remains six digits
+with 600-second expiry. These are new configuration results, not delivery proof.
+
+Account A's real request at **15:59:56 UTC** returns **500 / unexpected_failure**.
+The correlated Auth event at **15:59:58 UTC** reports Google SMTP **535 /
+BadCredentials**, with username/password rejection. The operator must correct
+the SMTP login in provider storage. No delivered code, verified A/B identity,
+refresh or authenticated hosted Flutter result is claimed. No B request, repeated
+credential rotation/database probe, broad test run or app/protocol change occurred.
+Phase 0 remains open; Phase 1 has not started.
+[Safe new evidence](evidence/phase0-hosted-smtp-delivery-2026-10-17.json).
+
+### Real hosted SMTP/OTP and authenticated Flutter flow — 2026-10-18 IST
+
+After operator credential correction, Account A's single requested retry returns
+200 at **23:23:44 UTC**. The initially open Gmail account was the SMTP sender;
+its Sent copy was excluded. Operator sign-in and Google verification established
+actual recipient-mailbox access. Both designated recipients delivered codes and
+verified as distinct, confirmed ES256 Supabase subjects; the aliases share a
+mailbox. Both initial sessions also refresh successfully with owner continuity
+and rotated refresh tokens. No codes, sessions, credentials or message bodies
+were written into evidence.
+
+The credential-gated hosted sync case initially failed twice: the widget binding
+intercepted HTTP with synthetic 400s (**53.67 s**), then an incorrect assertion
+expected an exact retry to retain `accepted` instead of returning `duplicate`
+(**13.99 s**). Removing the unnecessary binding and asserting `accepted` then
+`duplicate` with identical remaining receipt fields fixes the harness. Its actual
+Flutter → Render → Supabase run passes in **25.06 s**, with pending file-backed
+A → B → A recovery and isolated local/feed namespaces.
+
+The new `hosted_auth_lifecycle_test.dart` exercises the production Supabase SDK,
+account controller, gateway, coordinator and real SQLite stores. Its first run
+passes in **111.96 s**; a further run adds actual immediate-resend throttling,
+wrong-code rejection followed by valid verification, and a precise revoked-refresh
+error assertion, then passes in **115.03 s**. It proves refresh, controller/file
+reopening, provider sign-out with pending work, local lock/credential removal,
+A → B → A through fresh actual OTPs, B feed denial, B mutation of an uploaded A
+root rejected as `not_found`, and A recovery/upload/bootstrap at revision 3.
+These are **two distinct hosted cases**, not ordinary-suite or physical results.
+The local operator bridge and `MemoryProtectedStorage` keep codes/sessions in
+process memory; no native storage or screen-UI acceptance is inferred.
+
+Render displays **c5d5414** and HTTPS readiness returns **200** after an initial
+Windows request timeout. No deployment, credential rotation or independent SQL
+RLS probe was repeated; previous direct-RLS evidence remains dated separately.
+Current authenticated API tests exercise the guarded runtime and owner denial.
+Android discovery finds **0 physical devices / 0 emulators**. Real elapsed OTP
+expiry, trusted signing-key rotation, wider sender/rate review, physical/signing,
+managed backup/restore and named reviewer/operator gates remain open. No Phase 1.
+[Safe functional evidence](evidence/phase0-hosted-auth-flow-2026-10-18.json).
+
+### Elapsed OTP expiry, logging hardening and provider audit — 2026-10-18 IST
+
+Independently reread the Phase 0 roadmap/checklist, evidence, security/testing and
+current code/CI. Supported logged-in Playwright provider access remains available.
+Saved SMTP/code templates still pass protected presence checks; six-digit OTP
+lifetime remains 600 seconds. No SMTP, signing or database setting was changed.
+
+The new opt-in `hosted_otp_expiry_test.dart` requests a real recipient code,
+holds it unconsumed for **610 actual seconds after delivery**, then requires
+`invalid_or_expired_code`. A fresh delivered code verifies and the session signs
+out. The first run passes, with rejection at **07:58:15 UTC** and fresh verification
+at **07:59:05 UTC**. No simulated clock or shortened provider setting was used.
+The final hardened-source run also passes: a 610-second hold is rejected at
+**08:25:04 UTC**, fresh delivered-code verification succeeds at **08:25:17 UTC**,
+and provider sign-out succeeds. The temporary code bridge is then shut down.
+
+Adversarial source inspection confirmed that SDK `Session.toString()` includes
+tokens, so a failed negative matcher could print an unexpectedly returned session.
+The hosted assertions now use `requireAuthRejection`, which checks safe categories
+and never formats results or unexpected exceptions. Session-absence assertions
+compare booleans. Three synthetic regression tests pass. No actual session dump
+from these assertions was observed.
+
+The hardened lifecycle rerun initially fails at **00:30** with API initialization
+`timeout` after OTP verification; later readiness is 200. A cold-start cause is
+not proven. The harness now permits one existing-controller initialization retry
+with the retained verified session, only for pending initialization/timeout.
+No timeout was increased and no new code request substitutes for that retry.
+The final lifecycle run passes at **02:30**, completing **08:07:43 UTC**, with
+refresh/revocation, file recovery, pending logout, A → B → A and owner denial.
+This remains desktop memory credential storage, not native/physical evidence.
+
+**Provider findings and incident:** the Render service follows `main`, but the
+Blueprint source points to deleted `phase0-qualification-2026-10-13`. During a
+branch settings inspection, a generic form-value read returned the private
+Blueprint sync hook in a tool response. The credential is absent from repository
+evidence; tool-history purge and provider invalidation are not claimed. The UI
+exposes no regeneration control; operator/Render support invalidation is requested.
+The unsaved source-branch edit was discarded and repair is held until containment.
+Subsequent reads use explicit field scopes and nonsecret results only.
+
+Added Render deploy/sync hook credential detection to the repository guard. A
+synthetic sample yields **0 findings before / 1 after**; all **9** targeted guard
+tests pass, without echoing credential material. This prevents source retention;
+it does not invalidate the already disclosed provider hook.
+
+Read-only sender/rate review confirms Gmail mailing/signing and TLS, a 60-second
+resend interval, 30-email/hour project budget, OTP/verify refill values 30 and
+refresh 150. The 30/hour allowance permits 720/day, exceeding the consumer Gmail
+sender's documented 500/day capacity. No quota exhaustion or operator acceptance
+is inferred. Current backup UI still indicates Free, an upgrade requirement,
+zero scheduled backup rows and no restore control. Public JWKS returns one ES256
+key; trusted-key rotation/revocation approval is pending and keys are unchanged.
+
+Validation on the working source:
+
+- API Ruff format/lint and strict mypy (13 source files) pass.
+- Full `DM_TEST_ADMIN_URL` / `DM_RUN_CONNECTED=1` pytest: **108 passed, 0 skipped**,
+  including the harness's **9 actual loopback Flutter HTTP/PostgreSQL cases**.
+- Full serial Flutter: **151 passed / 12 explicit skips**, reporter **02:36**;
+  analysis has no issues and formatting is unchanged. Hosted/connected cases are
+  run separately, not counted as ordinary passes.
+- OpenAPI export, DTO/limit generation plus formatting, and Drift regeneration
+  reproduce all **four** checked artifacts. The formatter is part of reproduction.
+- Docs, static native guards, source credential guard, evidence JSON/source hashes
+  and Git whitespace checks pass; final counts are in the linked evidence.
+- Actual baseline CI **38942611206 / c9a8370** remains green. New-source remote CI
+  is not claimed before publication/authorization.
+
+No application runtime, contract, schema or ADR changed. Physical hardware/signing,
+native protection/backup, accessibility, phone lifecycle/p95, managed recovery,
+processor and named operator/privacy/security acceptance remain unavailable.
+Hook invalidation, source repair, sender acceptance and approved trusted-key
+rehearsal remain provider/operator dependencies. Phase 0 stays **in progress**;
+Phase 1 has not started. No final independent release approval is claimed.
+[Safe new provider evidence](evidence/phase0-provider-qualification-2026-10-18.json).
+
+### Connection security and isolated recovery preparation — 2026-10-18 IST
+
+The destructive PostgreSQL fixture's string-suffix guard allowed remote hosts,
+query suffixes disguising another database and ambient `PGHOSTADDR` routing.
+Three regression cases fail before any real engine is opened, then pass after
+parsed exact database/driver/loopback validation and query/environment checks.
+The same review found hosted API/operator validation accepted libpq overrides;
+five operator query variants and an actual changed SQLAlchemy connection-argument
+hostname reproduce the mismatch without a connection. Eight initial hosted
+regressions fail before the fix. A shared transport validator now permits only
+`sslmode=verify-full` and one nonempty `sslrootcert`, with no ambient routing
+overrides. Provider configuration, credentials and deployments were not changed.
+
+Final affected validation from `services/api`:
+
+```sh
+uv run --no-sync pytest -q tests/test_database_target.py tests/test_auth.py tests/test_credential_guard.py tests/test_staging.py -k "not provision and not readiness and not runtime_probe"
+uv run --no-sync ruff check . ../../tools
+uv run --no-sync ruff format --check . ../../tools
+uv run --no-sync mypy --strict src scripts
+```
+
+Results: **59 passed / 0 skipped / 12 database cases deselected**; Ruff passes,
+35 files already formatted, strict mypy passes for 13 source files. A preceding
+selection had **57 passed / 8 explicit database skips / 4 deselected**. No full
+PostgreSQL, Flutter or remote CI rerun is claimed. Explicit authorization was
+requested before resetting the existing local synthetic test schema; it remains
+pending. Publication/deployment are separately unauthorized.
+
+A real custom-format dump of the existing local synthetic database is restored
+into a new network-isolated tmpfs PostgreSQL 17.7 container. All 11 tables,
+Alembic `0003`, row/policy/constraint/index fingerprints and forced RLS match.
+The fixture contains one workout, three sets, one receipt and one feed change;
+empty profile/observation/retirement/snapshot tables provide no nonempty coverage.
+Missing ACL role and truncated-archive attempts fail with zero training tables
+left behind. Restricted `NOLOGIN` roles preserve own-owner visibility, deny
+other/unset owners and owner reassignment; duplicate receipt insertion fails.
+The source is unchanged and temporary-container removal is confirmed. The
+first helper failure and cleanup-inspection race remain in the evidence.
+
+No hosted archive, Auth restoration, credential restoration, retained/off-site
+backup, hardware or operator approval is inferred. [Recovery preparation](../infra/RECOVERY.md)
+now provides the concrete approval package. A 30-to-10/hour staging sender limit
+reduction was requested as a conservative mitigation; no setting was saved or
+operator capacity acceptance claimed. Render incident **215476446235862** remains
+OPEN without reinvestigation. No migration, contract or ADR changed. Phase 0
+remains **in progress** and Phase 1 unstarted.
+[New evidence](evidence/phase0-recovery-and-connection-guards-2026-10-18.json).
+
+The bounded locked-dependency review also completes: OSV returns **0 advisories**
+for **47 PyPI / 135 hosted Pub packages**, with exact result counts and complete
+pagination. Known affected control versions return **13 PyPI / 2 Pub advisories**.
+Both lock hashes are retained; no versions were changed. SDK/native dependency
+internals and unknown advisories are outside this result. Final repository checks:
+**31 Markdown / 355 local links / 5 fenced JSON**, credential guard **264 files /
+0 findings**, new evidence JSON/six tested source hashes and whitespace pass.
+
+### Authorized CI and independent routing review — 2026-10-18 IST
+
+- Published exactly **d655e1f** to existing PR #4 after a **264-file / zero-finding**
+  source scan and **46 changed file versions / four commits / zero findings**.
+  Workflow inspection confirms disposable job-local PostgreSQL, loopback test
+  connection and connected Flutter enabled, with no deployment step.
+- Push [39125077861](https://github.com/bluxo1/Daily-Motion/actions/runs/39125077861)
+  and PR [39125080814](https://github.com/bluxo1/Daily-Motion/actions/runs/39125080814)
+  pass all three jobs. Each API run has **137 passed / zero skipped**; each Linux
+  and macOS mobile run has **151 passed / 12 explicit skips**. Android all modes,
+  routine build, unsigned iOS debug/release and four-output reproduction pass.
+- After that regression checkpoint, independent SQLAlchemy/libpq default analysis
+  proves three destination ambiguities without opening connections; startup role
+  options also lack rejection. **Six new negative tests fail before the fix**.
+  Shared/local guards now reject multiple hosts, omitted database, ambient
+  `PGOPTIONS` and inherited `PGPORT` for an omitted port. Positive tests retain
+  explicit-port precedence and the clean implicit-port default.
+- The Store-backed local Python launcher becomes unavailable before the first
+  new tests execute. Recovery installs pinned **3.13.14** separately under ignored
+  `.tools/python`, with no bin/registry changes, and frozen dependencies in
+  `.tools/phase0-review-env`. The old environment and lockfiles remain intact.
+  Local uv is **0.13.1**; remote CI retains its pinned **0.13.0**.
+- Follow-up qualification: **67 focused passed / 12 DB cases deselected**; then
+  **145 full Python passed / zero skipped**, including the **nine live Flutter
+  HTTP/PostgreSQL cases**, in a newly created loopback/tmpfs container. Initial
+  emptiness and final removal are verified. No existing local/hosted database was
+  reset. Ruff passes for 35 files, strict mypy for 13 source files, and regenerated
+  OpenAPI has no diff. No Flutter runtime, migration, protocol, contract or ADR change.
+- The new review fix is local and needs its own publication/CI approval before
+  deployment selection. [The concise change plan](../infra/staging/PHASE0_CHANGE_PLAN.md)
+  defines credential-preserving deployment/code rollback, 30→10/hour sender
+  tradeoffs and managed/manual/PITR recovery decisions. This session exposes no
+  provider/browser control; fresh preflight readback is not claimed. No staging,
+  key, sender, backup or operator acceptance change occurred. Render incident
+  **215476446235862** stays OPEN. Physical/native/operator gates remain external;
+  Phase 0 stays in progress and Phase 1 unstarted.
+  [New evidence](evidence/phase0-ci-routing-review-2026-10-18.json).
+- Final repository checks: **32 Markdown / 365 local links / five fenced JSON**,
+  **266 source files / zero credential findings**, six tested source hashes and
+  retained local-result equality verified, unchanged lockfiles and clean whitespace.

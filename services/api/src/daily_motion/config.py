@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 from typing import Literal
 from urllib.parse import urlsplit
@@ -5,8 +6,28 @@ from urllib.parse import urlsplit
 from fastapi import HTTPException
 from pydantic import Field, ValidationError, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from sqlalchemy.engine import make_url
+from sqlalchemy.engine import URL, make_url
 from sqlalchemy.exc import ArgumentError
+
+
+def validate_database_transport(database: URL) -> None:
+    """Do not let libpq replace the destination/role that the operator confirmed."""
+    root_cert = database.query.get("sslrootcert")
+    if (
+        not database.host
+        or "," in database.host
+        or not database.database
+        or (database.port is None and os.environ.get("PGPORT"))
+        or set(database.query) - {"sslmode", "sslrootcert"}
+        or database.query.get("sslmode") != "verify-full"
+        or not isinstance(root_cert, str)
+        or not root_cert
+        or any(
+            os.environ.get(name)
+            for name in ("PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE", "PGOPTIONS")
+        )
+    ):
+        raise ValueError("Database transport configuration is invalid")
 
 
 class Settings(BaseSettings):
@@ -49,13 +70,12 @@ class Settings(BaseSettings):
             ):
                 raise ValueError()
             database = make_url(self.database_url)
+            validate_database_transport(database)
             if (
                 database.drivername != "postgresql+psycopg"
                 or not database.host
                 or not database.username
                 or not database.password
-                or database.query.get("sslmode") != "verify-full"
-                or not database.query.get("sslrootcert")
                 or database.port == 6543
             ):
                 raise ValueError()

@@ -14,7 +14,6 @@ import 'repository_test.dart' show recordPayload;
 /// Opt-in only. Obtain real staging credentials through OTP before invocation.
 /// This proves hosted sync/recovery, not delivery or UI/provider sign-out.
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
   final enabled = Platform.environment['DM_HOSTED_SYNC_QUALIFICATION'] == '1';
   test('real staging receipt, RLS namespace and file-backed A to B to A recovery', () async {
     if (!enabled) return;
@@ -71,8 +70,9 @@ void main() {
       final first = await transportA.push(body);
       final replay = await transportA.push(body);
       // Accepted response deliberately remains uninstalled until after restart.
-      expect(first.results.single, replay.results.single);
-      expect((first.results.single as Json)['status'], 'accepted');
+      final accepted = first.results.single as Json;
+      expect(accepted['status'], 'accepted');
+      expect(replay.results.single, {...accepted, 'status': 'duplicate'});
       final metadataA = await selected.repository.syncMetadata();
       await selected.repository.signOut();
       await expectLater(

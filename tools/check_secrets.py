@@ -17,6 +17,11 @@ PATTERNS = {
         rb"\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})\b"
     ),
     "AWS access key": re.compile(rb"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b"),
+    "Render hook credential": re.compile(
+        rb"https://api\.render\.com/(?:deploy|sync)/[A-Za-z0-9_-]+"
+        rb"\?[^\s\"'<>]*\bkey=[^&\s\"'<>]+",
+        re.IGNORECASE,
+    ),
 }
 JWT = re.compile(rb"\beyJ[A-Za-z0-9_-]{9,}\.([A-Za-z0-9_-]{12,})\.[A-Za-z0-9_-]{16,}\b")
 

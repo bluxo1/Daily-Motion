@@ -8,7 +8,9 @@ report. See [IMPLEMENTATION.md](IMPLEMENTATION.md), [TESTING.md](TESTING.md) and
 
 The current workspace is Windows. The user confirmed no physical Android phone,
 iPhone or Mac test host is available. Supabase/Render staging was deployed on
-2026-10-14; controlled inboxes and real OTP/SMTP qualification remain unavailable.
+2026-10-14; Oct 18 now adds actual SMTP/OTP and authenticated desktop Flutter
+functional evidence. Fresh Android discovery finds no connected physical device
+or emulator. Hardware qualification remains unavailable.
 Windows SQLite kills, controlled auth responses, static native checks and emulator
 results cannot close those gates. Record each unavailable case as **blocked**,
 not passed, skipped successfully or inferred from another platform.
@@ -182,12 +184,16 @@ long history; record those workloads separately. Current physical sample count i
 
 ## Hosted provider qualification
 
-Hosted staging project, HTTPS API and publishable configuration are now available;
-two controlled inboxes are designated and both real requests returned HTTP 200.
-Inbox delivery/verification, restored dashboard access and SMTP configuration
-remain required. Configure six-digit OTP templates,
-custom SMTP/domain authentication and provider limits outside the app. Verify real
-request/delivery/resend/expiry/incorrect code/refresh/revocation/account guards and
-restart/A → B → A with pending work. Record delivery timing and safe statuses,
+Actual custom-SMTP recipient delivery and A/B verification now pass, with distinct
+Supabase subjects. Two desktop Flutter cases exercise real SDK/controller
+OTP, refresh/revocation, immediate-resend and incorrect-code denial, account
+initialization, file reopening, pending sign-out, A → B → A, retries and hosted
+owner denial. See [functional evidence](evidence/phase0-hosted-auth-flow-2026-10-18.json).
+Protected storage is in memory in that desktop case; native storage, process death
+and hardware acceptance remain separate. Actual elapsed OTP expiry now passes:
+610 seconds after delivery against a 600-second lifetime, followed by fresh-code
+verification and sign-out. Trusted-key rotation, sender-capacity acceptance and
+the Render hook/source-branch incident remain open in
+[the provider audit](evidence/phase0-provider-qualification-2026-10-18.json). Record safe statuses,
 never OTP values, tokens, headers, SMTP passwords or provider/admin secrets.
 Controlled SDK/provider tests remain separate and are not delivery evidence.

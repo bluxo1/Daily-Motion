@@ -50,3 +50,16 @@ def test_configuration_repr_does_not_expose_connection_or_signing_credentials() 
     }
     rendered = repr(Settings(**values))
     assert all(value not in rendered for value in values.values())
+
+
+@pytest.mark.parametrize("resource", [b"deploy/srv-synthetic", b"sync/exs-synthetic"])
+@pytest.mark.parametrize("query", [b"key=", b"clearCache=true&key="])
+def test_guard_rejects_render_hooks_without_echoing_credentials(
+    resource: bytes, query: bytes
+) -> None:
+    public_path = b"https://api.render.com/" + resource
+    hook = public_path + b"?" + query + b"synthetic-hook-value"
+    assert guard.findings(b"first line\n" + hook) == [(2, "Render hook credential")]
+    assert hook.decode() not in repr(guard.findings(hook))
+    assert "synthetic-hook-value" not in repr(guard.findings(hook))
+    assert guard.findings(public_path) == []

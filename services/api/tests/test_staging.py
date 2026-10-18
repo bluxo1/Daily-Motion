@@ -60,6 +60,107 @@ def test_hosted_configuration_accepts_verified_session_connection() -> None:
         validate_admin_url(admin, "xxxxxxxxxxxxxxxxxxxx")
 
 
+@pytest.mark.parametrize(
+    "override",
+    [
+        "host=other-project.example.test",
+        "hostaddr=192.0.2.10",
+        "dbname=other_database",
+        "user=other_role",
+        "service=other_project",
+        "options=-crole=postgres",
+        "sslrootcert=/tmp/another-root.crt",
+    ],
+)
+def test_hosted_project_confirmation_rejects_query_routing_overrides(override: str) -> None:
+    values = hosted()
+    values["database_url"] += "&" + override
+    with pytest.raises(HTTPException) as error:
+        Settings(**values).validate_hosted()
+    assert error.value.detail == {"code": "service_not_configured"}
+    assert "synthetic" not in str(error.value)
+    assert override not in str(error.value)
+    admin = values["database_url"].replace("dm_staging_runtime:", "postgres:")
+    with pytest.raises(ValueError, match="Staging project/TLS configuration is invalid"):
+        validate_admin_url(admin, "abcdefghijklmnopqrst")
+
+
+@pytest.mark.parametrize("name", ["PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE"])
+def test_hosted_project_confirmation_rejects_ambient_routing_overrides(
+    monkeypatch: pytest.MonkeyPatch, name: str
+) -> None:
+    monkeypatch.setenv(name, "synthetic-routing-override")
+    values = hosted()
+    with pytest.raises(HTTPException) as error:
+        Settings(**values).validate_hosted()
+    assert error.value.detail == {"code": "service_not_configured"}
+    admin = values["database_url"].replace("dm_staging_runtime:", "postgres:")
+    with pytest.raises(ValueError, match="Staging project/TLS configuration is invalid"):
+        validate_admin_url(admin, "abcdefghijklmnopqrst")
+
+
+@pytest.mark.parametrize(
+    "scenario", ["port_default", "multiple_hosts", "database_default", "role_options"]
+)
+def test_connection_review_rejects_implicit_and_multiple_destinations(
+    monkeypatch: pytest.MonkeyPatch, scenario: str
+) -> None:
+    values = hosted()
+    if scenario == "port_default":
+        values["database_url"] = values["database_url"].replace(":5432/postgres", "/postgres")
+        monkeypatch.setenv("PGPORT", "6543")
+    elif scenario == "multiple_hosts":
+        values["database_url"] = (
+            values["database_url"]
+            .replace(
+                "db.abcdefghijklmnopqrst.supabase.co",
+                "unrelated.example.test,aws-0-ap-south-1.pooler.supabase.com",
+            )
+            .replace("dm_staging_runtime:", "dm_staging_runtime.abcdefghijklmnopqrst:")
+        )
+    elif scenario == "database_default":
+        values["database_url"] = values["database_url"].replace("/postgres?", "/?")
+        monkeypatch.setenv("PGDATABASE", "unintended_database")
+    else:
+        monkeypatch.setenv("PGOPTIONS", "-c role=unintended_role")
+    with pytest.raises(HTTPException) as error:
+        Settings(**values).validate_hosted()
+    assert error.value.detail == {"code": "service_not_configured"}
+    assert "synthetic" not in str(error.value)
+    admin = values["database_url"].replace("dm_staging_runtime", "postgres")
+    with pytest.raises(ValueError, match="Staging project/TLS configuration is invalid"):
+        validate_admin_url(admin, "abcdefghijklmnopqrst")
+
+
+def test_explicit_port_takes_precedence_over_unused_environment_default(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("PGPORT", "6543")
+    values = hosted()
+    Settings(**values).validate_hosted()
+    validate_admin_url(
+        values["database_url"].replace("dm_staging_runtime:", "postgres:"), "abcdefghijklmnopqrst"
+    )
+    engine = create_engine(values["database_url"])
+    try:
+        _, arguments = engine.dialect.create_connect_args(engine.url)
+        assert arguments["port"] == 5432
+    finally:
+        engine.dispose()
+
+
+def test_implicit_port_without_environment_override_is_accepted(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("PGPORT", raising=False)
+    values = hosted()
+    values["database_url"] = values["database_url"].replace(":5432/postgres", "/postgres")
+    Settings(**values).validate_hosted()
+    validate_admin_url(
+        values["database_url"].replace("dm_staging_runtime:", "postgres:"), "abcdefghijklmnopqrst"
+    )
+
+
 def test_provision_staging_is_repeatable_and_probe_rolls_back(
     database: Engine, admin_engine: Engine, owner: UUID
 ) -> None:

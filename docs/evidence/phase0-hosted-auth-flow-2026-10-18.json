@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-17T23:46:34Z",
+  "local_date": "2026-10-18",
+  "timezone": "Asia/Calcutta",
+  "scope": "Real SMTP/OTP and authenticated desktop Flutter functional qualification",
+  "source_revision": "1dfbee7",
+  "working_tree_test_changes": ["apps/mobile/test/hosted_staging_test.dart", "apps/mobile/test/hosted_auth_lifecycle_test.dart"],
+  "test_source_sha256": {
+    "apps/mobile/test/hosted_staging_test.dart": "25d8a592c9bc29cdb9fc2d6924e31f6fce46501cc81c43ca7d66e0708f38c389",
+    "apps/mobile/test/hosted_auth_lifecycle_test.dart": "c5139b4efc1196acc25ac5eb248bbdb3de3e2ab60788e0724add435cee74bbae"
+  },
+  "providers": {
+    "supabase_project_ref": "pulruylvpehwftwqcvct",
+    "api_url": "https://daily-motion-staging-api.onrender.com",
+    "render_displayed_source_revision": "c5d5414fef28a4a5170d605b61d878797786acbd",
+    "readiness_http_status": 200,
+    "initial_windows_readiness_request_timed_out": true,
+    "subsequent_playwright_request_ready": true,
+    "deployment_or_database_credentials_changed": false
+  },
+  "smtp_and_identity": {
+    "route": "configured custom Google SMTP",
+    "account_a_request_at_utc": "2026-10-17T23:23:44.099554Z",
+    "account_a_request_http_status": 200,
+    "account_b_request_at_utc": "2026-10-17T23:31:35.625699Z",
+    "account_b_request_http_status": 200,
+    "recipient_mailbox_access_required_operator_google_sign_in": true,
+    "sender_sent_copy_excluded_from_delivery_proof": true,
+    "controlled_aliases_share_recipient_mailbox": true,
+    "account_a_actual_recipient_delivery_and_verification": true,
+    "account_b_actual_recipient_delivery_and_verification": true,
+    "distinct_verified_supabase_subjects": true,
+    "provider_user_confirmation_checked": true,
+    "signing_algorithm": "ES256",
+    "successful_delivered_and_verified_challenges_including_reauthentication": 8,
+    "rest_refresh_both_owners_preserved_identity_and_rotated_refresh_tokens": true
+  },
+  "sync_case": {
+    "command": "flutter test test/hosted_staging_test.dart --reporter=expanded",
+    "latest_pass_elapsed_seconds": 25.06,
+    "passed": true,
+    "real_flutter_render_supabase_sync": true,
+    "accepted_then_duplicate_with_other_receipt_fields_equal": true,
+    "acknowledgement_uninstalled_before_restart": true,
+    "file_backed_a_b_a_pending_recovery": true,
+    "other_owner_local_and_feed_namespace_absent": true,
+    "pending_outbox_drained": true
+  },
+  "harness_defects_fixed": [
+    {"defect": "Widget binding intercepted HTTP with synthetic 400 responses", "failed_run_elapsed_seconds": 53.67, "fix": "Remove unnecessary widget binding"},
+    {"defect": "Retry assertion expected accepted instead of duplicate", "failed_run_elapsed_seconds": 13.99, "fix": "Require duplicate status with all other receipt fields unchanged"}
+  ],
+  "auth_controller_case": {
+    "command": "flutter test test/hosted_auth_lifecycle_test.dart --reporter=expanded",
+    "latest_pass_elapsed_seconds": 115.03,
+    "earlier_pass_before_additional_provider_checks_elapsed_seconds": 111.96,
+    "passed": true,
+    "real_supabase_sdk_and_production_account_controller": true,
+    "real_render_account_initialization_and_sync": true,
+    "actual_recipient_code_verification_a_b_a": true,
+    "immediate_provider_resend_denied_as_throttled": true,
+    "incorrect_code_rejected_then_correct_code_verified": true,
+    "sdk_refresh_preserved_owner_and_rotated_refresh_token": true,
+    "controller_close_reopen_with_real_sqlite_and_pending_work": true,
+    "remote_sign_out_with_pending_work": true,
+    "local_owner_locked_and_cloud_credentials_removed": true,
+    "revoked_refresh_denied_as_authentication_required": true,
+    "b_cannot_read_a_root_from_local_store_or_feed": true,
+    "b_mutation_against_uploaded_a_root_rejected_as_not_found": true,
+    "a_reauthentication_preserves_exact_pending_envelope": true,
+    "a_pending_work_synchronizes_and_bootstraps_at_revision_3": true,
+    "latest_pass_completed_at_utc": "2026-10-17T23:45:18.094280Z",
+    "protected_storage": "MemoryProtectedStorage; sessions remain in test-process memory",
+    "native_secure_storage_or_widget_ui_qualified": false
+  },
+  "isolation_scope": {
+    "hosted_api_owner_isolation_verified": true,
+    "readiness_and_tenant_transaction_runtime_guards_exercised": true,
+    "independent_direct_sql_rls_probe_repeated": false,
+    "prior_direct_sql_rls_evidence_date": "2026-10-15"
+  },
+  "execution_summary": {
+    "distinct_hosted_cases_passed": 2,
+    "initial_failed_runs_retained": true,
+    "broad_regression_suites_or_remote_ci_rerun": false,
+    "application_api_or_contract_source_changed": false,
+    "credential_rotation_repeated": false,
+    "secrets_or_message_bodies_in_evidence": false
+  },
+  "validation": {
+    "changed_dart_files_formatted": true,
+    "changed_dart_files_analysis_issues": 0,
+    "default_mode_hosted_cases_executed": 0,
+    "default_mode_hosted_cases_skipped": 2,
+    "markdown_files_validated": 30,
+    "relative_links_validated": 323,
+    "fenced_json_validated": 5,
+    "source_credential_guard_files": 253,
+    "source_credential_guard_findings": 0,
+    "comprehensive_browser_or_provider_log_clearance_claimed": false,
+    "whitespace_passed": true
+  },
+  "remaining_phase0_gates": {
+    "real_elapsed_otp_expiry": "not exercised; configured 600 seconds is separate",
+    "trusted_signing_key_rotation": "unqualified",
+    "full_rate_budget_and_sender_domain_deliverability_review": "unqualified",
+    "physical_android_devices_currently_connected": 0,
+    "emulators_currently_connected": 0,
+    "signed_iphone_and_android_native_protection_and_backup": "open",
+    "physical_accessibility_durability_and_p95": "open",
+    "operator_signing_backup_restore_processor_and_named_review": "open"
+  },
+  "phase0_complete": false,
+  "phase1_started": false
+}

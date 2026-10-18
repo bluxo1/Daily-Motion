@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-18T08:26:39Z",
+  "scope": "Phase 0 elapsed OTP expiry, assertion/logging hardening and provider audit",
+  "qualification_parent_revision": "1dfbee7bc74098fcd50f745c3148236b0187961c",
+  "test_source_sha256": {
+    "apps/mobile/test/hosted_auth_lifecycle_test.dart": "d62d088231ddda2496b7e872e380d55428f1aebfc18fd03ae47760ba30107d2d",
+    "apps/mobile/test/hosted_otp_expiry_test.dart": "64b560e8a985fa901614900468b62fbafa9074a1a2b5ead64602567bb66033d5",
+    "apps/mobile/test/support/auth_rejection.dart": "dddf91956677f314fb24062ffb1e6ce92c0a22fa2ea4ec3d7df69a19221885d7",
+    "tools/check_secrets.py": "bf0349327064feaa9dc7206f0c16708216f88ac75fb707e516a9d67be4f088e7"
+  },
+  "smtp_configuration": {
+    "saved_configuration_http_status": 200,
+    "required_smtp_fields_present": true,
+    "confirmation_and_magic_link_token_markers": true,
+    "otp_digits": 6,
+    "otp_expiry_seconds": 600,
+    "configuration_changed": false
+  },
+  "elapsed_otp_expiry": {
+    "first_run_passed": true,
+    "first_run_before_assertion_hardening": true,
+    "first_wait_started_at_utc": "2026-10-18T07:48:05.054017Z",
+    "first_expiry_denied_at_utc": "2026-10-18T07:58:15.774507Z",
+    "first_fresh_code_verified_at_utc": "2026-10-18T07:59:05.368854Z",
+    "first_session_signed_out_at_utc": "2026-10-18T07:59:05.734222Z",
+    "configured_seconds": 600,
+    "measured_seconds_after_delivery": 610,
+    "real_clock_wait": true,
+    "resend_or_verification_during_hold": false,
+    "error_category": "invalid_or_expired_code",
+    "fresh_actual_delivery_and_verification_after_expiry": true,
+    "hardened_source_run": {
+      "passed": true,
+      "events": [
+        {
+          "event": "expiry_wait_started",
+          "at": "2026-10-18T08:14:53.065687+00:00",
+          "configured_seconds": 600
+        },
+        {
+          "event": "elapsed_otp_expiry_rejected",
+          "at": "2026-10-18T08:25:04.059056+00:00",
+          "elapsed_seconds": 610
+        },
+        {
+          "event": "fresh_delivered_code_verified_after_expiry",
+          "at": "2026-10-18T08:25:17.054950+00:00"
+        },
+        {
+          "event": "qualification_session_signed_out",
+          "at": "2026-10-18T08:25:17.185180+00:00"
+        }
+      ],
+      "reporter_elapsed": "11:16",
+      "actual_recipient_challenges": 2,
+      "actual_codes_supplied_privately": 2,
+      "bridge_shutdown_requested": true
+    }
+  },
+  "hardened_lifecycle": {
+    "passed": true,
+    "reporter_elapsed": "02:30",
+    "completed_at_utc": "2026-10-18T08:07:43.788853Z",
+    "actual_inbox_challenges": 3,
+    "real_sdk_refresh_and_revocation": true,
+    "file_restart_pending_sign_out_a_b_a_and_hosted_sync": true,
+    "cross_owner_feed_and_mutation_denied": true,
+    "protected_storage": "MemoryProtectedStorage; no native hardware qualification",
+    "preceding_failed_run": {
+      "reporter_elapsed": "00:30",
+      "category": "API initialization timeout after OTP verification",
+      "subsequent_readiness_http_status": 200,
+      "cold_start_root_cause_proven": false
+    },
+    "bounded_initialization_retry": "One retry with retained verified session, only when initialization is pending and code is timeout; no timeout increase"
+  },
+  "assertion_hardening": {
+    "defect": "SDK Session.toString includes tokens; failed throwsA/equality matchers could format unexpected sessions",
+    "unexpected_success_and_wrong_error_type_not_formatted": true,
+    "synthetic_regression_tests_passed": 3,
+    "actual_session_dump_from_these_assertions_observed": false
+  },
+  "credential_guard": {
+    "added_category": "Render hook credential",
+    "synthetic_before_fix_findings": 0,
+    "synthetic_after_fix_findings": 1,
+    "targeted_tests_passed": 9,
+    "only_paths_lines_and_categories_reported": true,
+    "tool_response_history_clearance_claimed": false
+  },
+  "provider_review": {
+    "public_jwks_status": 200,
+    "public_key_count": 1,
+    "public_algorithms": [
+      "ES256"
+    ],
+    "trusted_keys_changed": false,
+    "rotation_approval_requested": true,
+    "consumer_gmail_smtp_account": true,
+    "sender_matches_smtp_user": true,
+    "recipient_message_details": {
+      "mailed_by_gmail": true,
+      "signed_by_gmail": true,
+      "standard_tls": true,
+      "raw_spf_dkim_dmarc_results_obtained": false
+    },
+    "configured_budgets": {
+      "email_per_hour": 30,
+      "otp_bucket_refill": 30,
+      "verify_bucket_refill": 30,
+      "refresh_bucket_refill": 150,
+      "resend_interval_seconds": 60
+    },
+    "hourly_budget_daily_maximum": 720,
+    "published_consumer_gmail_daily_limit": 500,
+    "hourly_or_daily_quota_exhaustion_not_performed": true,
+    "capacity_and_operator_delivery_review_open": true,
+    "source_urls": [
+      "https://supabase.com/docs/guides/auth/rate-limits",
+      "https://support.google.com/mail/answer/22839?hl=en",
+      "https://supabase.com/docs/guides/auth/signing-keys"
+    ]
+  },
+  "render_audit": {
+    "service_branch": "main",
+    "blueprint_source_branch": "phase0-qualification-2026-10-13",
+    "blueprint_source_branch_missing_from_remote": true,
+    "source_branch_edit_saved": false,
+    "source_branch_repair_held_for_hook_invalidation": true,
+    "security_incident": {
+      "private_blueprint_sync_hook_returned_in_tool_response": true,
+      "hook_value_in_repository_or_evidence": false,
+      "invalidation_confirmed": false,
+      "regeneration_control_exposed_by_settings_ui": false,
+      "operator_or_render_support_invalidation_requested": true,
+      "private_saved_value_comparison_prepared_in_browser_memory": true,
+      "comprehensive_log_purge_claimed": false
+    }
+  },
+  "backup_audit": {
+    "free_plan_currently_indicated": true,
+    "upgrade_required_by_backup_page": true,
+    "scheduled_backup_rows": 0,
+    "restore_controls": 0,
+    "paid_upgrade_or_restore_not_performed": true,
+    "operator_approved_alternative_backup_arrangement_unavailable": true
+  },
+  "regression": {
+    "api_tests_passed": 108,
+    "api_tests_skipped": 0,
+    "live_flutter_http_cases": 9,
+    "ordinary_flutter_passed": 151,
+    "ordinary_flutter_explicit_skips": 12,
+    "flutter_full_reporter_elapsed": "02:36",
+    "flutter_analysis_issues": 0,
+    "mypy_source_files": 13,
+    "ruff_format_and_lint_passed": true,
+    "four_generated_artifacts_identical": true,
+    "remote_ci_for_baseline": {
+      "revision": "c9a837032bb65843c99f76376a2b8f3fb8f289dc",
+      "run_id": 38942611206,
+      "conclusion": "success"
+    },
+    "new_changes_remote_ci_qualified": false,
+    "docs_markdown_files": 30,
+    "docs_local_links": 332,
+    "docs_fenced_json": 5,
+    "source_credential_guard_files": 257,
+    "source_credential_guard_findings": 0,
+    "staged_whitespace_passed": true
+  },
+  "remaining": [
+    "Invalidate exposed Render Blueprint sync hook; then repair and verify Blueprint source branch",
+    "Approved staging trusted signing-key rotation/revocation rehearsal",
+    "Approved sender capacity/rate arrangement",
+    "Physical Android/iPhone signed installation, native storage/backup, lifecycle/accessibility and durable-save p95 <=100 ms",
+    "Managed backup/recovery and processor arrangements",
+    "Named privacy/security reviewer, incident/operator acceptance and developer/store prerequisites",
+    "CI on newly committed source and final release review after external gates"
+  ],
+  "phase0_complete": false,
+  "phase1_started": false
+}

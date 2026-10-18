@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from daily_motion.config import settings
 from daily_motion.models import OwnerState
+from tests.database_target import validate_local_test_target
 
 
 @pytest.fixture(scope="session")
@@ -20,8 +21,7 @@ def admin_engine() -> Iterator[Engine]:
     url = os.environ.get("DM_TEST_ADMIN_URL", "")
     if not url:
         pytest.skip("PostgreSQL integration requires DM_TEST_ADMIN_URL (see README)")
-    if not url.endswith("/daily_motion_test"):
-        raise RuntimeError("Integration tests require the dedicated daily_motion_test database")
+    validate_local_test_target(url)
     admin = create_engine(url)
     with admin.begin() as db:
         db.execute(text("DROP SCHEMA IF EXISTS training CASCADE"))

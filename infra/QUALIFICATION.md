@@ -1,8 +1,8 @@
 # Operator qualification handoff
 
-This is a preparation checklist, not a deployed environment or a claim that
-provider settings, email delivery, legal review or signing were qualified.
-The workspace has synthetic local PostgreSQL and remote compilation only.
+This is an operator checklist. Staging deployment and desktop hosted SMTP/OTP,
+SDK/controller and sync functional proof now exist; legal review, signing,
+managed recovery and physical-device acceptance remain open.
 [Phase 0 evidence](../docs/PHASE0_EVIDENCE.md) separates these from external gates.
 
 The Daily Motion product/repository owner is accountable for commissioning the
@@ -10,6 +10,66 @@ India launch privacy/security review and assigning a named qualified reviewer.
 The deployment operator owns region, backup, processor and signing evidence.
 Named appointments and approval artifacts must be recorded before closing the
 external dependency; software tests cannot provide that approval.
+
+### Current operator dependencies — 2026-10-18 IST
+
+- Invalidate the exposed private Render Blueprint sync hook for
+  `daily-motion-staging` (provider support if necessary; no regeneration control
+  is exposed by the current settings UI). Do not paste the replacement URL into
+  chat. Confirm invalidation, then repair and verify the deleted source branch to
+  `main`. The service already follows `main`; its secrets must remain protected.
+- Authorize the staging-only ES256 standby/rotation/revocation rehearsal and API
+  cache restart before trusted keys change. Observe provider JWKS cache propagation
+  and verify overlapping/new/retired credentials. No key change is authorized yet.
+- Approve a staging sender capacity policy: 30 emails/hour can permit 720/day,
+  exceeding the consumer Gmail sender's documented 500/day allowance. Actual
+  recipient delivery/signing/TLS and immediate resend denial pass; hourly/daily
+  quota exhaustion and an operator capacity acceptance are not claimed.
+- Provide an approved managed or separately arranged backup/recovery route and
+  processor acceptance. The current backup dashboard still shows Free, no
+  scheduled backup rows and no restore control. No paid upgrade was attempted.
+  [Recovery preparation](RECOVERY.md) now includes an actual isolated local
+  logical restore and the concrete hosted approval package; it does not close
+  managed recovery or operator acceptance.
+- Supply Android/iPhone hardware, signing/install access, developer/store
+  prerequisites, named privacy/security and incident ownership, and operator
+  acceptance. Physical/native/accessibility/p95 evidence remains mandatory.
+
+See [the safe provider audit](../docs/evidence/phase0-provider-qualification-2026-10-18.json).
+
+#### Private Render Support request — submitted
+
+The owner-authorized request was submitted through the authenticated private
+Render Dashboard messenger. Support conversation reference: **215476446235862**;
+no separate formal ticket number was observed. HTTP 200 and the visible sent
+message confirm submission. The automated agent acknowledged escalation to the
+human team after its service deploy-hook guidance was challenged. No human
+revocation confirmation has arrived. Continue in that conversation; incident
+status remains **OPEN**. No hook URLs, credentials or attachments were submitted.
+[Submission evidence](../docs/evidence/phase0-render-support-submission-2026-10-18.json).
+
+Submitted action scope:
+
+> Please invalidate/disable or rotate in place the potentially compromised
+> Blueprint Sync Hook for `daily-motion-staging` / `exs-db7otpl9fdbs73f0qaqg`.
+> Preserve existing service `srv-db7p5knavr4c7392dasg`, deployed revision,
+> credentials and external Supabase PostgreSQL. Enqueue no sync/deploy and
+> create/delete no resources. Confirm old credentials are rejected before
+> enqueueing, using redacted provider-side evidence or a supported auth-only check.
+> If direct invalidation is unavailable, document disconnection's revocation
+> semantics and a same-resource reattachment plan without duplication, deployment
+> or credential reset; obtain owner approval before disconnecting. Keep secrets
+> and hook URLs out of the reply.
+
+Auto Sync off is verified; revocation is not. The published Blueprint update API
+accepts only name, Auto Sync and path. The separate service deploy-hook control
+does not rotate a Blueprint sync hook. [Current evidence](../docs/evidence/phase0-render-hook-investigation-2026-10-18.json).
+
+Read-only recipient-message inspection also confirms SPF, DKIM and DMARC **pass**
+in both the receiving server's Authentication-Results and Gmail's original-message
+summary. This adds sender-authentication proof without a new OTP request;
+capacity policy and operator acceptance remain open.
+[Header evidence](../docs/evidence/phase0-smtp-authentication-headers-2026-10-18.json).
 
 ## Hosted staging prerequisites
 

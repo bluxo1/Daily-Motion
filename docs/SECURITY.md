@@ -74,6 +74,31 @@ Restrict storage objects by owner and use short-lived authenticated download pat
 
 ## Phase 0 development authentication boundary
 
+The Oct 18 connection review found that a database-name suffix check could let
+the destructive test fixture reach a remote host or another database. The fixture
+now validates the parsed local target before engine creation and rejects query
+and ambient libpq routing overrides. Separately, hosted API/operator validation
+now shares a strict TLS query allowlist: additional parameters cannot replace the
+confirmed host, database or role. SQLAlchemy's effective-host override was
+reproduced without opening a connection; three fixture regressions and eight
+initial hosted regressions fail before the fixes. Focused tests pass afterward.
+The original `d655e1f` fix is now published with green remote CI. The subsequent
+review closes inherited-port/database, multiple-host and startup-role-options
+gaps; its full local regression uses a newly created disposable database.
+An omitted port requires no `PGPORT` override; explicit ports retain precedence.
+One host and an explicit database are required, and `PGOPTIONS` is rejected.
+The follow-up remains local and **not deployed**; its publication/deployment
+require authorization. No existing database was reset.
+[Security and recovery evidence](evidence/phase0-recovery-and-connection-guards-2026-10-18.json).
+[CI and follow-up review](evidence/phase0-ci-routing-review-2026-10-18.json).
+
+The same review queries OSV with all 47 registry packages in the frozen Python
+lock and 135 hosted Pub packages. It returns zero advisories, with all responses
+present and no pending pagination. Known affected PyPI/Pub versions return 13/2
+advisories as positive controls. This is a dated package-advisory check, excluding
+native libraries, SDK internals and unknown/unreported issues; no dependency
+version changed and no comprehensive security certification is claimed.
+
 The requested hosted staging setup is documented in
 [the Supabase/Render runbook](../infra/staging/README.md). Render holds only the
 restricted runtime connection and synchronization signing key; migrations run
@@ -170,8 +195,45 @@ Operators must configure separate projects, asymmetric signing/JWKS, confirmed
 six-digit email OTP templates, custom SMTP, sender-domain SPF/DKIM, delivery monitoring and
 provider resend/attempt limits. The UI's 60-second resend cooldown supplements
 provider limits and is not an abuse-control replacement. Keep SMTP, service/admin
-and signing secrets outside client-safe configuration. Hosted OTP/SMTP, urgent
-JWKS rotation and observable session revocation have not been qualified here.
+and signing secrets outside client-safe configuration. Actual hosted SMTP/OTP,
+refresh, observable revoked-refresh denial and elapsed email-code expiry now
+have desktop evidence. Urgent trusted-JWKS rotation remains unqualified and
+requires operator authorization. See [the provider audit](evidence/phase0-provider-qualification-2026-10-18.json).
+
+The Oct 18 audit also found a private Render Blueprint sync hook in a tool
+response. It is absent from repository evidence, but remains exposed until
+provider/operator invalidation is confirmed; no tool-log purge is claimed.
+Source scanning now rejects Render deploy/sync hook credentials without printing
+values. This guard does not invalidate an already disclosed credential.
+
+**Later Oct 18 supported-control audit:** Auto Sync is verified disabled after
+reload, while the hook is unchanged by private comparison. The Blueprint UI and
+full published API expose no supported rotation/revocation or auth-only check.
+Disconnection preserves resources but does not document hook revocation;
+recreation can duplicate resources and adoption can apply configuration changes.
+No hook request, disconnection, recreation, deployment or credential change was
+performed. The same service remains Live on `c5d5414`; health/readiness return 200.
+The saved Blueprint source still references the deleted branch, while the service
+uses `main`. Incident status remains **OPEN** pending Render Support's server-side
+invalidation and redacted non-triggering proof. Any fallback disconnection needs
+owner approval plus confirmed revocation/migration semantics.
+[Investigation and sources](evidence/phase0-render-hook-investigation-2026-10-18.json).
+
+**Authorized Support submission:** private Render conversation
+**215476446235862** accepted the request and the automated agent acknowledged
+human escalation. Its initial service deploy-hook advice was challenged, not
+applied. No human revocation confirmation or old-credential rejection proof has
+arrived; incident status remains **OPEN**. The request contains no hook URL or
+credential value and requires preserving services/database, enqueueing no sync or
+deployment, and obtaining further approval for any resource modification.
+No resource or credential changes were performed.
+[Support evidence](evidence/phase0-render-support-submission-2026-10-18.json).
+
+An already delivered recipient OTP message also passes SPF, DKIM and DMARC in
+the receiving server's headers and Gmail's separate summary. Only classifications
+and domains are retained; no raw headers, email address or code is recorded.
+This qualifies sender authentication for that message, not future delivery or
+daily capacity. [Header evidence](evidence/phase0-smtp-authentication-headers-2026-10-18.json).
 
 ## AI and health data boundaries
 

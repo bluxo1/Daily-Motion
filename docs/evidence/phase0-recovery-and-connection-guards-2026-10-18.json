@@ -1,0 +1,290 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-18T10:27:15.610468+00:00",
+  "parent_revision": "578a02e",
+  "scope": "Phase 0 connection safety, local recovery preparation and sender-capacity approval package",
+  "qualification_source_sha256": {
+    "services/api/src/daily_motion/config.py": "8ca39078a40eb6d58cf88805cde64a6dcda811d483855ad97852961a5412309a",
+    "services/api/src/daily_motion/staging.py": "51d4b375d360ee48a813933ef39ad82567eb95835945a1eca0422e23ec73ff5d",
+    "services/api/tests/conftest.py": "f72bb46791919d8d35231e3706b48e1315e37e2bda373c9b7d9a925c117db56b",
+    "services/api/tests/database_target.py": "46bd6c87bd652c83bcaf0dd7432d800b86d72090a3dfd0f63e647ba8a3e510ce",
+    "services/api/tests/test_database_target.py": "fc473c56922a8b1f4650d258a8d51cd71a076df793e6ff5a7f0270fad84186ba",
+    "services/api/tests/test_staging.py": "ede01b8d2febf81862fae5902ca94e0148df23cf1bc574d496d929fce489398e"
+  },
+  "connection_guard_defects": {
+    "test_fixture": {
+      "before": "Suffix-only database check allowed a remote host, a different database disguised in the query suffix, and ambient remote hostaddr",
+      "baseline_regressions_failed": 3,
+      "database_connection_opened_by_attack_tests": false,
+      "after": "Parsed exact database/driver, explicit loopback host, no connection query or ambient libpq routing overrides; checked before engine creation",
+      "new_guard_cases_passed": 19
+    },
+    "hosted_transport": {
+      "before": "API and operator project checks allowed additional libpq routing parameters or ambient service/hostaddr overrides",
+      "baseline_runtime_regressions_failed": 8,
+      "operator_query_override_variants_accepted_before_fix": 5,
+      "sqlalchemy_effective_host_changed_without_opening_connection": true,
+      "after": "Shared API/operator transport validation accepts only verify-full SSL and one nonempty root certificate, rejects additional query keys and ambient routing overrides",
+      "remote_connection_or_provider_mutation_performed": false,
+      "runtime_fix_deployed": false
+    }
+  },
+  "local_recovery": {
+    "observed_at_utc": "2026-10-18T10:20:53.359839+00:00",
+    "scope": "Local synthetic PostgreSQL logical restore only",
+    "source_fingerprint": {
+      "metadata": {
+        "revision": "0003",
+        "tables": 11,
+        "forced_rls": true,
+        "policy_hash": "e00ea4b07aaf68e63bea4552056c4be6",
+        "constraint_hash": "8fe981ba607c8698bebbc49cbe8b1df2",
+        "index_hash": "7e4004e9e7c19983436052fb582c80bc"
+      },
+      "rows": {
+        "account_retirements": {
+          "rows": 0,
+          "hash": "d751713988987e9331980363e24189ce"
+        },
+        "changes": {
+          "rows": 1,
+          "hash": "34f1b66dcc695303b238cf3fb269e38f"
+        },
+        "exercises": {
+          "rows": 1,
+          "hash": "02b4762d1d808b8222d88efa5a4db0ef"
+        },
+        "observations": {
+          "rows": 0,
+          "hash": "d751713988987e9331980363e24189ce"
+        },
+        "owner_state": {
+          "rows": 1,
+          "hash": "9a237bcf9a8fc41a87d77e9adc657e4d"
+        },
+        "profiles": {
+          "rows": 0,
+          "hash": "d751713988987e9331980363e24189ce"
+        },
+        "receipts": {
+          "rows": 1,
+          "hash": "1ba6a6ce5df1f0a093521aaf47afd44d"
+        },
+        "retired_ids": {
+          "rows": 0,
+          "hash": "d751713988987e9331980363e24189ce"
+        },
+        "sets": {
+          "rows": 3,
+          "hash": "b9074ffa996e0adabb1b61ae5434702d"
+        },
+        "snapshots": {
+          "rows": 0,
+          "hash": "d751713988987e9331980363e24189ce"
+        },
+        "workouts": {
+          "rows": 1,
+          "hash": "ad179fbc210a8026413efa6e3da4b0c1"
+        }
+      }
+    },
+    "archive_bytes": 28436,
+    "archive_sha256": "3e9e2baf088b7f3789931eeb881be577d2841bfb7b7240037d4a28859ae29c58",
+    "source_written": false,
+    "hosted_accessed": false,
+    "archive_retained_at_rest": false,
+    "bootstrap_readiness_before_final_server_observed": false,
+    "missing_role_restore_rejected": true,
+    "failed_restore_left_no_training_tables": true,
+    "truncated_archive_rejected": true,
+    "truncated_restore_left_no_training_tables": true,
+    "restored_fingerprint": {
+      "metadata": {
+        "revision": "0003",
+        "tables": 11,
+        "forced_rls": true,
+        "policy_hash": "e00ea4b07aaf68e63bea4552056c4be6",
+        "constraint_hash": "8fe981ba607c8698bebbc49cbe8b1df2",
+        "index_hash": "7e4004e9e7c19983436052fb582c80bc"
+      },
+      "rows": {
+        "account_retirements": {
+          "rows": 0,
+          "hash": "d751713988987e9331980363e24189ce"
+        },
+        "changes": {
+          "rows": 1,
+          "hash": "34f1b66dcc695303b238cf3fb269e38f"
+        },
+        "exercises": {
+          "rows": 1,
+          "hash": "02b4762d1d808b8222d88efa5a4db0ef"
+        },
+        "observations": {
+          "rows": 0,
+          "hash": "d751713988987e9331980363e24189ce"
+        },
+        "owner_state": {
+          "rows": 1,
+          "hash": "9a237bcf9a8fc41a87d77e9adc657e4d"
+        },
+        "profiles": {
+          "rows": 0,
+          "hash": "d751713988987e9331980363e24189ce"
+        },
+        "receipts": {
+          "rows": 1,
+          "hash": "1ba6a6ce5df1f0a093521aaf47afd44d"
+        },
+        "retired_ids": {
+          "rows": 0,
+          "hash": "d751713988987e9331980363e24189ce"
+        },
+        "sets": {
+          "rows": 3,
+          "hash": "b9074ffa996e0adabb1b61ae5434702d"
+        },
+        "snapshots": {
+          "rows": 0,
+          "hash": "d751713988987e9331980363e24189ce"
+        },
+        "workouts": {
+          "rows": 1,
+          "hash": "ad179fbc210a8026413efa6e3da4b0c1"
+        }
+      }
+    },
+    "all_rows_and_policies_match": true,
+    "source_unchanged_after_dump": true,
+    "restored_owner_workouts": 1,
+    "restored_other_owner_workouts": 0,
+    "restored_unset_owner_workouts": 0,
+    "restored_owner_reassignment_denied": true,
+    "restored_duplicate_receipt_denied": true,
+    "restored_runtime_is_restricted_non_owner": true,
+    "passed": true,
+    "temporary_container_removed": true
+  },
+  "local_recovery_limits": {
+    "postgresql_version": "17.7 local, not the hosted 17.11 provider",
+    "real_dump_and_restore": true,
+    "source_container_compose_directory_verified": true,
+    "restore_destination_new_network_none_tmpfs_container": true,
+    "raw_archives_rows_or_credentials_retained_in_repository": false,
+    "test_runtime_role": "Restricted non-owner NOLOGIN role; no login credential restoration claimed",
+    "empty_tables_do_not_supply_nonempty_recovery_evidence": [
+      "account_retirements",
+      "observations",
+      "profiles",
+      "retired_ids",
+      "snapshots"
+    ],
+    "full_flutter_http_retry_after_restore": false,
+    "hosted_auth_user_restore": false,
+    "offsite_encryption_retention_or_operator_acceptance": false,
+    "managed_backup_gate_closed": false,
+    "initial_helper_failure": "Command failed before the post-failed-restore table check; initialization timing suspected but not independently reproduced",
+    "startup_recovery": "Wait for final postgres PID 1 and successful destination query",
+    "intermediate_cleanup_inspection_race": "Immediate inspect after stop still saw the auto-removed container; final helper waits for actual removal",
+    "final_cleanup_confirmed": true,
+    "one_off_local_helper_sha256": "3d13922fcfc30ca03b28f518678591d64087883af2efae0fada90d987ea6350e"
+  },
+  "sender_capacity": {
+    "saved_email_messages_per_hour": 30,
+    "saved_otp_requests_per_hour": 30,
+    "saved_verification_requests_per_hour": 30,
+    "saved_resend_interval_seconds": 60,
+    "current_nominal_24_hour_allowance": 720,
+    "documented_consumer_gmail_daily_message_limit": 500,
+    "proposed_email_messages_per_hour": 10,
+    "proposed_nominal_24_hour_allowance": 240,
+    "proposal_is_not_a_guaranteed_account_wide_daily_budget": true,
+    "account_other_senders_bursts_bounces_and_monitoring_require_operator_review": true,
+    "authorization_requested": true,
+    "authorization_received": false,
+    "provider_setting_changed": false,
+    "quota_exhaustion_or_bulk_email_test_performed": false,
+    "new_otp_requests": 0,
+    "sources": [
+      "https://supabase.com/docs/guides/auth/rate-limits",
+      "https://support.google.com/mail/answer/22839?hl=en"
+    ]
+  },
+  "validation": {
+    "final_focused_python_passed": 59,
+    "final_focused_python_skipped": 0,
+    "final_focused_python_deselected_database_cases": 12,
+    "preceding_selection": {
+      "passed": 57,
+      "skipped": 8,
+      "deselected": 4
+    },
+    "ruff_check_passed": true,
+    "ruff_format_files_passed": 35,
+    "strict_mypy_source_files_passed": 13,
+    "full_postgresql_regressions": "Explicit local test-schema reset authorization requested, not received; not run",
+    "flutter_runtime_changed": false,
+    "new_remote_ci_run": false,
+    "repository_checks": {
+      "markdown_files": 31,
+      "local_links": 355,
+      "fenced_json_examples": 5,
+      "credential_guard_files": 264,
+      "credential_findings": 0,
+      "git_diff_check_passed": true,
+      "new_evidence_json_and_six_tested_source_hashes_verified": true
+    }
+  },
+  "external_boundaries": {
+    "render_incident": "OPEN; support reference 215476446235862, no reinvestigation or revocation claim",
+    "provider_key_rotation_deployment_ci_publication_or_operator_acceptance_performed": false,
+    "physical_devices_available": false
+  },
+  "phase0_complete": false,
+  "phase1_started": false,
+  "locked_dependency_advisory_review": {
+    "checked_at_utc": "2026-10-18T10:30:26.150959+00:00",
+    "provider": "OSV public querybatch API",
+    "http_status": 200,
+    "queries": 182,
+    "pypi_packages": 47,
+    "pub_packages": 135,
+    "sdk_packages_excluded": [
+      "flutter",
+      "flutter_driver",
+      "flutter_test",
+      "flutter_web_plugins",
+      "fuchsia_remote_debug_protocol",
+      "integration_test",
+      "sky_engine"
+    ],
+    "all_results_present_and_pagination_complete": true,
+    "lock_sha256": {
+      "services/api/uv.lock": "af7e1221203db918f3bdf4ae25347cbb4792cade782777c72bc0ab83f40a1c24",
+      "apps/mobile/pubspec.lock": "f06c4f5c56cb31339d57f7f12821a51811861430033b872dc337e590a51cfce5"
+    },
+    "findings": [],
+    "package_versions_changed": false,
+    "limits": "Package advisories only; not native Gradle/CocoaPods/OS images, SDK internals, unsupported/unreported advisories or a comprehensive security certification",
+    "positive_controls": [
+      {
+        "ecosystem": "PyPI",
+        "package": "requests",
+        "version": "2.0.0",
+        "advisory_count": 13,
+        "error_present": false,
+        "pagination_pending": false
+      },
+      {
+        "ecosystem": "Pub",
+        "package": "archive",
+        "version": "3.3.6",
+        "advisory_count": 2,
+        "error_present": false,
+        "pagination_pending": false
+      }
+    ],
+    "api_documentation": "https://google.github.io/osv.dev/post-v1-querybatch/"
+  },
+  "updated_at_utc": "2026-10-18T10:31:41.603413+00:00"
+}

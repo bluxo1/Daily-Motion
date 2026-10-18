@@ -1,25 +1,99 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
+## Project status and source of truth
 
-This repository currently contains planning documents only: `README.md` introduces the product, and `docs/` holds requirements, architecture, design, security, and testing specifications. Application code, tests, and assets have not been scaffolded. The proposed layout is `apps/mobile/` for Flutter, `services/api/` for FastAPI, `contracts/` for API schemas and shared fixtures, and `infra/` for deployment configuration. Add `ml/` only when experiments begin. Start with `docs/PRODUCT.md`, `docs/ROADMAP.md`, and `docs/ARCHITECTURE.md`; consult `docs/DATA_MODEL.md`, `docs/SYNC_PROTOCOL.md`, and `docs/API.md` together for workout behavior.
+This repository contains a Phase 0 development foundation for Daily Motion, not a
+production-ready public app. Phase 0 remains in progress; remaining provider,
+physical-device and operator qualification are open, and Phase 1 has not started. Check
+[`docs/phases.md`](docs/phases.md), [`docs/IMPLEMENTATION.md`](docs/IMPLEMENTATION.md),
+and [`docs/PHASE0_EVIDENCE.md`](docs/PHASE0_EVIDENCE.md) for current evidence and
+gaps. Do not infer release readiness from desktop tests or CI compilation.
 
-## Build, Test, and Development Commands
+Before changing product behavior, read [`docs/PRODUCT.md`](docs/PRODUCT.md),
+[`docs/ROADMAP.md`](docs/ROADMAP.md), and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+For workout behavior, consult [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md),
+[`docs/SYNC_PROTOCOL.md`](docs/SYNC_PROTOCOL.md), and [`docs/API.md`](docs/API.md)
+together. [`docs/DECISIONS.md`](docs/DECISIONS.md) records accepted choices;
+[`docs/SECURITY.md`](docs/SECURITY.md) governs identity, isolation, deletion, and
+data handling.
 
-There is no runnable application or build/test script yet. For documentation edits, run `git diff --check` to catch whitespace errors and review changed Markdown links against their targets. Once implementation exists, follow `docs/CONTRIBUTING.md`: use `dart format`, `flutter analyze`, and `flutter test` for mobile changes; use `ruff format`, `ruff check`, mypy, and pytest for Python changes. Do not report those future checks as completed today.
+## Project structure
 
-## Coding Style & Naming Conventions
+- `apps/mobile/`: Flutter, Riverpod, Drift, workout domain, UI, and native adapters.
+- `services/api/`: FastAPI modular monolith, PostgreSQL models, Alembic migrations,
+  and API tests.
+- `contracts/`: checked OpenAPI and shared contract fixtures.
+- `infra/`: local services, deployment configuration, and operator runbooks.
+- `docs/`: product, architecture, qualification, and implementation evidence.
+- `tools/`: contract generation and repository checks.
 
-Keep Markdown headings descriptive and relative links valid. Use the domain terms in `docs/DATA_MODEL.md` precisely: a routine, template, program version, workout session, session exercise, and set are distinct. Future Dart and Python code should follow their standard formatters, with feature/domain names matching the specifications. Keep planned, observed, inferred, and derived values separate.
+Do not add empty services or shared packages for hypothetical reuse. Add `ml/`
+only when the roadmap's reproducible experiments begin.
 
-## Testing Guidelines
+## Build, development, and validation commands
 
-For now, check documentation consistency, links, and phase claims. `docs/TESTING.md` defines future unit, widget, database, contract, device, accessibility, and sync fault tests. Add tests for observable behavior with deterministic synthetic fixtures; exercise real SQLite or PostgreSQL where transactions, migrations, or row policies matter. No coverage percentage or test-file naming convention is established yet.
+The pinned Flutter SDK is 3.47.7 / Dart 3.13.5 (`.fvmrc`); this Windows workspace
+also has an ignored SDK at `.tools/flutter`. From `apps/mobile/`, use:
 
-## Commit & Pull Request Guidelines
+```sh
+flutter pub get --enforce-lockfile
+dart run build_runner build
+dart format lib test
+flutter analyze
+flutter test
+```
 
-History currently contains an initial commit and `docs: add Daily Motion product and architecture planning`; `docs/CONTRIBUTING.md` encourages meaningful, conventional-style messages and short-lived `feat/`, `fix/`, `docs/`, or `chore/` branches. Keep one outcome per PR. Explain scope, roadmap phase, validation commands and results, and limitations. Include screenshots for interaction changes, contract fixtures for API changes, and migration/rollback details for schema changes.
+When using the workspace SDK on Windows, invoke `.tools\\flutter\\bin\\flutter.bat`
+from the repository root and set `PUB_CACHE`, `TEMP`, and `TMP` to the task-local
+paths documented in `README.md`.
 
-## Security & Configuration
+Python is pinned to 3.13.14. From `services/api/`, use:
 
-Keep secrets and production user data out of version control, fixtures, screenshots, and notebooks. Use placeholders in example environment files. Check `docs/SECURITY.md` before changing authentication, owner isolation, deletion, or data handling.
+```sh
+uv sync --frozen --extra dev
+uv run --no-sync ruff format --check .
+uv run --no-sync ruff check .
+uv run --no-sync mypy src
+uv run --no-sync pytest -q
+```
+
+PostgreSQL integration tests require `DM_TEST_ADMIN_URL` for the dedicated test
+database; without it, those cases are explicitly skipped. The connected Flutter
+HTTP/PostgreSQL harness additionally requires `DM_RUN_CONNECTED=1` and the
+documented test setup. Never report skipped cases as passed. For documentation
+changes, run `python tools/check_docs.py` and `git diff --check`, and review
+changed relative Markdown links.
+
+## Coding and domain conventions
+
+Use standard Dart and Python formatters. Keep domain terms from
+`docs/DATA_MODEL.md` precise: a routine, template, program version, workout session,
+session exercise, and set are distinct. Keep planned, observed, inferred, and
+derived values separate. Widgets render state; domain validation, persistence, and
+synchronization remain in their respective layers.
+
+## Testing and evidence
+
+Add deterministic tests for observable behavior. Use real SQLite or PostgreSQL
+when transaction, migration, or row-policy behavior matters. Sync changes need
+fault/restart coverage; auth and ownership changes need isolation and lifecycle
+coverage. Follow `docs/TESTING.md` for the relevant acceptance cases.
+
+Desktop or emulator results do not qualify physical-device durability,
+performance, accessibility, native secure storage, or backup behavior. Hosted
+HTTP acceptance does not prove real inbox delivery or verified account sync.
+Record evidence and limitations in the implementation docs rather than upgrading
+a prototype or local result into a release claim.
+
+## Branches, reviews, and security
+
+Keep one coherent outcome per change and use short-lived `feat/`, `fix/`, `docs/`,
+or `chore/` branches. Explain scope, roadmap phase, validation and limitations in
+reviews. Include migration/rollback details for schema changes and contract
+fixtures for API changes. Do not commit, deploy, or publish without authorization.
+
+Keep secrets and production user data out of version control, fixtures,
+screenshots, and notebooks. Example environment files contain placeholders only.
+Use separate environment credentials and restricted runtime database roles; never
+put Supabase service-role, signing, database, SMTP, or admin credentials in mobile
+configuration or source control.

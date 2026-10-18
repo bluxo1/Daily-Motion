@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-10-17T04:56:59Z",
+  "timezone": "Asia/Calcutta",
+  "scope": "Authenticated staging configuration readback; SMTP operator boundary",
+  "source_revision": "c9a8370",
+  "previous_pr": {"number": 3, "state": "MERGED"},
+  "browser": {
+    "supported_page_automation_available": true,
+    "authenticated_supabase_dashboard_reachable": true,
+    "desktop_focus_requirement_bypassed": true,
+    "native_focus_capability_repaired": false,
+    "initial_fresh_form_probe_timed_out": true,
+    "successful_explicit_configuration_readbacks": 2,
+    "configuration_http_status": 200,
+    "configuration_endpoint": "https://api.supabase.com/platform/auth/pulruylvpehwftwqcvct/config",
+    "provider_configuration_modified": false,
+    "credential_values_printed": false
+  },
+  "saved_smtp": {
+    "project_ref": "pulruylvpehwftwqcvct",
+    "host_nonempty": false,
+    "username_nonempty": false,
+    "password_nonempty": false,
+    "sender_email_nonempty": false,
+    "sender_name_nonempty": false,
+    "port_present": false,
+    "configuration_qualified": false,
+    "actual_delivery_qualified": false
+  },
+  "saved_templates": {
+    "magic_link": {"token_marker": false, "confirmation_link_marker": true, "custom_override_nonempty": false},
+    "confirmation": {"token_marker": false, "confirmation_link_marker": true, "custom_override_nonempty": false},
+    "subjects_match_prepared_staging_subject": false,
+    "code_templates_active": false,
+    "configuration_changed": false
+  },
+  "hosted_authentication": {
+    "new_otp_requests": 0,
+    "confirmed_email_deliveries": 0,
+    "otp_verifications": 0,
+    "distinct_verified_app_owners": 0,
+    "authenticated_hosted_flutter_cases_executed": 0,
+    "dashboard_operator_access_is_not_app_owner_verification": true
+  },
+  "scope_boundaries": {
+    "credential_rotation_repeated": false,
+    "database_verification_repeated": false,
+    "deployed_revision_reverified": false,
+    "last_verified_deployed_revision": "c5d5414",
+    "last_verified_deployment_date": "2026-10-15",
+    "application_source_changed": false,
+    "regression_suites_rerun": false,
+    "remote_ci_rerun": false
+  },
+  "limited_browser_artifact_scan": {"files": 14, "credential_pattern_findings": 0, "comprehensive_clearance_claimed": false},
+  "evidence_validation": {"markdown_files": 30, "local_links": 311, "fenced_json": 5, "standalone_evidence_json": 6, "credential_guard_files": 209, "credential_guard_findings": 0, "whitespace_passed": true, "application_source_unchanged": true},
+  "blocker": "Operator must configure and save a real staging SMTP sender directly in provider storage",
+  "adr_changed": false,
+  "phase0_complete": false,
+  "phase1_started": false
+}
