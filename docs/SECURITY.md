@@ -194,6 +194,22 @@ invalidation and redacted non-triggering proof. Any fallback disconnection needs
 owner approval plus confirmed revocation/migration semantics.
 [Investigation and sources](evidence/phase0-render-hook-investigation-2026-10-18.json).
 
+**Authorized Support submission:** private Render conversation
+**215476446235862** accepted the request and the automated agent acknowledged
+human escalation. Its initial service deploy-hook advice was challenged, not
+applied. No human revocation confirmation or old-credential rejection proof has
+arrived; incident status remains **OPEN**. The request contains no hook URL or
+credential value and requires preserving services/database, enqueueing no sync or
+deployment, and obtaining further approval for any resource modification.
+No resource or credential changes were performed.
+[Support evidence](evidence/phase0-render-support-submission-2026-10-18.json).
+
+An already delivered recipient OTP message also passes SPF, DKIM and DMARC in
+the receiving server's headers and Gmail's separate summary. Only classifications
+and domains are retained; no raw headers, email address or code is recorded.
+This qualifies sender authentication for that message, not future delivery or
+daily capacity. [Header evidence](evidence/phase0-smtp-authentication-headers-2026-10-18.json).
+
 ## AI and health data boundaries
 
 No AI or health integration ships in MVP. Future LLM context is minimized to authorized training facts required for the request; provider retention/training settings and subprocessors require documented review. Imported HealthKit/Health Connect data remains local by default and is excluded from cloud sync, global model datasets, and LLM context. Permission to read a device store does not authorize onward sharing. See [HEALTH_INTEGRATIONS.md](HEALTH_INTEGRATIONS.md).

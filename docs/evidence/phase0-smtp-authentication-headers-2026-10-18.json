@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-10-18T09:08:45Z",
+  "source_revision": "6fb199e",
+  "scope": "Read-only sender authentication qualification for an already delivered staging OTP message",
+  "message": {
+    "source": "Controlled recipient Gmail inbox, supported Show original viewer",
+    "smtp_sender_sent_folder_used": false,
+    "message_date_utc": "2026-10-18T08:25:05Z",
+    "staging_code_subject_and_body_markers_present": true,
+    "new_otp_requested_for_this_inspection": false
+  },
+  "authentication_results": {
+    "authentication_results_header_count": 1,
+    "receiving_authentication_server": "mx.google.com",
+    "spf": "pass",
+    "dkim": "pass",
+    "dmarc": "pass",
+    "dkim_header_identity_domain": "gmail.com",
+    "dmarc_header_from_domain": "gmail.com",
+    "independent_gmail_summary_agrees_for_all_three": true
+  },
+  "adversarial_review": {
+    "actual_recipient_message_not_sender_copy": true,
+    "raw_authentication_results_and_gmail_summary_checked_separately": true,
+    "prior_span_click_timed_out": true,
+    "supported_recovery": "Clicked the accessible Show original menuitem; its label span was intercepted by the parent menuitem",
+    "new_original_viewer_observed": true,
+    "this_does_not_prove_future_delivery_or_daily_capacity": true
+  },
+  "privacy": {
+    "raw_headers_saved_or_returned": false,
+    "email_addresses_codes_tokens_or_credentials_saved_or_returned": false,
+    "provider_configuration_changes": 0
+  },
+  "remaining_sender_dependency": "Operator acceptance of a sender capacity policy; configured 30 emails/hour can exceed the previously documented consumer Gmail 500/day allowance",
+  "phase0_complete": false,
+  "phase1_started": false
+}

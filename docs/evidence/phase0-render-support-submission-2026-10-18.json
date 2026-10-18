@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-10-18T09:08:45Z",
+  "source_revision": "6fb199e",
+  "incident_status": "OPEN: server-side hook invalidation unconfirmed",
+  "blueprint_id": "exs-db7otpl9fdbs73f0qaqg",
+  "preserved_service_id": "srv-db7p5knavr4c7392dasg",
+  "authorization": "Account owner explicitly authorized the prepared private Render Support request and hook invalidation only",
+  "submission": {
+    "channel": "Authenticated Render Dashboard private support messenger",
+    "support_reference": "215476446235862",
+    "reference_type": "Support conversation ID; no separate formal ticket number observed",
+    "initial_message_http_status": 200,
+    "visible_sent_message_confirmed": true,
+    "reviewed_composer_matched_prepared_request": true,
+    "request_contained_url_strings": false,
+    "request_contained_credential_values": false,
+    "attachments": 0,
+    "followup_in_same_visible_conversation": true,
+    "followup_http_status": 200
+  },
+  "requested_action": [
+    "Invalidate the old Blueprint sync-hook credential server-side or rotate it in place",
+    "Explicitly confirm that the old credential is revoked before any sync or deployment can be enqueued",
+    "Preserve the existing Blueprint association, service ID, deployed revision, environment credentials and external Supabase PostgreSQL",
+    "Enqueue no sync or deployment; disconnect, recreate, redeploy or otherwise modify no existing resources without further owner authorization",
+    "Provide redacted provider-side proof or a supported non-triggering authentication-only verification method",
+    "Keep old and replacement hook URLs and credential values out of all replies"
+  ],
+  "response": {
+    "automated_service_deploy_hook_guidance_received": true,
+    "service_hook_guidance_applied": false,
+    "blueprint_versus_service_hook_difference_clarified": true,
+    "human_escalation_requested": true,
+    "automated_agent_acknowledged_human_escalation": true,
+    "human_staff_response_received": false,
+    "revocation_confirmation_received": false,
+    "old_credential_rejection_proven": false
+  },
+  "safety": {
+    "old_hook_invoked": false,
+    "blueprint_disconnected_or_recreated": false,
+    "service_database_credential_or_deployment_mutations_performed": 0,
+    "provider_health_retest_performed_after_message_only_action": false,
+    "prior_infrastructure_health_evidence": "phase0-render-hook-investigation-2026-10-18.json",
+    "secret_values_retained_in_evidence": false
+  },
+  "next_dependency": "Render human Support must invalidate the old hook and confirm revocation with supported non-disruptive evidence; continue in the same conversation",
+  "repository_validation": {
+    "markdown_files": 30,
+    "local_links": 343,
+    "fenced_json_examples": 5,
+    "new_evidence_json_documents_parsed": 2,
+    "credential_guard_source_files": 260,
+    "credential_guard_findings": 0,
+    "git_diff_check_passed": true,
+    "application_regressions_rerun_for_evidence_only_changes": false,
+    "new_remote_ci_claimed": false
+  },
+  "phase0_complete": false,
+  "phase1_started": false
+}

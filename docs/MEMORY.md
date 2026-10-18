@@ -1188,3 +1188,29 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   approval is still required before any fallback disconnection. Phase 0 remains
   **in progress**; Phase 1 has not started.
   [New evidence](evidence/phase0-render-hook-investigation-2026-10-18.json).
+
+## 2026-10-18, 14:38 IST — Authorized Render Support submission and sender headers
+
+- Submitted the owner-approved private request through Render's authenticated
+  support messenger: **HTTP 200**, visible sent request, conversation reference
+  **215476446235862**. No separate formal ticket number was observed. No hook URL,
+  credentials or attachments were submitted.
+- The automated agent suggested the separate service deploy-hook control. That
+  advice was challenged and not applied; the same conversation now acknowledges
+  human escalation. No human reply, revocation confirmation or old-credential
+  rejection proof has arrived. Incident remains **OPEN**; no old-hook invocation,
+  disconnection, recreation, deployment or infrastructure/credential change.
+- Continued read-only qualification: the recipient's already-delivered staging
+  message dated **08:25:05 UTC** passes SPF, DKIM and DMARC in the receiving
+  server's Authentication-Results and Gmail summary. Clicking the accessible
+  menuitem recovered the earlier intercepted label click. No new OTP request,
+  code, raw headers or email address was returned/retained.
+- Remaining tasks require Render Support, explicit provider/publication approval,
+  hardware/signing, recovery/processor arrangements or named operator/reviewer
+  acceptance. No application code or ADR changed; Phase 0 remains **in progress**,
+  Phase 1 unstarted.
+- Evidence-only validation: **30 Markdown / 343 local links / 5 fenced JSON**,
+  **2 new evidence JSON**, credential guard **260 files / 0 findings** and
+  `git diff --check` pass. No application regression or remote CI rerun.
+  [Support evidence](evidence/phase0-render-support-submission-2026-10-18.json),
+  [header evidence](evidence/phase0-smtp-authentication-headers-2026-10-18.json).

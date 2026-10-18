@@ -51,6 +51,15 @@ The configured 30-email/hour allowance can exceed consumer Gmail's documented
 500/day capacity. Trusted-key rotation needs explicit approval. Physical,
 managed recovery, processor and named operator/reviewer gates remain open.
 
+**Authorized Support continuation:** private Render conversation
+**215476446235862** is submitted and acknowledged for human escalation. The hook
+incident remains **OPEN**, with no revocation confirmation or resource change.
+Separately, an already delivered recipient message passes SPF/DKIM/DMARC in its
+raw Authentication-Results and Gmail summary; no new OTP was requested and no
+raw headers or credentials were retained. Sender-capacity acceptance remains
+open. [Support submission](evidence/phase0-render-support-submission-2026-10-18.json),
+[sender authentication](evidence/phase0-smtp-authentication-headers-2026-10-18.json).
+
 The next explicitly requested milestone is hosted **Supabase + Render staging**,
 with a scoped [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification)
 hosting decision. [Deployment preparation](../infra/staging/README.md), role/

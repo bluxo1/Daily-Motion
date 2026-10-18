@@ -34,11 +34,18 @@ external dependency; software tests cannot provide that approval.
 
 See [the safe provider audit](../docs/evidence/phase0-provider-qualification-2026-10-18.json).
 
-#### Prepared private Render Support request
+#### Private Render Support request — submitted
 
-Submit through the Render Dashboard support portal or the support address on
-[Render's contact page](https://render.com/contact). No message has been sent by
-the agent. Omit hook URLs and secret values:
+The owner-authorized request was submitted through the authenticated private
+Render Dashboard messenger. Support conversation reference: **215476446235862**;
+no separate formal ticket number was observed. HTTP 200 and the visible sent
+message confirm submission. The automated agent acknowledged escalation to the
+human team after its service deploy-hook guidance was challenged. No human
+revocation confirmation has arrived. Continue in that conversation; incident
+status remains **OPEN**. No hook URLs, credentials or attachments were submitted.
+[Submission evidence](../docs/evidence/phase0-render-support-submission-2026-10-18.json).
+
+Submitted action scope:
 
 > Please invalidate/disable or rotate in place the potentially compromised
 > Blueprint Sync Hook for `daily-motion-staging` / `exs-db7otpl9fdbs73f0qaqg`.
@@ -54,6 +61,12 @@ the agent. Omit hook URLs and secret values:
 Auto Sync off is verified; revocation is not. The published Blueprint update API
 accepts only name, Auto Sync and path. The separate service deploy-hook control
 does not rotate a Blueprint sync hook. [Current evidence](../docs/evidence/phase0-render-hook-investigation-2026-10-18.json).
+
+Read-only recipient-message inspection also confirms SPF, DKIM and DMARC **pass**
+in both the receiving server's Authentication-Results and Gmail's original-message
+summary. This adds sender-authentication proof without a new OTP request;
+capacity policy and operator acceptance remain open.
+[Header evidence](../docs/evidence/phase0-smtp-authentication-headers-2026-10-18.json).
 
 ## Hosted staging prerequisites
 
