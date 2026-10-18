@@ -14,11 +14,18 @@ def validate_database_transport(database: URL) -> None:
     """Do not let libpq replace the destination/role that the operator confirmed."""
     root_cert = database.query.get("sslrootcert")
     if (
-        set(database.query) - {"sslmode", "sslrootcert"}
+        not database.host
+        or "," in database.host
+        or not database.database
+        or (database.port is None and os.environ.get("PGPORT"))
+        or set(database.query) - {"sslmode", "sslrootcert"}
         or database.query.get("sslmode") != "verify-full"
         or not isinstance(root_cert, str)
         or not root_cert
-        or any(os.environ.get(name) for name in ("PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE"))
+        or any(
+            os.environ.get(name)
+            for name in ("PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE", "PGOPTIONS")
+        )
     ):
         raise ValueError("Database transport configuration is invalid")
 

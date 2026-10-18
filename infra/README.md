@@ -20,7 +20,9 @@ docker compose -f infra/compose.yaml exec -T postgres createdb -U dm_admin daily
 The integration suite requires the parsed database name `daily_motion_test`, the
 `postgresql+psycopg` driver and an explicit loopback host (`localhost`, `127.0.0.1`
 or `::1`). It rejects connection-query parameters and nonempty `PGHOSTADDR`,
-`PGSERVICE` or `PGSERVICEFILE` routing overrides before opening any connection.
+`PGSERVICE`, `PGSERVICEFILE` or `PGOPTIONS` routing/startup overrides before opening
+any connection. An omitted port additionally requires no `PGPORT` override;
+explicit URL ports retain precedence.
 It rebuilds the private training schema there, runs Alembic and grants a separate
 `NOSUPERUSER NOBYPASSRLS` test role. Test schema cleanup is destructive inside
 that dedicated database. Keep it separate from development/personal data.

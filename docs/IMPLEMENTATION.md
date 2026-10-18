@@ -1583,3 +1583,44 @@ Both lock hashes are retained; no versions were changed. SDK/native dependency
 internals and unknown advisories are outside this result. Final repository checks:
 **31 Markdown / 355 local links / 5 fenced JSON**, credential guard **264 files /
 0 findings**, new evidence JSON/six tested source hashes and whitespace pass.
+
+### Authorized CI and independent routing review — 2026-10-18 IST
+
+- Published exactly **d655e1f** to existing PR #4 after a **264-file / zero-finding**
+  source scan and **46 changed file versions / four commits / zero findings**.
+  Workflow inspection confirms disposable job-local PostgreSQL, loopback test
+  connection and connected Flutter enabled, with no deployment step.
+- Push [39125077861](https://github.com/bluxo1/Daily-Motion/actions/runs/39125077861)
+  and PR [39125080814](https://github.com/bluxo1/Daily-Motion/actions/runs/39125080814)
+  pass all three jobs. Each API run has **137 passed / zero skipped**; each Linux
+  and macOS mobile run has **151 passed / 12 explicit skips**. Android all modes,
+  routine build, unsigned iOS debug/release and four-output reproduction pass.
+- After that regression checkpoint, independent SQLAlchemy/libpq default analysis
+  proves three destination ambiguities without opening connections; startup role
+  options also lack rejection. **Six new negative tests fail before the fix**.
+  Shared/local guards now reject multiple hosts, omitted database, ambient
+  `PGOPTIONS` and inherited `PGPORT` for an omitted port. Positive tests retain
+  explicit-port precedence and the clean implicit-port default.
+- The Store-backed local Python launcher becomes unavailable before the first
+  new tests execute. Recovery installs pinned **3.13.14** separately under ignored
+  `.tools/python`, with no bin/registry changes, and frozen dependencies in
+  `.tools/phase0-review-env`. The old environment and lockfiles remain intact.
+  Local uv is **0.13.1**; remote CI retains its pinned **0.13.0**.
+- Follow-up qualification: **67 focused passed / 12 DB cases deselected**; then
+  **145 full Python passed / zero skipped**, including the **nine live Flutter
+  HTTP/PostgreSQL cases**, in a newly created loopback/tmpfs container. Initial
+  emptiness and final removal are verified. No existing local/hosted database was
+  reset. Ruff passes for 35 files, strict mypy for 13 source files, and regenerated
+  OpenAPI has no diff. No Flutter runtime, migration, protocol, contract or ADR change.
+- The new review fix is local and needs its own publication/CI approval before
+  deployment selection. [The concise change plan](../infra/staging/PHASE0_CHANGE_PLAN.md)
+  defines credential-preserving deployment/code rollback, 30→10/hour sender
+  tradeoffs and managed/manual/PITR recovery decisions. This session exposes no
+  provider/browser control; fresh preflight readback is not claimed. No staging,
+  key, sender, backup or operator acceptance change occurred. Render incident
+  **215476446235862** stays OPEN. Physical/native/operator gates remain external;
+  Phase 0 stays in progress and Phase 1 unstarted.
+  [New evidence](evidence/phase0-ci-routing-review-2026-10-18.json).
+- Final repository checks: **32 Markdown / 365 local links / five fenced JSON**,
+  **266 source files / zero credential findings**, six tested source hashes and
+  retained local-result equality verified, unchanged lockfiles and clean whitespace.

@@ -1242,3 +1242,29 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   advisories. No dependency change or native/SDK coverage claim. Repository checks:
   **31 Markdown / 355 links / 5 fenced JSON**, **264 source files / 0 credential
   findings**, six tested source hashes/new evidence JSON and whitespace pass.
+
+## 2026-10-18 — Authorized CI, further routing fixes and approval plan
+
+- `d655e1f` was authorized and published to PR #4 after clean worktree/range scans.
+  Both push **39125077861** and PR **39125080814** pass all three CI jobs:
+  **137 Python / zero skipped**, Linux/Mac **151 Flutter / 12 explicit skips**,
+  Android all modes, unsigned iOS debug/release and four generated outputs.
+- Independent driver/default checks find inherited port/database and multi-host
+  gaps; unapproved startup role options also pass. Six new negative cases fail
+  before the fix. Shared/fixture guards close them while preserving valid default
+  and explicit ports. **67 focused** and then **145 full Python / zero skipped**
+  pass, including nine live Flutter HTTP cases, in a new disposable local database.
+  Existing databases are untouched; test container removal is verified.
+- Recovered an inaccessible Store-backed Python using isolated pinned **3.13.14**
+  and frozen dependencies under ignored `.tools/`; old environment/locks/global
+  bin/registry remain unchanged. Local uv **0.13.1**, CI **0.13.0**. Ruff/mypy and
+  unchanged OpenAPI pass. No migration, contract, Flutter runtime or ADR change.
+- [Prepared plan](../infra/staging/PHASE0_CHANGE_PLAN.md): exact-SHA deployment
+  and code rollback using current credentials; hourly sender mitigation with
+  operator tradeoffs; hosted recovery choices. Follow-up publication/CI needs
+  explicit approval because the prior authorization named `d655e1f`. No deployment,
+  key, sender, backup or acceptance action is authorized/performed. Provider/browser
+  integrations are not currently exposed. Render **215476446235862** stays OPEN
+  without reinvestigation; hardware/signing/native/operator gates remain external.
+  Phase 0 is in progress, Phase 1 unstarted.
+  [CI and review evidence](evidence/phase0-ci-routing-review-2026-10-18.json).

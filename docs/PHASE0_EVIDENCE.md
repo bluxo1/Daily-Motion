@@ -65,10 +65,22 @@ restore preserves nonempty workout/receipt/feed data, constraints, indexes and
 forced RLS; missing-role and truncated-archive attacks roll back atomically.
 This does not qualify hosted Auth, off-site custody or managed recovery.
 Connection-target defects in the destructive fixture and hosted API/operator
-validation are fixed locally; 59 focused tests pass. Hosted deployment and full
-local PostgreSQL regression authorization are pending. The sender-limit reduction
-is proposed, not applied or accepted. [Results and limitations](evidence/phase0-recovery-and-connection-guards-2026-10-18.json),
+validation are fixed locally; 59 focused tests pass at that checkpoint. The later
+CI/disposable-database qualification below supersedes its regression blocker;
+hosted deployment still needs approval. The sender-limit reduction is proposed,
+not applied or accepted. [Results and limitations](evidence/phase0-recovery-and-connection-guards-2026-10-18.json),
 [hosted recovery approval package](../infra/RECOVERY.md).
+
+**Authorized CI and independent review:** published `d655e1f` passes all three
+jobs in both push and PR CI: 137 Python with no skips; Linux/macOS each 151
+Flutter with 12 explicit skips; Android all modes and unsigned iOS debug/release.
+Independent driver/default analysis then finds six uncovered negative cases in
+the routing guards. The local follow-up fixes them and preserves valid-port
+compatibility: 145 Python / zero skipped, including nine live Flutter HTTP cases,
+pass in a new disposable local PostgreSQL container. Existing databases are not
+reset. The follow-up awaits its own publication/CI authorization; hosted changes
+remain unauthorized. [New evidence](evidence/phase0-ci-routing-review-2026-10-18.json),
+[deployment/sender/recovery approval plan](../infra/staging/PHASE0_CHANGE_PLAN.md).
 
 The next explicitly requested milestone is hosted **Supabase + Render staging**,
 with a scoped [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification)

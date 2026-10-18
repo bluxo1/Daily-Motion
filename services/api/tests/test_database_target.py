@@ -6,7 +6,7 @@ from tests.database_target import validate_local_test_target
 
 @pytest.fixture(autouse=True)
 def clear_routing_overrides(monkeypatch: pytest.MonkeyPatch) -> None:
-    for name in ("PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE"):
+    for name in ("PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE", "PGPORT", "PGOPTIONS"):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -86,3 +86,23 @@ def test_libpq_routing_overrides_are_rejected(monkeypatch: pytest.MonkeyPatch, n
             "postgresql+psycopg://fixture:synthetic-only@localhost/daily_motion_test"
         )
     assert "synthetic-routing-override" not in str(error.value)
+
+
+@pytest.mark.parametrize(
+    ("name", "value"), [("PGPORT", "6543"), ("PGOPTIONS", "-c role=other_role")]
+)
+def test_fixture_rejects_implicit_port_and_role_before_engine_creation(
+    monkeypatch: pytest.MonkeyPatch, name: str, value: str
+) -> None:
+    monkeypatch.setenv(
+        "DM_TEST_ADMIN_URL",
+        "postgresql+psycopg://fixture:synthetic-only@localhost/daily_motion_test",
+    )
+    monkeypatch.setenv(name, value)
+
+    def forbidden_engine(*args: object, **kwargs: object) -> None:
+        pytest.fail("Implicit destination or role reached engine construction")
+
+    monkeypatch.setattr(conftest, "create_engine", forbidden_engine)
+    with pytest.raises(RuntimeError):
+        next(conftest.admin_engine.__wrapped__())

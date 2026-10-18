@@ -82,9 +82,15 @@ now shares a strict TLS query allowlist: additional parameters cannot replace th
 confirmed host, database or role. SQLAlchemy's effective-host override was
 reproduced without opening a connection; three fixture regressions and eight
 initial hosted regressions fail before the fixes. Focused tests pass afterward.
-The runtime fix is local and **not deployed**; publication/deployment and the
-destructive local PostgreSQL regression need explicit authorization.
+The original `d655e1f` fix is now published with green remote CI. The subsequent
+review closes inherited-port/database, multiple-host and startup-role-options
+gaps; its full local regression uses a newly created disposable database.
+An omitted port requires no `PGPORT` override; explicit ports retain precedence.
+One host and an explicit database are required, and `PGOPTIONS` is rejected.
+The follow-up remains local and **not deployed**; its publication/deployment
+require authorization. No existing database was reset.
 [Security and recovery evidence](evidence/phase0-recovery-and-connection-guards-2026-10-18.json).
+[CI and follow-up review](evidence/phase0-ci-routing-review-2026-10-18.json).
 
 The same review queries OSV with all 47 registry packages in the frozen Python
 lock and 135 hosted Pub packages. It returns zero advisories, with all responses

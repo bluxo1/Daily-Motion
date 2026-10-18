@@ -74,8 +74,11 @@ sender arrangement remains necessary. See [Gmail limits](https://support.google.
    `sslmode=verify-full` and the downloaded certificate in `sslrootcert`.
    These are the only accepted connection-query keys. Project/transport
    validation rejects routing, role, service and other query overrides, duplicate
-   root-certificate values, and nonempty `PGHOSTADDR`, `PGSERVICE` or
-   `PGSERVICEFILE` environment overrides before opening a connection.
+   root-certificate values, and nonempty `PGHOSTADDR`, `PGSERVICE`,
+   `PGSERVICEFILE` or `PGOPTIONS` environment overrides before opening a
+   connection. Use a single host and explicit database; an omitted port is
+   accepted only without a `PGPORT` override. See the prepared
+   [deployment/sender/recovery approval plan](PHASE0_CHANGE_PLAN.md).
    [Supabase connections](https://supabase.com/docs/guides/database/connecting-to-postgres),
    [certificate verification](https://supabase.com/docs/guides/database/psql).
 5. In an operator process, supply the environment names below from protected

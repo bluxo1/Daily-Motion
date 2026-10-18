@@ -14,7 +14,11 @@ def validate_local_test_target(raw: str) -> None:
             or target.host not in {"localhost", "127.0.0.1", "::1"}
             or target.database != "daily_motion_test"
             or target.query
-            or any(os.environ.get(name) for name in ("PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE"))
+            or (target.port is None and os.environ.get("PGPORT"))
+            or any(
+                os.environ.get(name)
+                for name in ("PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE", "PGOPTIONS")
+            )
         ):
             raise ValueError()
     except (ArgumentError, TypeError, ValueError):
