@@ -170,8 +170,16 @@ Operators must configure separate projects, asymmetric signing/JWKS, confirmed
 six-digit email OTP templates, custom SMTP, sender-domain SPF/DKIM, delivery monitoring and
 provider resend/attempt limits. The UI's 60-second resend cooldown supplements
 provider limits and is not an abuse-control replacement. Keep SMTP, service/admin
-and signing secrets outside client-safe configuration. Hosted OTP/SMTP, urgent
-JWKS rotation and observable session revocation have not been qualified here.
+and signing secrets outside client-safe configuration. Actual hosted SMTP/OTP,
+refresh, observable revoked-refresh denial and elapsed email-code expiry now
+have desktop evidence. Urgent trusted-JWKS rotation remains unqualified and
+requires operator authorization. See [the provider audit](evidence/phase0-provider-qualification-2026-10-18.json).
+
+The Oct 18 audit also found a private Render Blueprint sync hook in a tool
+response. It is absent from repository evidence, but remains exposed until
+provider/operator invalidation is confirmed; no tool-log purge is claimed.
+Source scanning now rejects Render deploy/sync hook credentials without printing
+values. This guard does not invalidate an already disclosed credential.
 
 ## AI and health data boundaries
 

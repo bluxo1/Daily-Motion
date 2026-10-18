@@ -1,8 +1,8 @@
 # Implementation phases
 
-Updated: 2026-10-17 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
+Updated: 2026-10-18 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
 
-**Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, interaction prototypes, Windows fault tests and native qualification harnesses are implemented. All three remote Linux/PostgreSQL/Android and macOS unsigned iOS jobs passed on `46f5d5a` after earlier `b8968ca`/`a27dfdd` proof; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope and the resolved ARM64 runner allocation failure. The [audited evidence matrix](PHASE0_EVIDENCE.md) reconciles foundation completion with the separate external acceptance. Hosted OTP/SMTP, managed-provider/operator review, signing, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
+**Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, interaction prototypes, Windows fault tests and native qualification harnesses are implemented. All three remote Linux/PostgreSQL/Android and macOS unsigned iOS jobs passed on `46f5d5a` after earlier `b8968ca`/`a27dfdd` proof; [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope and the resolved ARM64 runner allocation failure. The [audited evidence matrix](PHASE0_EVIDENCE.md) reconciles foundation completion with the separate external acceptance. Remaining trusted-key/provider, managed recovery/operator review, signing, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
 
 Mumbai Supabase / Singapore Render **staging was verified on `c5d5414` on Oct 15**, with real
 TLS/RLS/readiness evidence after credential rotation. Both earlier controlled inbox
@@ -42,6 +42,35 @@ is required before real delivery/identity qualification. No additional checkbox
 is closed. PR #3 is merged and Git main is **c9a8370**; the deployed revision was
 not reverified in this continuation.
 
+The later Oct 17 continuation verifies all saved SMTP fields and fixes both
+Confirmation and Magic Link code templates, confirmed after reload. Account A's
+real OTP request at **15:59:56 UTC** returns **500 / unexpected_failure**; the
+correlated Auth event reports Google SMTP **535 / BadCredentials**. Correcting
+the saved SMTP login is now the operator boundary. No delivery, verification,
+distinct A/B identity or hosted Flutter case is qualified. No rotation/database
+verification was repeated. See [new evidence](evidence/phase0-hosted-smtp-delivery-2026-10-17.json).
+
+**Oct 18 IST:** the corrected SMTP login now supports actual recipient OTP
+delivery and verification for distinct A/B Supabase subjects. Two targeted desktop
+Flutter cases pass against real Supabase/Render: retry/receipt recovery and the
+production SDK/controller lifecycle. Refresh, revoked-refresh denial, incorrect
+code, immediate resend throttling, file reopening, sign-out with pending work,
+A → B → A and cross-owner read/mutation denial pass. Two harness defects were
+fixed. Physical Android discovery finds **0 devices / 0 emulators**. Elapsed OTP
+expiry is now proven separately below. Signing-key rotation and native/operator
+gates remain open; no independent
+SQL probe or credential rotation was repeated. See
+[functional evidence](evidence/phase0-hosted-auth-flow-2026-10-18.json).
+
+**Later Oct 18 audit:** real 600-second OTP expiry passes after a 610-second hold
+and a fresh delivered code succeeds. Hardened assertions and Render-hook source
+detection pass their regressions; full local suites pass 108 Python and 151
+ordinary Flutter (12 explicit skips), including nine separately enabled live
+Flutter HTTP cases. A Render Blueprint sync-hook disclosure in a tool response
+requires invalidation; its deleted source branch remains unchanged pending that
+containment. Signing-key approval, sender-capacity review and hardware/operator
+gates remain open. [Provider audit](evidence/phase0-provider-qualification-2026-10-18.json).
+
 ## Phase summary
 
 | Phase | Deliverable | Entry condition | Exit evidence |
@@ -67,7 +96,7 @@ not reverified in this continuation.
 - [x] Connect foreground Flutter HTTP push/pull/bootstrap to verified test authentication and restricted PostgreSQL; prove receipt, branch, erasure and cursor safety on desktop databases.
 - [x] Exercise foundation Drift version 1→3 and 2→3 upgrades with frozen outbox, active workout, timer and draft preserved; test file reopening in pending/conflict/bootstrap/cursor/deletion states.
 - [x] Connect the supported Supabase email OTP/refresh API to awaited platform-secure session persistence, verified idempotent application-account initialization and owner-scoped local unlocking; prove expiry/refresh failure, sign-out, restart, stale completions and A → B → A isolation on desktop SQLite/PostgreSQL.
-- [ ] Qualify real hosted Supabase/custom SMTP/inbox delivery, rate limits, revocation and trusted signing-key rotation. Staging project/publishable-key configuration is verified. Actual 2026-10-17 saved-provider readback finds SMTP settings absent and code templates inactive; operator SMTP setup, real delivery/identity and provider lifecycle qualification remain required.
+- [ ] Complete provider qualification: real custom-SMTP recipient delivery, A/B verification, immediate resend throttling, incorrect-code denial, refresh, revocation and actual elapsed OTP expiry pass on Oct 18. Trusted signing-key rotation, sender-capacity/operator acceptance and Render hook containment/source-branch repair remain open.
 - [x] Prepare native storage/recovery and full caller durable-save benchmark entrypoints; compile Android debug/profile and exercise unconfigured startup on a Windows Android emulator, without claiming physical-device evidence.
 - [x] Exercise hard Windows process kills before/during/after real SQLite commits, SQLite capacity failure, additive schema 2→3 timer migration and controlled monotonic/clock-change recovery.
 - [x] Compile unsigned iOS debug/release on hosted macOS and Android debug/profile/release on Linux through actual remote CI; this proves compilation only.
@@ -81,7 +110,7 @@ not reverified in this continuation.
 - [x] Complete public-source region feasibility and backup/processor prerequisite desk review: published Mumbai availability, backup/object/custom-role limits and current DPA/subprocessor source inventory. This is not live project, restore or legal/provider qualification.
 - [x] Prepare the requested Supabase/Render staging deployment, separate Alembic/runtime-role setup, verified TLS/readiness guards, OTP template and credential-gated Flutter qualification harness. Local preparation is distinct from hosting evidence.
 - [x] Select/configure the actual Mumbai Supabase staging project, deploy Render Singapore, apply Alembic 0003 and verify hosted restricted-role/forced RLS, owner/pool isolation, TLS/readiness and public auth/contract denial. Initial deployment `8e5af65`; continued **c5d5414 / dep-db8efpon74is73epb8ng** passes after actual credential rotation, protected provider read-back and fresh-connection probes. See [hosted evidence](evidence/phase0-hosted-staging-2026-10-14.json) and [rotation evidence](evidence/phase0-hosted-rotation-2026-10-15.json). No personal workout data or admin credentials on the API/mobile app.
-- [ ] Run real OTP/refresh/account/sync/restart qualification with controlled inboxes. A/B inboxes are designated and both earlier real requests returned HTTP 200; delivery, verified distinct identities and authenticated hosted tests remain unproven. Credential rotation/log inspection/runtime verification are performed; retained legacy statistics were not purged. Page automation works; actual saved SMTP settings are absent and code templates inactive, requiring protected operator SMTP setup before qualification. Blueprint source-branch and managed backup/restore qualification remain open. [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification) records the staging hosting exception.
+- [x] Run real desktop OTP/refresh/account/sync/restart qualification with controlled recipients. Actual A/B delivery and distinct subjects, two hosted Flutter cases, SDK refresh/revocation, pending sign-out, A → B → A, duplicate receipts and hosted API owner denial pass on Oct 18. Code/session values stay in process memory. Native storage/process loss is separate; prior direct SQL RLS evidence was not repeated. Blueprint source-branch and managed backup/restore qualification remain open. [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification) records the staging hosting exception.
 
 All remaining Phase 0 rows require external hardware, provider, signing or operator/reviewer resources. Full public routine features, conflict-resolution UI, export/deletion jobs, production retention/restore operations and long-history release qualification remain Phase 1 work under the roadmap; their foundation safety primitives above are exercised. This scope clarification does not close physical Phase 0 acceptance or reduce any public-release requirement.
 

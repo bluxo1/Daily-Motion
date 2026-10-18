@@ -77,7 +77,11 @@ controlled. Backend tests verify signed JWT rejection, idempotent/concurrent
 initialization, current-provider rejection, retirement and disable races under
 forced RLS. See [IMPLEMENTATION.md](IMPLEMENTATION.md) for exact counts.
 These tests do not qualify real email delivery or native protected-storage hardware.
-Hosted SMTP/provider revocation and physical-device restore/backup remain required.
+Real hosted SMTP/provider revocation and elapsed OTP expiry now have separate
+desktop qualification. Trusted signing-key rotation and physical-device
+restore/backup remain required. Hosted negative assertions use a helper that
+never formats an unexpected session or provider exception; synthetic regressions
+challenge unexpected success and incorrect error types/categories.
 
 Verify composite owner-aware foreign keys, session CAS, immutable historical corrections, receipt uniqueness/hash binding, retired UUID checks, and atomic feed publication. Deliberately force transaction rollback after intermediate writes. Exercise simultaneous transactions against the per-user feed lock and ensure committed cursor ordering. Validate new/existing migration paths on real PostgreSQL and every supported released Drift schema. [Drift migration testing](https://drift.simonbinder.eu/migrations/)
 

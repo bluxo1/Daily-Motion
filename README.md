@@ -14,14 +14,14 @@ development foundation, not a public MVP. See
 
 The first public release remains free, adult, English and India-first. Online
 email OTP is required before personal training. After verification, local training
-continues offline even when cloud credentials expire. Real provider/email delivery,
-native secure-storage qualification and public onboarding remain open. Phase 1
+continues offline even when cloud credentials expire. Native secure-storage
+qualification and public onboarding remain open. Phase 1
 has not started.
 
 Windows qualification now includes Android debug/profile compilation and emulator
 startup, native clock/backup configuration, real SQLite capacity faults and hard
-Windows process-kill recovery. Physical Android/iPhone, hosted
-OTP/SMTP, backup transfer, hardware secure storage and phone p95 remain open.
+Windows process-kill recovery. Physical Android/iPhone, backup transfer,
+hardware secure storage and phone p95 remain open.
 Use [the device qualification procedure](docs/DEVICE_QUALIFICATION.md) for the
 prepared native recovery and full durable-save benchmark harnesses. Emulator or
 desktop timings do not establish the **physical p95 ≤100 ms** target.
@@ -56,14 +56,23 @@ The hosted audit confirmed **two retained historical plaintext-password
 statements**, using counts only. Affected staging credentials are now rotated;
 Render's saved runtime secret was verified after reload and a new process passed
 readiness, restricted-role/RLS and owner/pool checks. Deployment **`c5d5414`** was
-verified on Oct 15, with **6/6 public checks passing**; it has not been reverified
-against current Git main. Historical statistics were not purged.
-Real inbox/SMTP and authenticated hosted sync remain unqualified. On Oct 17,
-authenticated page automation bypassed the focus blocker, but actual saved SMTP
-settings are absent and code templates still use confirmation links. A real SMTP
-sender must be entered and saved directly in Supabase before qualification. The checked
-blueprint and actual service branch target `main`; Blueprint source-branch
-verification is separate. See the
+verified on Oct 15, with **6/6 public checks passing**. On Oct 18 IST, Render again
+displays `c5d5414` and readiness passes. Historical statistics were not purged.
+Real custom-SMTP delivery and OTP verification now pass for distinct A/B identities.
+Two targeted hosted Flutter cases pass: sync/retry/file recovery and the production
+SDK/controller lifecycle, including refresh, remote sign-out with pending work,
+A → B → A, incorrect-code/resend denial and cross-owner mutation denial. Two
+hosted harness defects were fixed. See
+[new evidence](docs/evidence/phase0-hosted-auth-flow-2026-10-18.json).
+Real elapsed OTP expiry also passes after a 610-second hold against the saved
+600-second lifetime, followed by fresh delivery/verification. See
+[the provider audit](docs/evidence/phase0-provider-qualification-2026-10-18.json).
+Native hardware/storage, signing-key rotation and operator
+qualification remain open. The checked
+blueprint and actual service branch target `main`; the Blueprint source still
+references a deleted branch. Repair is held pending invalidation of a private
+Blueprint sync hook returned in a tool response. No hook value is in repository
+evidence and no log purge is claimed. See the
 [staging runbook](infra/staging/README.md) for the protected recovery procedure.
 
 ## Repository
@@ -110,8 +119,9 @@ using that SDK here. No global PATH or cache settings were changed.
 Configure a separate Supabase project for each environment, asymmetric ES256/RS256
 signing keys, six-digit email OTP templates containing `{{ .Token }}`, provider rate limits
 and custom SMTP. SMTP credentials, service keys and database credentials stay in
-operator-managed secrets; they never enter mobile configuration. Hosted provider
-delivery and native storage have **not** been qualified in this workspace.
+operator-managed secrets; they never enter mobile configuration. Hosted delivery
+and desktop controller behavior now have real staging evidence; native storage
+remains unqualified.
 
 Run the real application path with client-safe compile-time configuration:
 
@@ -152,11 +162,12 @@ configuration file. Staging is deployed: Supabase Mumbai
 `https://pulruylvpehwftwqcvct.supabase.co`, Render Singapore
 `https://daily-motion-staging-api.onrender.com`, last verified revision `c5d5414`, Alembic `0003`.
 Hosted readiness, restricted role/forced RLS and public authentication-denial
-checks pass. No real OTP/SMTP or authenticated hosted sync result is claimed:
-the two controlled inboxes are now designated and both real email-auth requests
-returned HTTP 200, but delivery/verification and custom SMTP remain unqualified.
-Authenticated Oct 17 readback finds SMTP settings absent and code templates
-inactive; operator setup, actual inbox delivery and verified identities remain open.
+checks pass. Actual recipient SMTP/OTP delivery, distinct A/B identities and two
+authenticated desktop Flutter cases now pass. The cases use real Supabase Auth,
+Render and PostgreSQL plus local SQLite; controller credentials remain in memory.
+They do not qualify phone secure storage, physical process loss or trusted
+signing-key rotation. Separate actual elapsed OTP expiry now passes. See
+[the hosted functional evidence](docs/evidence/phase0-hosted-auth-flow-2026-10-18.json).
 See [hosted evidence](docs/evidence/phase0-hosted-staging-2026-10-14.json) and
 [DM-018](docs/DECISIONS.md#dm-018--render-staging-provider-qualification)
 for the staging hosting exception; production Cloud Run Mumbai is unchanged.

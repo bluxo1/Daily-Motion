@@ -1,6 +1,6 @@
 # Phase 0 evidence reconciliation
 
-Audited through 2026-10-17 (IST); latest continuation on
+Audited through 2026-10-18 (IST); latest continuation on
 `docs/phase0-hosted-smtp-2026-10-17` from merged `main` (`c9a8370`).
 [ROADMAP.md](ROADMAP.md) remains the scope authority. This matrix distinguishes
 implemented foundation work from its separate physical/provider acceptance.
@@ -11,7 +11,7 @@ the overall Phase 0 exit gate.
 | Authoritative Phase 0 work | Actual evidence | Status |
 |---|---|---|
 | Flutter/Riverpod/Drift, modular FastAPI, migrations and pinned toolchains | Mobile/API source, lockfiles, Alembic 0001–0003, Drift 1→3 and 2→3 tests; Linux Android all modes and macOS unsigned iOS debug/release CI | Complete for buildable foundations |
-| Onboarding interaction prototype | Supabase OTP/account UI; controlled SDK/provider and widget/lifecycle tests, first verified owner initialization | Complete as executable prototype; real delivery remains external |
+| Onboarding interaction prototype | Supabase OTP/account UI; controlled tests plus actual custom-SMTP A/B delivery/verification and production SDK/controller hosted cases | Prototype and desktop hosted functional proof complete; native UI/storage remains external |
 | Routine-editing interaction prototype | Separate synthetic `routine_prototype.dart` entrypoint; editable planned sets/rep range/rest, immutable workout previews, validation/back/keyboard/large-text tests | Complete as disposable prototype; no production routine storage or sync |
 | Active logging and history interaction prototypes | Fixture Train/History, durable editor/drafts, completion/abandonment/corrections; widget tests and real SQLite suites | Complete as executable foundation; public feature breadth belongs to Phase 1 |
 | Small internal light/dark design system and accessible numeric/set controls | Semantic themes, explicit action/text colors, contrast tests, 320px/200% text/keyboard and labeled tap-target widget tests | Complete for implemented controls; physical usability/screen-reader acceptance remains external |
@@ -24,6 +24,32 @@ the overall Phase 0 exit gate.
 | Physical iPhone and Android acceptance, signed installation, native protection/backup/accessibility and durable-save p95 | Device procedures and native harnesses in [DEVICE_QUALIFICATION.md](DEVICE_QUALIFICATION.md); safe [emulator evidence](evidence/phase0-windows-native-2026-10-13.json) explicitly ineligible | External hardware/signing/provider acceptance outstanding |
 
 ## Scope corrections
+
+**Latest Oct 18 functional proof:** actual custom-SMTP recipient delivery and
+verification establish distinct A/B subjects. Both targeted hosted Flutter cases
+pass, including provider refresh/revocation, immediate resend/incorrect-code
+denial, file reopening, pending sign-out, A → B → A, retry receipts and cross-owner
+read/mutation denial. Two harness defects were fixed. Historical unperformed/
+SMTP-failure statements below describe earlier checkpoints; current detail is in
+[new evidence](evidence/phase0-hosted-auth-flow-2026-10-18.json). No native storage
+or phone performance result is inferred.
+
+**Later Oct 18 provider audit:** a delivered, unconsumed OTP is rejected after
+610 actual seconds against the saved 600-second lifetime; a fresh delivered code
+verifies and signs out. The hardened lifecycle case passes again. Local full
+regressions pass: 108 Python, including the nine live Flutter HTTP cases, and
+151 ordinary Flutter with 12 explicit skips. Assertion failure paths now avoid
+formatting sessions; the credential guard rejects Render hook credentials.
+[New provider evidence](evidence/phase0-provider-qualification-2026-10-18.json).
+
+**New security/operator blockers:** a private Blueprint sync hook was returned in
+a tool response during settings inspection; provider/operator invalidation is
+requested and unconfirmed. No value is retained in repository evidence, and no
+log purge is claimed. The Blueprint source still references a deleted branch;
+its unsaved edit was discarded and repair is held until hook invalidation.
+The configured 30-email/hour allowance can exceed consumer Gmail's documented
+500/day capacity. Trusted-key rotation needs explicit approval. Physical,
+managed recovery, processor and named operator/reviewer gates remain open.
 
 The next explicitly requested milestone is hosted **Supabase + Render staging**,
 with a scoped [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification)
@@ -141,6 +167,15 @@ does not verify app owners. No rotation/database probe or unchanged regression
 suite was repeated. Current Git main is **c9a8370**; deployment was not reverified
 and its last observed revision remains separately dated **c5d5414 / Oct 15**.
 See [the safe readback evidence](evidence/phase0-hosted-smtp-2026-10-17.json).
+
+**Later 2026-10-17 continuation:** saved SMTP fields are now verified. Both
+Confirmation and Magic Link templates were fixed to contain `{{ .Token }}` and
+the prepared subject, then verified after reload. Account A's real request at
+**15:59:56 UTC** returns **500 / unexpected_failure**; the correlated Auth event
+at **15:59:58 UTC** reports Google SMTP **535 / BadCredentials**. The current
+human boundary is correcting the SMTP login directly in Supabase. No actual
+delivery, verified identity or hosted Flutter case is claimed. Rotation/database
+probes were not repeated. [New evidence](evidence/phase0-hosted-smtp-delivery-2026-10-17.json).
 
 Source `8e5af65` passed all three jobs in
 [actual run 38587594908](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908):

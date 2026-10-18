@@ -10,17 +10,42 @@ PostgreSQL **17.11**, Alembic **0003**, restricted runtime,
 11 forced-RLS tables and rolled-back owner/pool probes are verified. These
 resources are staging only. [Evidence](../../docs/evidence/phase0-hosted-staging-2026-10-14.json).
 
-**Email/account/sync qualification remains blocked**: A/B controlled inboxes are
-now designated and both earlier real requests returned HTTP 200, without claiming delivery
-or verified distinct identities. **2026-10-17** authenticated page access bypasses
-the desktop-focus blocker. Actual saved-provider readback returns **200** but has
-no SMTP host/user/password, sender or port. Both auth templates contain confirmation
-links without a Token marker or nonempty custom override. The earlier operator
-configuration report and an enabled editable form are insufficient. Enter and save
-a real staging SMTP sender directly in provider storage, then apply the prepared
-code templates. No incomplete settings were submitted. Six-digit OTP/600-second
-expiry were verified previously; real delivery and verified identities remain open.
+**Hosted functional flow passes on 2026-10-18 IST.** After the operator replaced
+the Google SMTP credential, actual recipient delivery and verification pass for
+distinct A/B Supabase subjects. The controlled aliases share a recipient mailbox;
+the sender's Sent copy was excluded from delivery evidence. Both code templates
+remain active. Two targeted Flutter cases pass against real Supabase/Render,
+including SDK refresh/revocation, incorrect-code and immediate-resend denial,
+restart, pending sign-out, A → B → A, duplicate receipts and cross-owner denial.
+The initial HTTP interception and duplicate-status assertion defects in the
+hosted harness were fixed. Render displays `c5d5414`; readiness returns 200 after
+an initial Windows warm-up timeout. See
+[new functional evidence](../../docs/evidence/phase0-hosted-auth-flow-2026-10-18.json).
+Actual elapsed OTP expiry now passes after a 610-second real hold against the
+600-second lifetime, followed by fresh delivered-code verification. Trusted
+signing-key rotation, native storage/hardware and operator qualification remain
+open. Do not paste credentials or codes into chat.
 The free project has **no managed backups**; plan/restore qualification is open.
+
+The later Oct 18 audit finds the Blueprint source still targets the deleted
+`phase0-qualification-2026-10-13` branch, while the service follows `main`.
+A private Blueprint sync hook was returned in a tool response during inspection.
+Provider/operator invalidation is requested; the settings UI exposes no hook
+regeneration control. The unsaved branch edit was discarded. Invalidate the hook
+before repairing/reloading the source branch; preserve existing service secrets.
+Never return generic form input values: editing a field can change ancestor
+scope to include adjacent password fields. Compare explicit saved fields inside
+the protected process and return only nonsecret results. No hook value is in
+evidence, and no tool-log purge is claimed.
+
+The saved email budget is 30/hour, OTP/verify refill values are 30 and refresh
+is 150; resend interval is 60 seconds. These settings are configuration evidence,
+not an exhausted-quota test. Recipient details show Gmail mailing/signing and TLS.
+The consumer Gmail sender's published 500/day allowance can be exceeded by a
+30/hour configuration (720/day). An operator-approved staging capacity cap or
+sender arrangement remains necessary. See [Gmail limits](https://support.google.com/mail/answer/22839?hl=en),
+[Supabase rate limits](https://supabase.com/docs/guides/auth/rate-limits) and
+[safe provider evidence](../../docs/evidence/phase0-provider-qualification-2026-10-18.json).
 
 ## Provisioning order
 
@@ -194,19 +219,51 @@ the four client-safe settings and short-lived `DM_STAGING_TOKEN_A` /
 training, not sessions/tokens. It initializes both owners through the real API,
 sends the same frozen command twice, leaves its acknowledgement uninstalled,
 locks/reopens A→B→A, checks B's local/feed namespace and resumes the pending
-mutation through the coordinator. It is **skipped by default and unqualified**
-until actual staging credentials exist. It exercises repository locking; real
-provider logout, OTP, refresh and UI secure storage are separately exercised
-through the actual app, not inferred from this harness.
+mutation through the coordinator. It is **skipped by default** and passed with
+real credentials on Oct 18. It exercises repository locking; provider lifecycle
+and native secure storage require their own evidence.
+
+`apps/mobile/test/hosted_auth_lifecycle_test.dart` additionally exercises the real
+`SupabaseOtpProvider`, `AccountController`, API gateway and SQLite stores. Supply
+`DM_HOSTED_AUTH_LIFECYCLE=1`, the four client-safe settings and
+`DM_HOSTED_OTP_BRIDGE=http://127.0.0.1:PORT`, then run
+`flutter test test/hosted_auth_lifecycle_test.dart`. The operator bridge is a
+temporary local process, not an app endpoint. Its contract is:
+
+| Method and path | Purpose |
+|---|---|
+| `GET /account/A` or `/account/B` | Return the owner-designated recipient email to the test process |
+| `POST /challenge` | Accept account label/request UTC time and return a unique challenge `id` |
+| `GET /code/ID` | Return `code: null` while waiting, then consume the privately delivered code once |
+| `POST /event` | Accept a safe event name for progress/evidence, without session data |
+
+The browser operator reads the latest matching message in the actual recipient
+mailbox and supplies its code privately to that process. Bind only loopback,
+require `X-DM-Qualification: phase0-local`, deny requests carrying an `Origin`,
+bound request bodies, disable request logging and discard all code/session state
+at shutdown. Never put codes in tool arguments, files, CLI arguments or evidence.
+The executed bridge kept codes in memory; the Flutter case's
+`MemoryProtectedStorage` kept sessions in memory across controller recreation.
+This qualifies hosted SDK/controller behavior, not native Keychain/protected
+storage or a phone process kill.
+
+`apps/mobile/test/hosted_otp_expiry_test.dart` uses the same private bridge with
+`DM_HOSTED_OTP_EXPIRY=1`. Additionally, `GET /settings` must return
+`otp_expiry_seconds` from an independently verified saved provider setting.
+The case requests/receives one actual code, holds it without verification or
+resending for that lifetime plus ten seconds, requires rejection, then requests
+and verifies a fresh delivered code and signs out. The timer starts after inbox
+delivery; no simulated clock or shortened provider setting substitutes for this
+qualification. Sessions remain in memory and negative checks never format them.
 
 Verify lost-response exact retry, own echo, second-client pull/bootstrap, restart
 with pending work, sign-out locking and A→B→A recovery. Disable only a deliberately
 selected synthetic staging account through a separate operator action and prove
 server denial; do not expose a public administrator route. Record rollback-only
 hosted RLS probe results separately from Flutter HTTP behavior and physical-device
-qualification. Hosted rollback-only database RLS/owner/pool probes have passed;
-authenticated hosted Flutter sync and OTP lifecycle remain **unperformed** until
-real credentials and mailbox evidence exist.
+qualification. Hosted rollback-only database RLS/owner/pool probes passed earlier;
+they were not repeated. The Oct 18 Flutter cases add authenticated API namespace
+and cross-owner mutation-denial evidence against the guarded runtime.
 
 Record: UTC/local date, project/API URLs, actual Supabase/Render regions and plans,
 PostgreSQL version, Alembic revision, API deployed commit, HTTPS/readiness/auth

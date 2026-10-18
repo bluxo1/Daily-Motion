@@ -1096,3 +1096,79 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
 - Evidence-only validation: docs **30 / 311 links / 5 fenced JSON**, **6 evidence
   JSON**, credential guard **209 / 0 findings**, whitespace and unchanged app/source
   checks pass. No repeated full tests/artifact regeneration or new CI claim.
+
+## 2026-10-17, 21:34 IST — SMTP saved, code templates fixed, Google rejects login
+
+- Fresh authenticated readback verifies all saved SMTP fields. Both Confirmation
+  and Magic Link templates were saved with `{{ .Token }}` and the prepared
+  subject, then verified after reload; OTP remains six digits / 600 seconds.
+- Account A's real request at **15:59:56 UTC** returns **500 / unexpected_failure**.
+  The correlated Auth log at **15:59:58 UTC** reports SMTP **535**, Google
+  `BadCredentials`, and username/password rejection. No code or user session was
+  obtained; inbox accessibility is distinct from message delivery.
+- The operator must correct the SMTP login directly in Supabase. Retry A after
+  correction, then actual delivery/verification, B, distinct identities and the
+  credential-gated hosted Flutter/lifecycle path. No B request or hosted test ran.
+- No credential values were printed, no rotation/database verification or broad
+  tests repeated, and no application/protocol source changed. Phase 0 remains
+  open; Phase 1 has not started. [New evidence](evidence/phase0-hosted-smtp-delivery-2026-10-17.json).
+
+## 2026-10-18, 05:16 IST — Real SMTP/OTP and authenticated hosted Flutter pass
+
+- Account A's one requested retry returns **200 at 23:23:44 UTC**. The operator
+  completed recipient Google sign-in; the SMTP sender's Sent copy was excluded.
+  A/B recipient codes verify as distinct confirmed ES256 Supabase subjects. The
+  controlled aliases share a mailbox. Both sessions also refresh successfully.
+- Fixed two hosted-harness defects: widget binding intercepted live HTTP, and
+  duplicate receipts were incorrectly expected to retain `accepted`. The actual
+  hosted sync case passes in **25.06 s** after preserving both initial failures.
+- Added a separate opt-in real SDK/controller case: actual OTP, refresh, file
+  reopening, remote sign-out with pending work, credential removal/local lock,
+  A → B → A, cross-owner feed/mutation denial and recovery/bootstrap pass. The
+  stronger final run includes wrong-code/immediate-resend denial and the precise
+  revoked-refresh error; **115.03 s**, after an earlier **111.96 s** pass.
+- Two distinct hosted cases pass. Credentials/codes remain in test/operator
+  process memory; memory storage does not qualify native secure storage or phone
+  process loss. No repeated rotation, SQL probe, broad suite or remote CI.
+- Render shows **c5d5414**, readiness **200** after a Windows timeout. Fresh ADB
+  discovery has **0 physical devices / 0 emulators**. Remaining gates: physical
+  devices/signing/storage/backup/accessibility/p95, elapsed OTP expiry, trusted
+  key rotation, broader sender/rate review and named operator/privacy review.
+  Phase 0 remains open; Phase 1 has not started.
+  [Functional evidence](evidence/phase0-hosted-auth-flow-2026-10-18.json).
+
+## 2026-10-18, 13:49 IST — Actual OTP expiry and provider/security audit
+
+- A real delivered, unconsumed code fails after **610 elapsed seconds** against
+  saved **600-second** expiry; fresh delivery/verification and sign-out pass.
+  A final hardened-source expiry rerun is recorded separately in the evidence.
+- Fixed hosted negative assertions that could format SDK sessions on unexpected
+  success. Three synthetic failure-path tests prove no sensitive result or
+  exception is formatted. The hardened actual A → B → A lifecycle passes at
+  **02:30**; an earlier **00:30 initialization timeout** is retained. The harness
+  permits one existing-controller retained-session initialization retry only on
+  pending/timeout; no app timeout was increased or cold-start root cause claimed.
+- Found Render's Blueprint source still references a deleted branch. A generic
+  form read during inspection returned its private sync hook in a tool response.
+  The value is absent from repository evidence; invalidation and tool-log purge
+  are not claimed. The UI exposes no regeneration control, so provider/operator
+  invalidation is requested. The unsaved branch edit was discarded; repair waits
+  for containment. Future reads use explicit fields and nonsecret results.
+- Fixed source scanning for Render hook credentials: synthetic findings **0 before
+  / 1 after**, **9** targeted guard tests pass. This does not revoke the exposed
+  hook. No database/SMTP credential rotation or trusted-key change occurred.
+- Sender review: Gmail mailing/signing and TLS, 60-second resend, email budget
+  30/hour (720/day possible) versus published consumer Gmail capacity 500/day.
+  Operator capacity acceptance is open. Current Free backup UI has no scheduled
+  backup rows/restore controls. One public ES256 key remains; rotation approval
+  is requested, not assumed.
+- Full local regressions: **108 Python / 0 skipped**, including the **9 live
+  Flutter HTTP/PostgreSQL cases**; **151 ordinary Flutter / 12 explicit skips**.
+  Analysis, Ruff/mypy and all four generated-artifact reproduction checks pass.
+  New source remote CI awaits authorized publication; baseline run **38942611206**
+  on `c9a8370` is green. No ADR/application-runtime/schema/contract change.
+- Remaining work needs provider containment/approval, physical Android/iPhone and
+  signing, native storage/backup/lifecycle/accessibility/physical p95 evidence,
+  managed recovery/processor arrangements and named review/operator acceptance.
+  Phase 0 remains **in progress**; Phase 1 has not started.
+  [New provider audit](evidence/phase0-provider-qualification-2026-10-18.json).

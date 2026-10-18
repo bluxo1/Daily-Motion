@@ -1,8 +1,8 @@
 # Operator qualification handoff
 
-This is a preparation checklist, not a deployed environment or a claim that
-provider settings, email delivery, legal review or signing were qualified.
-The workspace has synthetic local PostgreSQL and remote compilation only.
+This is an operator checklist. Staging deployment and desktop hosted SMTP/OTP,
+SDK/controller and sync functional proof now exist; legal review, signing,
+managed recovery and physical-device acceptance remain open.
 [Phase 0 evidence](../docs/PHASE0_EVIDENCE.md) separates these from external gates.
 
 The Daily Motion product/repository owner is accountable for commissioning the
@@ -10,6 +10,29 @@ India launch privacy/security review and assigning a named qualified reviewer.
 The deployment operator owns region, backup, processor and signing evidence.
 Named appointments and approval artifacts must be recorded before closing the
 external dependency; software tests cannot provide that approval.
+
+### Current operator dependencies — 2026-10-18 IST
+
+- Invalidate the exposed private Render Blueprint sync hook for
+  `daily-motion-staging` (provider support if necessary; no regeneration control
+  is exposed by the current settings UI). Do not paste the replacement URL into
+  chat. Confirm invalidation, then repair and verify the deleted source branch to
+  `main`. The service already follows `main`; its secrets must remain protected.
+- Authorize the staging-only ES256 standby/rotation/revocation rehearsal and API
+  cache restart before trusted keys change. Observe provider JWKS cache propagation
+  and verify overlapping/new/retired credentials. No key change is authorized yet.
+- Approve a staging sender capacity policy: 30 emails/hour can permit 720/day,
+  exceeding the consumer Gmail sender's documented 500/day allowance. Actual
+  recipient delivery/signing/TLS and immediate resend denial pass; hourly/daily
+  quota exhaustion and an operator capacity acceptance are not claimed.
+- Provide an approved managed or separately arranged backup/recovery route and
+  processor acceptance. The current backup dashboard still shows Free, no
+  scheduled backup rows and no restore control. No paid upgrade was attempted.
+- Supply Android/iPhone hardware, signing/install access, developer/store
+  prerequisites, named privacy/security and incident ownership, and operator
+  acceptance. Physical/native/accessibility/p95 evidence remains mandatory.
+
+See [the safe provider audit](../docs/evidence/phase0-provider-qualification-2026-10-18.json).
 
 ## Hosted staging prerequisites
 
