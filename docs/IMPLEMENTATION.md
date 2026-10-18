@@ -1624,3 +1624,57 @@ internals and unknown advisories are outside this result. Final repository check
 - Final repository checks: **32 Markdown / 365 local links / five fenced JSON**,
   **266 source files / zero credential findings**, six tested source hashes and
   retained local-result equality verified, unchanged lockfiles and clean whitespace.
+
+### Wider setup-entrypoint review and follow-up CI — 2026-10-18 IST
+
+- With explicit authorization, published exactly **a4f0003** to PR #4 after a
+  clean scan of its **13 committed file versions** and unchanged workflow check.
+  PR [39128309352](https://github.com/bluxo1/Daily-Motion/actions/runs/39128309352)
+  passes all three jobs: **145 Python / zero skipped**, each mobile job **151
+  passed / 12 explicit skips**, Android all modes/routine and unsigned iOS both
+  modes. API and Linux also pass in push
+  [39128306625](https://github.com/bluxo1/Daily-Motion/actions/runs/39128306625).
+  Its initial macOS unsigned debug build fails with Flutter's missing-Development-
+  Team fallback; pinned Flutter source shows this can follow an undiagnosed build
+  issue. The actual Xcode cause is unconfirmed. Only the failed macOS job is rerun;
+  **attempt 2 passes**, including 151 mobile tests / 12 explicit skips and both
+  unsigned iOS modes. API/Linux conclusions are inherited, not reexecuted. No
+  signing setting, SDK or workflow is changed.
+- A wider scan of database entrypoints finds the local development-identity
+  script still validates only URL hostname/database. Real SQLAlchemy arguments
+  prove a query can replace the accepted loopback destination, with **zero
+  connections opened**. New tests fail **14/16 negative cases** before the fix;
+  the existing wrong-host/database rejections account for the two passes.
+- **cbacc0a** requires the psycopg driver, exact local development database and
+  loopback host, rejects queries/startup/destination overrides, and sanitizes
+  invalid-port/parse errors before file creation, migrations or engine setup.
+  Explicit URL ports retain precedence. Twenty boundary tests and **70 focused
+  tests / 12 DB cases deselected** pass. Accepted-input tests stop at the setup
+  boundary; the actual development provisioner is not executed.
+- **165 full Python tests / zero skipped**, including **nine connected Flutter
+  HTTP/PostgreSQL cases**, pass in a fresh local tmpfs database; initial emptiness
+  and final container removal are verified. No existing database is reset or
+  contacted. Ruff checks/format (36 files) and strict mypy (13 source files) pass.
+  No Flutter runtime, schema, lock, contract or ADR changes.
+- The code fix is separately authorized and published. Push
+  [39130484081](https://github.com/bluxo1/Daily-Motion/actions/runs/39130484081)
+  and PR [39130487873](https://github.com/bluxo1/Daily-Motion/actions/runs/39130487873)
+  pass all three jobs on **cbacc0a**: **165 Python / zero skipped**, Linux/macOS
+  each **151 Flutter / 12 explicit skips**, Android all modes/routine, unsigned
+  iOS debug/release and all generated-output checks. CI credential guard checks
+  **226 tracked files / zero findings**; local scans include untracked skill files.
+  Provider controls remain absent from the session. A credential-free CLI read
+  lists Playwright configured but not exposed, and no Supabase MCP entry. A cached
+  **0.0.83** server initializes, but its supported Chrome-extension tabs operation
+  fails; known default locations have no prior MCP profile. No raw response is
+  exposed, provider navigation requested or MCP configuration changed. The owned
+  probe process is cleaned up. Authenticated browser restoration is still needed
+  before private deployment preflight. No
+  deployment, key rotation, sender/backup change or operator acceptance occurs.
+  Render incident **215476446235862 remains OPEN**. Phase 0 remains in progress;
+  Phase 1 is unstarted.
+  [New evidence](evidence/phase0-development-routing-and-ci-2026-10-18.json).
+- Final repository checks pass: **32 Markdown / 369 local links / five fenced
+  JSON**, **268 local source files / zero credential findings**, two tested source
+  hashes, retained full-result equality and whitespace. Source is unchanged from
+  the fully qualified `cbacc0a`; the consolidated evidence update is local.

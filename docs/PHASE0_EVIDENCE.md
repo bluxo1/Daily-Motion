@@ -82,6 +82,21 @@ reset. The follow-up awaits its own publication/CI authorization; hosted changes
 remain unauthorized. [New evidence](evidence/phase0-ci-routing-review-2026-10-18.json),
 [deployment/sender/recovery approval plan](../infra/staging/PHASE0_CHANGE_PLAN.md).
 
+**Wider entrypoint review:** authorized `a4f0003` publication passes all three PR
+CI jobs (145 Python / zero skipped; each mobile job 151 passed / 12 explicit
+skips). Its push macOS unsigned debug build fails with Flutter's Development Team
+fallback, then passes both unsigned modes on a fresh runner; the actual first
+Xcode cause is unconfirmed. Only macOS is rerun; API/Linux successes are inherited.
+Separately, the local development-identity setup has the same routing bypass
+before migrations. Fourteen negative cases fail before the fix. New local
+`cbacc0a` rejects unsafe input before setup; 165 full Python tests / zero skipped,
+including nine live Flutter HTTP cases, pass against another new disposable
+database. That commit is now authorized and published, with all three jobs passing
+in both push/PR CI: 165 Python / zero skipped, mobile 151 passed / 12 explicit skips
+on each runner, Android all modes and unsigned iOS debug/release. No existing
+database or hosted configuration is changed.
+[Results](evidence/phase0-development-routing-and-ci-2026-10-18.json).
+
 The next explicitly requested milestone is hosted **Supabase + Render staging**,
 with a scoped [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification)
 hosting decision. [Deployment preparation](../infra/staging/README.md), role/

@@ -1,11 +1,16 @@
 # Phase 0 staging change approval plan
 
-**Prepared, not authorized or executed.** Phase 0 remains in progress; Phase 1 is
-unstarted. `d655e1f` passed both remote CI runs, but subsequent connection review
-found additional cases. The follow-up passes 145 local Python tests, including
-real disposable PostgreSQL and connected Flutter HTTP. Publish and qualify that
-follow-up in CI before selecting it for deployment.
-[Results](../../docs/evidence/phase0-ci-routing-review-2026-10-18.json).
+**Staging deployment prepared; not authorized or executed.** Phase 0 remains in progress; Phase 1 is
+unstarted. `d655e1f` passed both remote CI runs. The routing follow-up `a4f0003`
+is also published with green push/PR CI, including 145 Python tests; push macOS
+needed one failed-job retry. A wider review then finds a separate development
+setup bypass; its new fix passes
+165 local Python tests, including real disposable PostgreSQL and connected
+Flutter HTTP. That final review fix is published as `cbacc0a`; all three jobs pass
+in both push/PR CI, with 165 Python / zero skipped and 151 Flutter / 12 explicit
+skips on each mobile runner. Deployment candidate:
+`cbacc0ab74d8d5bf7e54aff7a13d27267bf8cfdd`.
+[Results and current CI status](../../docs/evidence/phase0-development-routing-and-ci-2026-10-18.json).
 
 ## 1. Deployment and rollback
 
@@ -25,7 +30,9 @@ capture the actual current revision before executing any change.
    `PGPORT` override. Explicit ports take precedence. Return only classifications
    and equality booleans. Stop for separate configuration authorization on any
    mismatch. Check actual service auto-deploy state; the committed Blueprint's
-   `off` setting does not establish persisted service state.
+   `off` setting does not establish persisted service state. Confirm the operation
+   fits the existing included pipeline budget; any charge or plan change needs
+   separate approval.
 3. Use Render's **Deploy a specific commit** on that exact qualified SHA. Preserve
    existing environment values, resource IDs, database, region, plan and source
    branch. No migration is required. Dashboard deployment of a specific SHA
@@ -94,9 +101,11 @@ operator/privacy/processor acceptance remain unqualified.
 
 ## Next approval
 
-Authorize publication of the **new local review-fix commit** to existing PR #4 and
-rerun the unchanged isolated CI workflow. The previous publication approval named
-`d655e1f`; no follow-up push is included in this prepared plan. Deployment,
+After authenticated browser restoration and private preflight, authorize one
+manual deployment of that exact qualified revision to the existing staging API
+and bounded code rollback to the captured prior SHA, using current environment
+values and the checks above. Publication of `cbacc0a` is already authorized;
+this plan grants no staging-change permission. Deployment,
 signing-key changes, sender limits, hosted backups and operator acceptance remain
 separate decisions. Physical Android/iPhone, signing, native storage/backup,
 accessibility and physical durable-save p95 evidence still require hardware/access.
