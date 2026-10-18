@@ -15,6 +15,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
+from sqlalchemy.exc import ArgumentError
 from sqlalchemy.orm import Session
 
 from daily_motion.config import settings
@@ -25,12 +26,25 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mobile-api-url", default="http://10.0.2.2:8000")
     args = parser.parse_args()
-    admin_url = make_url(os.environ["DM_DEV_ADMIN_URL"])
-    if (
-        admin_url.host not in ("127.0.0.1", "localhost", "::1")
-        or admin_url.database != "daily_motion"
-    ):
-        raise ValueError("Development setup requires the loopback daily_motion database")
+    try:
+        admin_url = make_url(os.environ["DM_DEV_ADMIN_URL"])
+        if (
+            admin_url.drivername != "postgresql+psycopg"
+            or admin_url.host not in ("127.0.0.1", "localhost", "::1")
+            or admin_url.database != "daily_motion"
+            or admin_url.query
+            or (admin_url.port is None and os.environ.get("PGPORT"))
+            or any(
+                os.environ.get(name)
+                for name in ("PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE", "PGOPTIONS")
+            )
+        ):
+            raise ValueError()
+    except (KeyError, ArgumentError, TypeError, ValueError):
+        raise ValueError(
+            "Development setup requires loopback PostgreSQL daily_motion "
+            "without query or libpq routing overrides"
+        ) from None
     root = Path(__file__).resolve().parents[3]
     output = root / ".tools/development-sync"
     output.mkdir(parents=True, exist_ok=True)

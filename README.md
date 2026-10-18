@@ -226,7 +226,10 @@ set `$env:DM_RUN_CONNECTED='1'` before running pytest.
 
 To exercise the debug app with a synthetic Android-emulator identity, set
 `DM_DEV_ADMIN_URL` to the local Compose **daily_motion** database's admin URL
-(separate from **daily_motion_test**), then run from `services/api`:
+(separate from **daily_motion_test**). The setup requires `postgresql+psycopg`,
+rejects connection-query parameters and `PGHOSTADDR`/`PGSERVICE`/`PGSERVICEFILE`/
+`PGOPTIONS`, and requires no `PGPORT` override when the URL omits its port.
+Validation runs before file creation or migrations. Run from `services/api`:
 
 ```sh
 uv run --no-sync python scripts/development_identity.py
