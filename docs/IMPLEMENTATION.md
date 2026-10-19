@@ -1868,3 +1868,58 @@ internals and unknown advisories are outside this result. Final repository check
   do not promote the incomplete post-deployment end-to-end gate to qualified.
   Render incident **215476446235862 remains OPEN**; Phase 0 remains in progress.
   [Review and retry preparation](evidence/phase0-staging-security-deployment-2026-10-18.json).
+
+### PR #6 integration recovery — 2026-10-20 IST
+
+- Remote main is healthy `8ba5a98`. PR #6 remains marked merged at `b2cfee9`,
+  but local reflogs show the subsequent reset and non-fast-forward push back to
+  `8ba5a98`, not a revert. The original `950a946` passed CI; the merge introduced
+  malformed Dart, a fixed clock and no-op delay beyond that tested head. Its
+  Linux formatting job failed before Flutter analysis/tests. The initiating
+  human/process is not attributed from reflogs. [Audit](INTEGRATION_RECOVERY.md).
+- Preserved all five existing worktrees and their HEADs/staged/unstaged patches,
+  plus the unrelated untracked skill installation. A separate recovery worktree
+  starts on healthy main. `recovery/pr6-bad-merge-20261020` retains the bad merge;
+  original auth refs remain. No reset, stash, deletion, main update or force-push
+  occurs in this recovery.
+- Selectively recovered successful-request cooldown timing, stale-recipient
+  invalidation, frozen A/B recipients, bounded pacing, redacted diagnostics,
+  operator tools and local JWKS rotation tests. Kept real clock/timer defaults;
+  two regressions exercise those defaults. Current main's newer evidence and
+  change-plan history are retained rather than replaced from the older branch.
+- Adversarial review reproduces another real defect: the original bridge reports
+  PASS for a zero-exit child with no challenges/checkpoints. The fix requires
+  nine ordered lifecycle events, three submitted/consumed A/B/A challenges and
+  successful exit. Twelve new cases challenge skipped, incomplete, reordered,
+  extra-event, unsubmitted, unconsumed and failed runs. No live provider is used.
+- Local Windows uses pinned Flutter **3.47.7 / Dart 3.13.5**, Python **3.13.14**
+  and frozen dependencies in the recovery worktree. **35 targeted Flutter** pass;
+  full Flutter **161 passed / 12 explicit skips** in **2:11**, with real SQLite
+  recovery and hard process-kill cases. Dart formatting checks **59 files**;
+  analysis has **zero issues** in **105.5 seconds**. Focused Python **39 pass**;
+  full local Python **148 pass / 56 skipped** in **11.88 seconds**. Docker Desktop
+  failed startup: **55 PostgreSQL cases + one connected wrapper are skipped
+  locally**, not claimed as passes. No existing database or Docker data is reset.
+- Ruff formatting/lint pass for **40 Python files**, strict mypy for **13 source
+  files**. OpenAPI, Dart DTOs/limits and Drift reproduce **four byte-identical
+  outputs**; Drift generation takes **88 seconds / 116 builder outputs**. Static
+  native guards, documentation and credential checks pass.
+- Reviewed source **`e3da9d0448fc57215d70b88a9d1e45d410a2af9d`** is published as
+  a GitHub-verified signed commit with its tree equal to the reviewed index;
+  local signing remains enabled. [PR #7](https://github.com/bluxo1/Daily-Motion/pull/7)
+  is open against main. All three [source PR CI jobs](https://github.com/bluxo1/Daily-Motion/actions/runs/39306127033)
+  pass without retries: **204 Python / zero skipped**, including **55 real
+  PostgreSQL cases** and the wrapper executing **nine live Flutter HTTP cases**;
+  Linux/macOS each **161 Flutter / 12 explicit skips**. Android debug/profile/
+  release and prototype debug, unsigned iOS debug/release and all generated checks
+  pass. CI PostgreSQL is the isolated **17.7** service under restricted runtime
+  role; no hosted PostgreSQL/provider action is substituted or performed.
+- The Phase 0 matrix is reconciled only after that passing integration. Main
+  protection is recommended with required API/Linux/macOS checks, current-base
+  review and blocked direct/force updates; repository settings are not changed.
+  No schema, API contract, dependency or ADR changes. No OTP requests, provider
+  settings, keys or deployments. The Oct 19 hosted return-to-A remains incomplete;
+  Render **215476446235862 remains OPEN**. Hardware/signing/native protection,
+  managed recovery/processor and named operator/reviewer gates remain open.
+  Phase 0 is **in progress** and Phase 1 **unstarted**.
+  [Machine-readable results](evidence/phase0-integration-recovery-2026-10-20.json).

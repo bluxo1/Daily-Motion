@@ -3,6 +3,8 @@ class HostedOtpSchedule {
   final DateTime Function() now;
   final Future<void> Function(Duration) delay;
   final _acceptedAt = <String, DateTime>{};
+  int _attempts = 0;
+  bool _failed = false;
 
   HostedOtpSchedule({
     DateTime Function()? now,
@@ -13,15 +15,24 @@ class HostedOtpSchedule {
   int get accountCount => _acceptedAt.length;
 
   Future<void> request(String account, Future<void> Function() send) async {
-    final previous = _acceptedAt[account];
-    if (previous != null) {
-      final remaining = previous
-          .add(const Duration(seconds: 61))
-          .difference(now().toUtc());
-      if (remaining > Duration.zero) await delay(remaining);
+    if (_failed || _attempts >= 3) {
+      throw StateError('Hosted OTP qualification is stopped');
     }
-    await send();
-    // Include network/provider latency before starting this account's cooldown.
-    _acceptedAt[account] = now().toUtc();
+    _attempts++;
+    try {
+      final previous = _acceptedAt[account];
+      if (previous != null) {
+        final remaining = previous
+            .add(const Duration(seconds: 61))
+            .difference(now().toUtc());
+        if (remaining > Duration.zero) await delay(remaining);
+      }
+      await send();
+      // Include network/provider latency before starting this account's cooldown.
+      _acceptedAt[account] = now().toUtc();
+    } catch (_) {
+      _failed = true;
+      rethrow;
+    }
   }
 }

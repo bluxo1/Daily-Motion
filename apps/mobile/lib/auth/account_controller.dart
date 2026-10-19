@@ -284,9 +284,14 @@ class AccountController extends ChangeNotifier {
       if (resend && resendAt != null && now().isBefore(resendAt!)) {
         throw const AuthFailure('throttled');
       }
+      // Once another challenge is requested, an ambiguous/failed response must
+      // not leave the previous recipient available for verification.
+      challengeEmail = null;
       resendAt = now().add(const Duration(seconds: 60));
       await provider.request(address);
       if (!_current(epoch)) return;
+      // Provider latency must not consume the successful request's cooldown.
+      resendAt = now().add(const Duration(seconds: 60));
       challengeEmail = address;
       _state(AccountPhase.codeSent);
     });

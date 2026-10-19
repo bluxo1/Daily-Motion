@@ -1,0 +1,140 @@
+{
+  "phase": 0,
+  "status": "REVIEWED_SOURCE_INTEGRATION_PASSED_PR_OPEN",
+  "audit_date_ist": "2026-10-20",
+  "recorded_at_utc": "2026-10-19T19:12:37.360445+00:00",
+  "healthy_main": "8ba5a980a4dcd2e31ce8cb6246176a522b912f39",
+  "original_auth_head": "950a9463df62f2df7bef2d9237410d095b4b80e4",
+  "bad_merge": "b2cfee92d6a22b5f6d829268276af9a2ab637bc0",
+  "recovered_source": "e3da9d0448fc57215d70b88a9d1e45d410a2af9d",
+  "pr_url": "https://github.com/bluxo1/Daily-Motion/pull/7",
+  "history": {
+    "local_merge_ist": "2026-10-19T23:09:55+05:30",
+    "first_push_reflog_ist": "2026-10-19T23:10:07+05:30",
+    "main_reset_ist": "2026-10-19T23:12:19+05:30",
+    "rewind_push_reflog_ist": "2026-10-19T23:12:26+05:30",
+    "mechanism": "non-fast-forward branch replacement, not a revert commit",
+    "initiating_human_or_automation_attributed": false,
+    "bad_merge_run": 39296087127,
+    "bad_merge_failure": "Linux Dart formatting: hosted_otp_schedule.dart line 14 column 19 cannot parse",
+    "main_protected_when_read": false
+  },
+  "preservation": {
+    "existing_worktrees": 5,
+    "heads_and_staged_unstaged_patch_hashes_unchanged": true,
+    "untracked_skill_installation_untouched": true,
+    "bad_merge_preservation_ref": "recovery/pr6-bad-merge-20261020",
+    "main_updated": false,
+    "force_push_performed": false,
+    "local_signing_disabled": false,
+    "source_commit_github_signature": "VALID",
+    "published_tree_matches_reviewed_index": true
+  },
+  "local": {
+    "environment": "Windows; Flutter 3.47.7 / Dart 3.13.5; Python 3.13.14; frozen dependencies in isolated worktree venv",
+    "targeted_flutter_passed": 35,
+    "full_flutter_passed": 161,
+    "full_flutter_skipped": 12,
+    "flutter_analysis_issues": 0,
+    "dart_format_files": 59,
+    "focused_python_passed": 39,
+    "full_python_passed": 148,
+    "full_python_skipped": 56,
+    "postgresql_skipped": 55,
+    "connected_wrapper_skipped": 1,
+    "database_limitation": "Docker Desktop failed startup; no existing database or Docker data reset",
+    "ruff_files": 40,
+    "mypy_source_files": 13,
+    "generated_artifacts_identical": 4,
+    "drift_builder_seconds": 88,
+    "drift_builder_outputs": 116
+  },
+  "source_ci": {
+    "run_id": 39306127033,
+    "url": "https://github.com/bluxo1/Daily-Motion/actions/runs/39306127033",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "mobile (macos-15-intel)",
+        "id": 118243563157,
+        "conclusion": "success"
+      },
+      {
+        "name": "mobile (ubuntu-24.04)",
+        "id": 118243563370,
+        "conclusion": "success"
+      },
+      {
+        "name": "api",
+        "id": 118243563461,
+        "conclusion": "success"
+      }
+    ],
+    "python_passed": 204,
+    "python_skipped": 0,
+    "python_seconds": 15.24,
+    "real_postgresql_cases": 55,
+    "live_flutter_http_cases": 9,
+    "ordinary_flutter_each_runner_passed": 161,
+    "ordinary_flutter_each_runner_skipped": 12,
+    "android_modes": [
+      "debug",
+      "profile",
+      "release",
+      "prototype debug"
+    ],
+    "ios_unsigned_modes": [
+      "debug",
+      "release"
+    ],
+    "generated_artifacts_unchanged": 4,
+    "retries": 0
+  },
+  "defects_fixed": [
+    "Successful OTP cooldown starts after provider completion",
+    "Failed new request invalidates prior recipient challenge",
+    "Excluded bad merge malformed/fixed-clock/no-op-delay constructor and malformed Duration",
+    "Bounded per-account real-delay qualification stops on failure and fourth request",
+    "Safe diagnostics replace raw output retention",
+    "Original bridge false PASS on skipped child reproduced and fixed with nine checkpoints and consumed A/B/A challenges"
+  ],
+  "source_sha256": {
+    "apps/mobile/lib/auth/account_controller.dart": "20269fa0e755dd6d96866f48934d2a228b6876cc965eb8aa3feb094e83427dd8",
+    "apps/mobile/test/support/hosted_otp_schedule.dart": "ec1c4da048cd3636805d16c0638ce52a8160d8336ac1cf69963d91b907fee59c",
+    "apps/mobile/test/hosted_otp_schedule_test.dart": "f272255185f90b3241d09b1404ac4a8cfa4717c13c2da556833bb4fbf374632e",
+    "apps/mobile/test/hosted_auth_lifecycle_test.dart": "09e9dd887ebaac2f450193cfba46fff6132b664f2a32e01c8312da18210b374b",
+    "tools/auth_security/operator_bridge.py": "f72c66fe92f01490fa6a85451c899ec4d41b8eb7cfc7ec02ccb4de415b06ad3d",
+    "services/api/tests/test_auth_qualification_bridge.py": "45097200435e09ab0673dc58cdb45839b998fd3406bbba46426dee5489dcbe61",
+    "services/api/tests/test_auth_rotation.py": "62f14e8f15f009edc91ad4074e99664838222e005969146952aa9e562f98b38e"
+  },
+  "provider_boundary": {
+    "provider_settings_changes": 0,
+    "otp_requests": 0,
+    "key_rotations": 0,
+    "deployments": 0,
+    "new_hosted_qualification_cases": 0,
+    "prior_failed_return_to_A_resolved": false,
+    "render_incident": "215476446235862",
+    "render_incident_status": "OPEN",
+    "invalidation_confirmed": false
+  },
+  "remaining_gates": [
+    "PR review and merge",
+    "Separately approved hosted return-to-A diagnosis/qualification",
+    "Trusted signing-key rehearsal and sender-capacity/operator acceptance",
+    "Render hook invalidation and source-branch repair",
+    "Managed recovery, processor and named review acceptance",
+    "Physical phones, signing, native secure storage/backup/lifecycle/accessibility and physical p95 <=100ms"
+  ],
+  "adr_changes": false,
+  "phase0_complete": false,
+  "phase1_started": false,
+  "documentation_checks": {
+    "markdown_files": 34,
+    "local_links": 395,
+    "fenced_json_examples": 5,
+    "credential_guard_files": 238,
+    "credential_findings": 0,
+    "diff_whitespace_passed": true
+  }
+}

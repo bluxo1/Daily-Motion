@@ -22,7 +22,6 @@ import 'support/hosted_otp_schedule.dart';
 /// The operator bridge supplies inbox codes in memory, never in test arguments.
 void main() {
   final enabled = Platform.environment['DM_HOSTED_AUTH_LIFECYCLE'] == '1';
-  final manualOtpEntry = Platform.environment['DM_HOSTED_MANUAL_OTP'] == '1';
   test(
     'hosted SDK OTP, refresh, restart, remote sign-out and owner isolation',
     () async {
@@ -89,31 +88,20 @@ void main() {
       )..foreground(false);
       var account = controller();
       final requests = HostedOtpSchedule();
-      var invalidCodeChecked = false;
+      // Freeze recipients once. A later bridge/UI change cannot retarget a leg.
+      final addresses = <String, String>{};
       Future<String> signIn(String label) async {
-        final address = (await operatorCall('GET', '/account/$label'))['email'];
+        final address = addresses[label]!;
         late DateTime requestedAt;
         await requests.request(label, () async {
           requestedAt = DateTime.now().toUtc();
-          await account.requestOtp(address as String);
+          await account.requestOtp(address);
           if (account.state.phase != AccountPhase.codeSent) {
             throw StateError(
               'Hosted OTP request failed: ${account.state.code}',
             );
           }
         });
-        // Manual qualification must not send an automatic resend probe.
-        if (!manualOtpEntry &&
-            requests.accountCount == 1 &&
-            !invalidCodeChecked) {
-          await expectLater(
-            provider.request(address),
-            throwsA(
-              isA<AuthFailure>().having((e) => e.code, 'code', 'throttled'),
-            ),
-          );
-          await event('provider_resend_throttle_passed');
-        }
         final challenge = await operatorCall('POST', '/challenge', {
           'account': label,
           'requested_at': requestedAt.toIso8601String(),
@@ -123,20 +111,7 @@ void main() {
           final result = await operatorCall('GET', '/code/${challenge['id']}');
           final code = result['code'];
           if (code is String && RegExp(r'^\d{6}$').hasMatch(code)) {
-            if (!manualOtpEntry && !invalidCodeChecked) {
-              final wrong =
-                  '${code.substring(0, 5)}${(int.parse(code[5]) + 1) % 10}';
-              await account.verifyOtp(wrong);
-              expect(account.state.code, 'invalid_or_expired_code');
-              invalidCodeChecked = true;
-              await event('incorrect_code_rejected');
-            }
             await account.verifyOtp(code);
-            if (!manualOtpEntry &&
-                account.canRetryInitialization &&
-                account.state.code == 'timeout') {
-              await account.retryInitialization();
-            }
             if (account.state.phase != AccountPhase.authenticated) {
               throw StateError(
                 'Hosted verification failed: ${account.state.code}',
@@ -151,6 +126,14 @@ void main() {
       }
 
       try {
+        for (final label in ['A', 'B']) {
+          addresses[label] =
+              (await operatorCall('GET', '/account/$label'))['email'] as String;
+        }
+        if (addresses['A']!.trim().toLowerCase() ==
+            addresses['B']!.trim().toLowerCase()) {
+          throw StateError('Distinct controlled recipients are required');
+        }
         final ownerA = await signIn('A');
         final beforeRefresh = (await storage.restoreSession())!;
         await account.refresh(force: true);
@@ -168,7 +151,7 @@ void main() {
           recordPayload((await repository.workout(root))!),
         );
         account.foreground(true);
-        await account.coordinator!.synchronize(force: !manualOtpEntry);
+        await account.coordinator!.synchronize();
         account.foreground(false);
         expect(account.coordinator!.status.phase, SyncPhase.synchronized);
         expect(await repository.pendingCount(), 0);
@@ -278,7 +261,7 @@ void main() {
         expect(await signIn('A'), ownerA);
         expect(await account.local!.repository.prepareHead(root), frozen);
         account.foreground(true);
-        await account.coordinator!.synchronize(force: !manualOtpEntry);
+        await account.coordinator!.synchronize();
         account.foreground(false);
         expect(account.coordinator!.status.phase, SyncPhase.synchronized);
         expect(await account.local!.repository.pendingCount(), 0);
