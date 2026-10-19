@@ -1,6 +1,6 @@
 # Phase 0 evidence reconciliation
 
-Audited through 2026-10-18 (IST); latest continuation on
+Audited through 2026-10-19 (IST); latest continuation on
 `docs/phase0-hosted-smtp-2026-10-17` from merged `main` (`c9a8370`).
 [ROADMAP.md](ROADMAP.md) remains the scope authority. This matrix distinguishes
 implemented foundation work from its separate physical/provider acceptance.
@@ -96,6 +96,55 @@ in both push/PR CI: 165 Python / zero skipped, mobile 151 passed / 12 explicit s
 on each runner, Android all modes and unsigned iOS debug/release. No existing
 database or hosted configuration is changed.
 [Results](evidence/phase0-development-routing-and-ci-2026-10-18.json).
+
+**Authenticated staging deployment preflight, Oct 18:** Playwright access is
+restored. Render still runs `c5d5414`, with service Auto Deploy Off and no active
+deployment displayed. The saved transport/runtime configuration and matching CA
+file pass private classification checks. Read-only Supabase catalogs confirm the
+restricted role, migration `0003`, 11 forced-RLS tables, required grants, 12 exact
+owner-policy definitions and denied PUBLIC/API-role training access. The exact
+`cbacc0a` selector enables deployment; its dialog is cancelled without submission.
+Pipeline usage is 2 / 500 included minutes. Public health/readiness return 200 and
+unauthenticated identity returns 401 after an earlier transport timeout whose
+cause is unconfirmed. No hosted configuration, resource or credential changes;
+no new authenticated Flutter run or regression rerun is claimed. Deployment and
+bounded code rollback require explicit approval. Render incident 215476446235862
+remains OPEN; physical/provider/operator gates remain open.
+[New preflight evidence](evidence/phase0-staging-deployment-preflight-2026-10-18.json),
+[exact deployment and rollback plan](../infra/staging/PHASE0_CHANGE_PLAN.md).
+
+**Authorized exact-SHA deployment:** user approval is received and exact `cbacc0a`
+is Live as `dep-dbaf73ijnfac73fg5l20`. Fresh public health/readiness return 200 and
+unauthenticated identity 401; post-deployment saved service/transport settings
+match expected classifications. No provider setting, credential, Blueprint,
+schema or resource changes; no rollback. A native masked-entry workflow allows
+the operator to read email independently. The Oct 18 attempt times out before
+verification; its original Auth logs show initial **200** and deliberate immediate
+resend **429 / over_email_send_rate_limit**, without a correlated SMTP error.
+The operator subsequently confirms the recipient and locates the original email.
+
+**Oct 19 post-deployment manual qualification:** the authorized fresh run skips
+automatic resend and incorrect-code probes. A and B verify as distinct identities;
+actual hosted synchronization, SDK refresh, accepted/duplicate receipts, file
+restart, pending sign-out/revocation, local isolation and cross-owner hosted
+read/mutation denial pass. The third submission, returning to A, is rejected with
+`invalid_or_expired_code` before final pending recovery/bootstrap. The generic
+failure screen is fixed locally and checked with six parser cases and a stubbed
+UI; no application defect is established. Exact provider status/error correlation
+is pending restoration of the extension connection. No further OTPs, test restart,
+provider changes or rollback. Public health/readiness remain 200. Deployment
+execution and partial authenticated proof do not close the full acceptance gate.
+[Deployment evidence](evidence/phase0-staging-security-deployment-2026-10-18.json).
+
+**Return-to-A review:** source and synthetic native UI checks find no recipient
+switch, retained old entry or account-state mixup. A separate pacing defect is
+reproduced and fixed: cooldown is now measured from successful request completion.
+Two regressions fail before correction; all four scheduling cases and targeted
+analysis pass afterward. This is not established as the earlier verification
+failure's cause. Manual Auth-log correlation is requested without repeated browser
+reconnection. One controlled three-request run is prepared but requires explicit
+approval; no new OTP or hosted run is executed. Full A → B → A recovery remains
+unqualified for this deployment until one complete run passes.
 
 The next explicitly requested milestone is hosted **Supabase + Render staging**,
 with a scoped [DM-018](DECISIONS.md#dm-018--render-staging-provider-qualification)

@@ -1,0 +1,306 @@
+{
+  "phase": 0,
+  "status": "EXACT_SHA_LIVE_AUTHENTICATED_QUALIFICATION_PENDING",
+  "authorization": {
+    "explicit_user_approval_received": true,
+    "scope": "One exact-SHA deployment, targeted controlled-account hosted Flutter verification and at most one conditional code rollback using current configuration and credentials",
+    "candidate_sha": "cbacc0ab74d8d5bf7e54aff7a13d27267bf8cfdd",
+    "captured_rollback_sha": "c5d5414fef28a4a5170d605b61d878797786acbd"
+  },
+  "fresh_preflight": {
+    "live_baseline_and_queue_rechecked_at_utc": "2026-10-18T16:24:52Z",
+    "captured_live_baseline_unchanged": true,
+    "active_or_queued_deployment_displayed": false,
+    "saved_service_settings_match_at_utc": "2026-10-18T16:25:29Z",
+    "saved_transport_auth_classifications_match_at_utc": "2026-10-18T16:26:04Z",
+    "included_pipeline_minutes_used": 2,
+    "included_pipeline_minutes_total": 500,
+    "budget_observed_at_utc": "2026-10-18T16:26:53Z"
+  },
+  "deployment": {
+    "service_id": "srv-db7p5knavr4c7392dasg",
+    "service_name": "daily-motion-staging-api",
+    "project_ref": "pulruylvpehwftwqcvct",
+    "submitted_at_utc": "2026-10-18T16:27:59.396Z",
+    "deployment_id": "dep-dbaf73ijnfac73fg5l20",
+    "live_sha": "cbacc0ab74d8d5bf7e54aff7a13d27267bf8cfdd",
+    "live_confirmed_at_utc": "2026-10-18T16:31:43Z",
+    "displayed_duration_seconds": 70,
+    "manual_exact_commit_selector_used": true,
+    "submission_count": 1,
+    "latest_main_merge_sha_substituted": false,
+    "rollback_used": false
+  },
+  "public_checks": {
+    "observed_at_utc": "2026-10-18T16:32:03Z",
+    "healthz_status": 200,
+    "readyz_status": 200,
+    "readyz_expected_body": true,
+    "unauthenticated_me_status": 401,
+    "authenticated_acceptance_implied": false
+  },
+  "post_deployment_configuration": {
+    "settings_checked_at_utc": "2026-10-18T16:44:14Z",
+    "existing_service_main_branch_singapore_free_plan_preserved": true,
+    "root_build_start_predeploy_health_settings_expected": true,
+    "auto_deploy_still_off": true,
+    "private_environment_checked_at_utc": "2026-10-18T16:45:43Z",
+    "eight_expected_fields_read_privately_and_remasked": true,
+    "intended_project_runtime_role_database_session_port_expected": true,
+    "verified_tls_and_matching_ca_secret_file": true,
+    "permitted_unique_query_keys_only": true,
+    "routing_overrides_absent": true,
+    "auth_and_environment_classifications_expected": true,
+    "provider_settings_or_credentials_changed": false,
+    "blueprint_schema_database_backup_or_resource_mutation": false
+  },
+  "authenticated_qualification": {
+    "observed_date_utc": "2026-10-19",
+    "target": "apps/mobile/test/hosted_auth_lifecycle_test.dart",
+    "target_service": "daily-motion-staging-api",
+    "live_revision_rechecked_during_this_attempt": false,
+    "last_private_live_revision_confirmation_utc": "2026-10-18T17:13:57Z",
+    "executed": true,
+    "passed": false,
+    "manual_otp_mode": true,
+    "fresh_otp_sdk_request_completions": 3,
+    "automatic_resend_probe_executed": false,
+    "incorrect_code_probe_executed": false,
+    "submitted_codes": 3,
+    "distinct_verified_accounts": 2,
+    "final_A_verified": false,
+    "failure_step": 3,
+    "failure_account": "A",
+    "failure_stage": "verification",
+    "application_error_category": "invalid_or_expired_code",
+    "process_error": "StateError at test/hosted_auth_lifecycle_test.dart:140:15",
+    "events": [
+      {
+        "event": "a_verified",
+        "at": "2026-10-19T06:41:16.779363+00:00"
+      },
+      {
+        "event": "sdk_refresh_passed",
+        "at": "2026-10-19T06:41:17.216471+00:00"
+      },
+      {
+        "event": "retry_receipt_replay_passed",
+        "at": "2026-10-19T06:41:34.773835+00:00"
+      },
+      {
+        "event": "controller_file_restart_passed",
+        "at": "2026-10-19T06:41:34.974795+00:00"
+      },
+      {
+        "event": "remote_sign_out_pending_and_revocation_passed",
+        "at": "2026-10-19T06:41:36.052918+00:00"
+      },
+      {
+        "event": "b_verified",
+        "at": "2026-10-19T06:42:11.064168+00:00"
+      },
+      {
+        "event": "cross_owner_feed_and_mutation_denial_passed",
+        "at": "2026-10-19T06:42:12.826002+00:00"
+      }
+    ],
+    "a_initial_hosted_sync_refresh_receipt_replay_restart_and_pending_signout_passed": true,
+    "b_distinct_identity_local_and_hosted_cross_owner_denial_passed": true,
+    "a_return_pending_recovery_and_final_bootstrap_passed": false,
+    "exact_provider_http_status_and_error_code_observed": false,
+    "provider_logs_blocker": "Extension remains disconnected; manual read-only Auth-log inspection instructions provided without reconnection retries",
+    "wrong_stale_or_expired_code_distinguished": false,
+    "application_or_deployment_regression_established": false,
+    "post_failure_public_checks": {
+      "healthz": 200,
+      "readyz": 200,
+      "unauthenticated_me": 401
+    },
+    "new_otp_requests_after_failure": 0,
+    "qualification_restart_after_failure": false,
+    "provider_settings_changed": false,
+    "follow_up": "Obtain existing provider error metadata if available; request explicit approval before one controlled fresh-OTP run of the reviewed candidate"
+  },
+  "otp_delivery_diagnosis": {
+    "initial_auth_log": {
+      "timestamp_utc": "2026-10-18T17:20:18Z",
+      "request_id": "01a15007-40d8-7c87-aca3-a5a7e74943d1",
+      "method": "POST",
+      "path": "/otp",
+      "status": 200,
+      "error_code_present": false,
+      "recipient_matches_configured_account_A": true,
+      "smtp_error_observed": false,
+      "actual_delivery_proven": false
+    },
+    "deliberate_immediate_resend_auth_log": {
+      "request_id": "01a15007-4fcc-7d8b-a1e2-195bf7e3fb89",
+      "method": "POST",
+      "path": "/otp",
+      "status": 429,
+      "error_code": "over_email_send_rate_limit",
+      "classification": "Per-user immediate resend guard",
+      "required_wait_seconds": 56,
+      "recipient_matches_configured_account_A": true,
+      "smtp_error_observed": false,
+      "project_or_sender_quota_exhaustion_established": false
+    },
+    "visible_otp_log_entries_in_bounded_scan": 2,
+    "visible_smtp_error_entries_in_bounded_scan": 0,
+    "complete_downstream_mail_audit": false,
+    "saved_smtp_readback_at_utc": "2026-10-18T17:40:48Z",
+    "custom_smtp_enabled": true,
+    "expected_google_smtp_host_and_tls_port": true,
+    "sender_and_smtp_login_match": true,
+    "password_control_masked_and_value_not_read": true,
+    "magic_link_template_readback_at_utc": "2026-10-18T17:42:05Z",
+    "magic_link_template_token_marker_present": true,
+    "expected_staging_code_subject": true,
+    "provider_settings_changed": false,
+    "operator_recipient_match": "PENDING",
+    "operator_all_mail_spam_trash_result": "PENDING",
+    "missing_message_cause": "UNRESOLVED",
+    "further_otp_requests_stopped": true,
+    "operator_followup_2026_10_19": {
+      "recipient_matches_inbox_confirmed": true,
+      "original_email_found": true,
+      "original_code_too_old_to_use": true,
+      "original_missing_message_search_or_delivery_delay_distinguished": false
+    }
+  },
+  "local_qualification_preparation": {
+    "native_masked_entry_synthetic_checks_passed": true,
+    "one_time_code_consumption_and_duplicate_rejection_checked": true,
+    "loopback_host_origin_header_and_body_size_checks_passed": true,
+    "new_hosted_receipt_replay_assertion_added": true,
+    "targeted_dart_format_and_analysis_passed": true,
+    "new_receipt_assertion_executed_against_hosted_service": true,
+    "new_device_qualification_implied": false,
+    "manual_mode_avoids_resend_and_wrong_code_probes": true,
+    "manual_mode_environment_forwarding_stub_check_passed": true,
+    "targeted_analysis_no_issues_duration_seconds": 129.2
+  },
+  "repository": {
+    "product_source_changed": false,
+    "passing_regressions_or_remote_ci_rerun": false,
+    "new_evidence_commit_created": false,
+    "commit_blocker": "Configured SSH signing key could not be unlocked; no signing bypass or credential changes",
+    "publication_performed": false,
+    "adr_changes": false,
+    "test_source_changed": true,
+    "hosted_lifecycle_source_sha256": "6af76883fafaa0873cae4360bf2f5b74b111a20ad3e66c72951b3b4152d364ad",
+    "hosted_lifecycle_source_sha256_scope": "Original failed hosted attempt, not the prepared retry candidate"
+  },
+  "render_incident": {
+    "ticket": "215476446235862",
+    "status": "OPEN",
+    "revocation_confirmed": false,
+    "reinvestigated": false
+  },
+  "phase0_completion": "IN PROGRESS",
+  "phase1_started": false,
+  "authenticated_qualification_2026_10_18": {
+    "target": "apps/mobile/test/hosted_auth_lifecycle_test.dart",
+    "live_candidate_reconfirmed_at_utc": "2026-10-18T17:13:57Z",
+    "executed": true,
+    "passed": false,
+    "failure_boundary": "Timed out waiting for recipient code entry before verification or authenticated synchronization",
+    "manual_masked_entry_available": true,
+    "email_browser_automation_required": false,
+    "challenge_created_at_utc": "2026-10-18T17:20:15.525253Z",
+    "new_otp_requests": 2,
+    "accepted_initial_requests": 1,
+    "deliberately_throttled_immediate_resends": 1,
+    "requests_during_delivery_diagnosis": 0,
+    "submitted_codes": 0,
+    "new_verified_accounts": 0,
+    "blocker": "Operator reports no received message; exact-recipient comparison and downstream delivery remain unconfirmed",
+    "controlled_accounts_share_delivery_mailbox_but_require_distinct_supabase_subjects": true,
+    "authenticated_render_synchronization_reached": false,
+    "deployment_regression_established": false,
+    "follow_up": "Identify missing-message cause before another OTP request or test restart; complete recipient comparison without sharing codes, then inspect supported downstream delivery evidence if needed"
+  },
+  "manual_entry_failure_display_fix": {
+    "scope": "Ignored local qualification tools; no application or provider settings changed",
+    "confirmed_defect": "Generic stopped-or-failed message hid the failing account step and sanitized category",
+    "fixed_for_next_manual_window": true,
+    "display": "Step 3/3, return to A, verification, invalid_or_expired_code",
+    "failure_parser_cases_passed": 6,
+    "ui_check_used_stubbed_read_only_calls": true,
+    "new_otp_or_provider_requests_from_checks": 0,
+    "existing_failed_process_and_bridge_state_preserved": true
+  },
+  "return_to_A_review": {
+    "prior_success_and_failure_evidence_preserved": true,
+    "prior_live_bridge_now_unreachable": true,
+    "original_failed_attempt_source_digest_preserved": true,
+    "same_frozen_A_recipient_used_for_both_A_legs": true,
+    "signout_clears_challenge_session_and_local_account": true,
+    "synthetic_UI_A_B_A_entry_clear_binding_and_mask_checks_passed": true,
+    "automatic_code_reuse_or_wrong_recipient_defect_established": false,
+    "manual_mode_skips_resend_and_wrong_code_probes": true,
+    "separate_timing_defect": {
+      "before": "Cooldown starts before the successful request completes",
+      "reproduction_request_latency_seconds": 15,
+      "simple_before_wait_seconds": 46,
+      "simple_required_wait_seconds": 61,
+      "A_B_A_before_wait_seconds": 36,
+      "A_B_A_required_wait_seconds": 51,
+      "regression_cases_failed_before_fix": 2,
+      "after": "Record successful completion time before the per-account 61-second cooldown",
+      "focused_tests_passed": 4,
+      "skipped": 0,
+      "failed_request_retried": false,
+      "cause_of_prior_verification_failure_established": false
+    },
+    "targeted_three_file_analysis": "No issues found",
+    "targeted_analysis_duration_seconds": 30.7,
+    "provider_requests_from_local_validation": 0,
+    "MCP_relay_established_browser_connections": 0,
+    "browser_reconnection_retried": false,
+    "manual_auth_log_lookup": {
+      "date_utc": "2026-10-19",
+      "start_utc": "06:40:00",
+      "end_utc": "06:46:00",
+      "time_ist": "12:10-12:16",
+      "method": "POST",
+      "path": "/verify",
+      "target": "Last failed A verification after B success at 06:42:11 UTC",
+      "requested_fields": [
+        "timestamp",
+        "HTTP status",
+        "error_code",
+        "request_id"
+      ],
+      "raw_logs_or_request_bodies_requested": false,
+      "provider_reason_received": false
+    }
+  },
+  "controlled_retry_preparation": {
+    "status": "AWAITING_EXPLICIT_APPROVAL",
+    "approval_received": false,
+    "maximum_runs": 1,
+    "maximum_otp_requests": 3,
+    "account_sequence": [
+      "A",
+      "B",
+      "A"
+    ],
+    "per_account_cooldown_seconds_after_successful_completion": 61,
+    "automatic_resends": false,
+    "wrong_code_probes": false,
+    "masked_local_manual_entry": true,
+    "stop_on_failure": true,
+    "same_run_final_A_recovery_and_hosted_bootstrap_required": true,
+    "provider_or_deployment_settings_changes": false,
+    "new_otp_requests_since_failed_run": 0,
+    "new_hosted_runs_since_failed_run": 0,
+    "candidate_source_sha256": {
+      "apps/mobile/test/hosted_auth_lifecycle_test.dart": "7f8c811484b12028938b23a7bdbc8943a336c452b6494786b094ad176f7ddedb",
+      "apps/mobile/test/support/hosted_otp_schedule.dart": "b7d7151290a476ddfd23966c96aae0d6f80ffd79b0e69bf44ef7587e27a67dce",
+      "apps/mobile/test/hosted_otp_schedule_test.dart": "ad3bdba459d423659dd2470e158103ace94045169e78f43677c912e646d485ee",
+      ".tools/staging/manual_otp_entry.py": "58d8391fe4b2ce7e6f775db02fb49e5fb0f51eb7b81e03f09097730ae08b3512",
+      ".tools/staging/phase0_qualification_bridge.py": "ffd8fa2f5a441d0ee8c99d5ae4f73c6d1aba131fb5215407509442d066dfb038"
+    }
+  }
+}
