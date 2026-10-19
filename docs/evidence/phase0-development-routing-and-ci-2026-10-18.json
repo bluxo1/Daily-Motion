@@ -1,0 +1,384 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-18T13:31:57.525944+00:00",
+  "scope": "Authorized a4f0003 CI and independent development-identity routing review",
+  "authorized_publication": {
+    "revision": "a4f000322a567a046991703bd29bb730639bcf4f",
+    "pull_request": 4,
+    "branch": "docs/phase0-hosted-smtp-2026-10-17",
+    "commits_scanned": 1,
+    "committed_file_versions_scanned": 13,
+    "credential_findings": 0,
+    "workflow_unchanged": true,
+    "existing_database_reset": false
+  },
+  "published_revision_ci_observation": [
+    {
+      "run_id": 39128306625,
+      "url": "https://github.com/bluxo1/Daily-Motion/actions/runs/39128306625",
+      "head_sha": "a4f000322a567a046991703bd29bb730639bcf4f",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 2,
+      "jobs": [
+        {
+          "name": "mobile (macos-15-intel)",
+          "conclusion": "success",
+          "inherited_success_from_attempt1": false,
+          "successful_build_steps": [
+            "Run flutter build ios --debug --no-codesign",
+            "Run flutter build ios --release --no-codesign"
+          ]
+        },
+        {
+          "name": "mobile (ubuntu-24.04)",
+          "conclusion": "success",
+          "inherited_success_from_attempt1": true,
+          "successful_build_steps": [
+            "Run flutter build apk --debug",
+            "Run flutter build apk --profile",
+            "Run flutter build apk --release",
+            "Run flutter build apk --debug -t lib/qualification/routine_prototype.dart"
+          ]
+        },
+        {
+          "name": "api",
+          "conclusion": "success",
+          "inherited_success_from_attempt1": true,
+          "successful_build_steps": []
+        }
+      ],
+      "test_counts": [
+        {
+          "job": "mobile (ubuntu-24.04)",
+          "suite": "Flutter",
+          "passed": 151,
+          "skipped": 12,
+          "attempt": 1
+        },
+        {
+          "job": "api",
+          "suite": "Python",
+          "passed": 145,
+          "skipped": 0,
+          "elapsed": "20.55s",
+          "attempt": 1
+        },
+        {
+          "job": "mobile (macos-15-intel)",
+          "suite": "Flutter",
+          "passed": 151,
+          "skipped": 12,
+          "attempt": 2
+        }
+      ]
+    },
+    {
+      "run_id": 39128309352,
+      "url": "https://github.com/bluxo1/Daily-Motion/actions/runs/39128309352",
+      "head_sha": "a4f000322a567a046991703bd29bb730639bcf4f",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "name": "api",
+          "conclusion": "success",
+          "successful_build_steps": []
+        },
+        {
+          "name": "mobile (ubuntu-24.04)",
+          "conclusion": "success",
+          "successful_build_steps": [
+            "Run flutter build apk --debug",
+            "Run flutter build apk --profile",
+            "Run flutter build apk --release",
+            "Run flutter build apk --debug -t lib/qualification/routine_prototype.dart"
+          ]
+        },
+        {
+          "name": "mobile (macos-15-intel)",
+          "conclusion": "success",
+          "successful_build_steps": [
+            "Run flutter build ios --debug --no-codesign",
+            "Run flutter build ios --release --no-codesign"
+          ]
+        }
+      ],
+      "test_counts": [
+        {
+          "job": "api",
+          "suite": "Python",
+          "passed": 145,
+          "skipped": 0,
+          "elapsed": "20.13s"
+        },
+        {
+          "job": "mobile (ubuntu-24.04)",
+          "suite": "Flutter",
+          "passed": 151,
+          "skipped": 12
+        },
+        {
+          "job": "mobile (macos-15-intel)",
+          "suite": "Flutter",
+          "passed": 151,
+          "skipped": 12
+        }
+      ]
+    }
+  ],
+  "push_first_attempt_failure": {
+    "run_id": 39128306625,
+    "job_id": 117678011930,
+    "failed_step": "flutter build ios --debug --no-codesign",
+    "category": "Flutter missing Development Team fallback after unsigned Xcode build failure",
+    "underlying_xcode_cause_confirmed": false,
+    "same_revision_pr_unsigned_debug_and_release_pass": true,
+    "failed_job_only_rerun_requested": true,
+    "retry_attempt": 2,
+    "signing_configuration_changed": false,
+    "retry_job_id": 117681698868,
+    "retry_conclusion": "success",
+    "initial_failure_reproduced_on_fresh_runner": false,
+    "api_and_linux_successes_inherited_not_reexecuted": true
+  },
+  "independent_review": {
+    "finding": "The local development identity setup checked URL hostname/database but accepted driver query and ambient libpq overrides before migrations",
+    "actual_sqlalchemy_arguments_prove_remote_host_override": true,
+    "counterexample_connections_opened": 0,
+    "actual_remote_database_mutated": false,
+    "baseline_negative_tests_failed": 14,
+    "baseline_negative_tests_passed": 2,
+    "new_cases": 20,
+    "focused_passed": 70,
+    "focused_database_cases_deselected": 12,
+    "fix": "Require loopback PostgreSQL+psycopg daily_motion, no queries or ambient destination/startup overrides; reject malformed input with generic errors before filesystem/migration/engine setup",
+    "negative_tests_stop_before_file_creation_migration_and_engine_construction": true,
+    "positive_tests_stop_at_file_creation_boundary": true,
+    "actual_identity_setup_executed": false,
+    "additional_confirmed_finding_after_entrypoint_review": false
+  },
+  "development_followup": {
+    "revision": "cbacc0ab74d8d5bf7e54aff7a13d27267bf8cfdd",
+    "published": true,
+    "remote_ci": true,
+    "deployed": false,
+    "publication_preflight": {
+      "commits_scanned": 1,
+      "committed_file_versions_scanned": 3,
+      "credential_findings": 0,
+      "workflow_locks_contracts_migrations_unchanged": true
+    },
+    "ci_runs": [
+      39130484081,
+      39130487873
+    ],
+    "remote_ci_conclusion": "success",
+    "remote_ci_runs": [
+      {
+        "run_id": 39130484081,
+        "url": "https://github.com/bluxo1/Daily-Motion/actions/runs/39130484081",
+        "event": "push",
+        "head_sha": "cbacc0ab74d8d5bf7e54aff7a13d27267bf8cfdd",
+        "conclusion": "success",
+        "attempt": 1,
+        "created_at": "2026-10-18T13:11:54Z",
+        "updated_at": "2026-10-18T13:23:00Z",
+        "jobs": [
+          {
+            "name": "mobile (ubuntu-24.04)",
+            "conclusion": "success",
+            "successful_build_steps": [
+              "Run flutter build apk --debug",
+              "Run flutter build apk --profile",
+              "Run flutter build apk --release",
+              "Run flutter build apk --debug -t lib/qualification/routine_prototype.dart"
+            ],
+            "generated_diff_checks_passed": true
+          },
+          {
+            "name": "api",
+            "conclusion": "success",
+            "successful_build_steps": [],
+            "generated_diff_checks_passed": true
+          },
+          {
+            "name": "mobile (macos-15-intel)",
+            "conclusion": "success",
+            "successful_build_steps": [
+              "Run flutter build ios --debug --no-codesign",
+              "Run flutter build ios --release --no-codesign"
+            ],
+            "generated_diff_checks_passed": true
+          }
+        ],
+        "test_counts": [
+          {
+            "job": "mobile (ubuntu-24.04)",
+            "suite": "Flutter",
+            "passed": 151,
+            "skipped": 12
+          },
+          {
+            "job": "api",
+            "suite": "Python",
+            "passed": 165,
+            "skipped": 0,
+            "elapsed": "18.07s"
+          },
+          {
+            "job": "mobile (macos-15-intel)",
+            "suite": "Flutter",
+            "passed": 151,
+            "skipped": 12
+          }
+        ],
+        "credential_guards": [
+          {
+            "job": "api",
+            "files": 226,
+            "findings": 0
+          }
+        ]
+      },
+      {
+        "run_id": 39130487873,
+        "url": "https://github.com/bluxo1/Daily-Motion/actions/runs/39130487873",
+        "event": "pull_request",
+        "head_sha": "cbacc0ab74d8d5bf7e54aff7a13d27267bf8cfdd",
+        "conclusion": "success",
+        "attempt": 1,
+        "created_at": "2026-10-18T13:11:57Z",
+        "updated_at": "2026-10-18T13:30:01Z",
+        "jobs": [
+          {
+            "name": "mobile (macos-15-intel)",
+            "conclusion": "success",
+            "successful_build_steps": [
+              "Run flutter build ios --debug --no-codesign",
+              "Run flutter build ios --release --no-codesign"
+            ],
+            "generated_diff_checks_passed": true
+          },
+          {
+            "name": "mobile (ubuntu-24.04)",
+            "conclusion": "success",
+            "successful_build_steps": [
+              "Run flutter build apk --debug",
+              "Run flutter build apk --profile",
+              "Run flutter build apk --release",
+              "Run flutter build apk --debug -t lib/qualification/routine_prototype.dart"
+            ],
+            "generated_diff_checks_passed": true
+          },
+          {
+            "name": "api",
+            "conclusion": "success",
+            "successful_build_steps": [],
+            "generated_diff_checks_passed": true
+          }
+        ],
+        "test_counts": [
+          {
+            "job": "mobile (macos-15-intel)",
+            "suite": "Flutter",
+            "passed": 151,
+            "skipped": 12
+          },
+          {
+            "job": "mobile (ubuntu-24.04)",
+            "suite": "Flutter",
+            "passed": 151,
+            "skipped": 12
+          },
+          {
+            "job": "api",
+            "suite": "Python",
+            "passed": 165,
+            "skipped": 0,
+            "elapsed": "20.75s"
+          }
+        ],
+        "credential_guards": [
+          {
+            "job": "api",
+            "files": 226,
+            "findings": 0
+          }
+        ]
+      }
+    ]
+  },
+  "tested_source_sha256": {
+    "services/api/scripts/development_identity.py": "80ec1070db6746192a8fb67c87d866d6b35645bcc06730b65633a528ffb061bb",
+    "services/api/tests/test_development_identity.py": "38bf491e84343e151c6cfa3b0c58f65216f4dfa67907d97e84a2480e43d0df0e"
+  },
+  "full_local_regression": {
+    "started_at_utc": "2026-10-18T12:52:45.797001+00:00",
+    "scope": "Full API and connected Flutter regressions in a new disposable local PostgreSQL container",
+    "existing_database_reset": false,
+    "hosted_accessed": false,
+    "new_database_initially_empty": true,
+    "isolated_tmpfs_container": true,
+    "pytest_exit_code": 0,
+    "summaries": [
+      {
+        "passed": 165,
+        "skipped": 0,
+        "elapsed": "60.46s"
+      }
+    ],
+    "connected_flutter_harness_reported": true,
+    "failed_case_ids": [],
+    "disposable_container_removed": true,
+    "completed_at_utc": "2026-10-18T12:54:12.779769+00:00"
+  },
+  "connected_flutter_cases_passed": 9,
+  "analysis": {
+    "ruff_format_files": 36,
+    "ruff_check": true,
+    "strict_mypy_source_files": 13,
+    "flutter_runtime_contract_migration_or_lock_changes": false
+  },
+  "provider_boundaries": {
+    "deployment": false,
+    "signing_rotation": false,
+    "sender_limit_change": false,
+    "hosted_backup_change": false,
+    "operator_acceptance": false,
+    "physical_device_claim": false,
+    "render_incident": "OPEN: 215476446235862; no revocation confirmation or repeated investigation",
+    "playwright_configured_but_not_exposed_to_session": true,
+    "supabase_absent_from_cli_mcp_configuration": true,
+    "supported_browser_recovery_probe": {
+      "cached_playwright_mcp_version": "0.0.83",
+      "server_initializes": true,
+      "browser_tabs_tool_available": true,
+      "extension_browser_tabs_call_error": true,
+      "render_or_supabase_tab_control_established": false,
+      "provider_navigation_or_change_requested": false,
+      "provider_response_or_secret_logged": false,
+      "existing_mcp_profile_found_in_default_locations": false,
+      "server_process_cleaned_up": true,
+      "codex_mcp_configuration_modified": false
+    }
+  },
+  "next_approval": "After restoring authenticated browser control and completing private preflight, authorize deploying exact cbacc0ab74d8d5bf7e54aff7a13d27267bf8cfdd to existing staging API with bounded rollback to captured prior code SHA using current environment values; no configuration/credentials/database/key/sender/backup changes",
+  "phase0_complete": false,
+  "phase1_started": false,
+  "final_repository_validation": {
+    "markdown_files": 32,
+    "local_links": 369,
+    "fenced_json_examples": 5,
+    "local_source_files_scanned": 268,
+    "credential_findings": 0,
+    "tested_source_hashes_verified": 2,
+    "local_result_equality_verified": true,
+    "whitespace_check": true,
+    "source_changes_after_full_local_regression": false,
+    "adr_changes": false,
+    "unpublished_evidence_commit_requires_no_source_requalification": true
+  }
+}

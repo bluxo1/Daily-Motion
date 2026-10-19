@@ -1268,3 +1268,30 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   without reinvestigation; hardware/signing/native/operator gates remain external.
   Phase 0 is in progress, Phase 1 unstarted.
   [CI and review evidence](evidence/phase0-ci-routing-review-2026-10-18.json).
+
+## 2026-10-18 — Development-entrypoint review
+
+- Authorized **a4f0003** is published. Its PR CI passes all three jobs: **145
+  Python / zero skipped**, Linux/Mac **151 Flutter / 12 explicit skips**, native
+  builds and generated checks. Push API/Linux pass; initial unsigned iOS debug
+  fails with a Development Team fallback and only macOS is rerun. Attempt 2 passes
+  both unsigned modes (151 tests / 12 skips); API/Linux successes are inherited.
+  Underlying Xcode cause is unconfirmed; no signing/workflow change or physical result.
+- Wider entrypoint review proves a remote host query override bypasses the local
+  development setup check, using driver arguments with no connections. **14 new
+  negative cases fail before the fix**. Local **cbacc0a** rejects unsafe targets
+  before setup with generic errors. Twenty new boundary cases, **70 focused** and
+  **165 full Python / zero skipped**, including nine live Flutter HTTP cases,
+  pass. Another fresh local database is removed afterward; existing databases
+  remain untouched. Ruff/mypy pass; no runtime/schema/lock/contract/ADR change.
+- Publication of **cbacc0a** is now authorized; push **39130484081** and PR
+  **39130487873** pass all three jobs: **165 Python / zero skipped**, Linux/Mac
+  **151 Flutter / 12 explicit skips**, native builds and generated checks.
+  Configured Playwright is not
+  exposed to this session and the CLI has no Supabase MCP entry. Staging deployment,
+  trusted-key rotation, sender limits, hosted recovery, hardware and named operator
+  acceptance remain separate dependencies. Render **215476446235862 stays OPEN**.
+  A supported cached MCP 0.0.83 server starts, but its Chrome-extension tabs
+  operation fails; no provider navigation/configuration change or raw output.
+  Human browser reconnection remains necessary before private preflight.
+  [Evidence](evidence/phase0-development-routing-and-ci-2026-10-18.json).

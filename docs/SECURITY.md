@@ -87,10 +87,19 @@ review closes inherited-port/database, multiple-host and startup-role-options
 gaps; its full local regression uses a newly created disposable database.
 An omitted port requires no `PGPORT` override; explicit ports retain precedence.
 One host and an explicit database are required, and `PGOPTIONS` is rejected.
-The follow-up remains local and **not deployed**; its publication/deployment
-require authorization. No existing database was reset.
+That follow-up is published as `a4f0003`; deployment remains unauthorized.
+The wider review also finds the development identity setup accepting query and
+ambient routing overrides before local migrations. Its new local fix rejects
+those inputs before file creation or database setup, sanitizes parse errors and
+preserves explicit-port precedence. Twenty new boundary tests pass, as does the
+full 165-test local PostgreSQL/connected Flutter regression with zero skips.
+That development-script follow-up is now authorized and published as `cbacc0a`;
+all three jobs pass in both push/PR CI (165 Python / zero skipped). The exact
+deployed candidate still needs separate approval.
+No existing database was reset, and no security fix was deployed.
 [Security and recovery evidence](evidence/phase0-recovery-and-connection-guards-2026-10-18.json).
 [CI and follow-up review](evidence/phase0-ci-routing-review-2026-10-18.json).
+[Development setup review](evidence/phase0-development-routing-and-ci-2026-10-18.json).
 
 The same review queries OSV with all 47 registry packages in the frozen Python
 lock and 135 hosted Pub packages. It returns zero advisories, with all responses

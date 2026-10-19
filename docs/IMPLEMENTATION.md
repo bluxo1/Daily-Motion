@@ -1624,3 +1624,247 @@ internals and unknown advisories are outside this result. Final repository check
 - Final repository checks: **32 Markdown / 365 local links / five fenced JSON**,
   **266 source files / zero credential findings**, six tested source hashes and
   retained local-result equality verified, unchanged lockfiles and clean whitespace.
+
+### Wider setup-entrypoint review and follow-up CI — 2026-10-18 IST
+
+- With explicit authorization, published exactly **a4f0003** to PR #4 after a
+  clean scan of its **13 committed file versions** and unchanged workflow check.
+  PR [39128309352](https://github.com/bluxo1/Daily-Motion/actions/runs/39128309352)
+  passes all three jobs: **145 Python / zero skipped**, each mobile job **151
+  passed / 12 explicit skips**, Android all modes/routine and unsigned iOS both
+  modes. API and Linux also pass in push
+  [39128306625](https://github.com/bluxo1/Daily-Motion/actions/runs/39128306625).
+  Its initial macOS unsigned debug build fails with Flutter's missing-Development-
+  Team fallback; pinned Flutter source shows this can follow an undiagnosed build
+  issue. The actual Xcode cause is unconfirmed. Only the failed macOS job is rerun;
+  **attempt 2 passes**, including 151 mobile tests / 12 explicit skips and both
+  unsigned iOS modes. API/Linux conclusions are inherited, not reexecuted. No
+  signing setting, SDK or workflow is changed.
+- A wider scan of database entrypoints finds the local development-identity
+  script still validates only URL hostname/database. Real SQLAlchemy arguments
+  prove a query can replace the accepted loopback destination, with **zero
+  connections opened**. New tests fail **14/16 negative cases** before the fix;
+  the existing wrong-host/database rejections account for the two passes.
+- **cbacc0a** requires the psycopg driver, exact local development database and
+  loopback host, rejects queries/startup/destination overrides, and sanitizes
+  invalid-port/parse errors before file creation, migrations or engine setup.
+  Explicit URL ports retain precedence. Twenty boundary tests and **70 focused
+  tests / 12 DB cases deselected** pass. Accepted-input tests stop at the setup
+  boundary; the actual development provisioner is not executed.
+- **165 full Python tests / zero skipped**, including **nine connected Flutter
+  HTTP/PostgreSQL cases**, pass in a fresh local tmpfs database; initial emptiness
+  and final container removal are verified. No existing database is reset or
+  contacted. Ruff checks/format (36 files) and strict mypy (13 source files) pass.
+  No Flutter runtime, schema, lock, contract or ADR changes.
+- The code fix is separately authorized and published. Push
+  [39130484081](https://github.com/bluxo1/Daily-Motion/actions/runs/39130484081)
+  and PR [39130487873](https://github.com/bluxo1/Daily-Motion/actions/runs/39130487873)
+  pass all three jobs on **cbacc0a**: **165 Python / zero skipped**, Linux/macOS
+  each **151 Flutter / 12 explicit skips**, Android all modes/routine, unsigned
+  iOS debug/release and all generated-output checks. CI credential guard checks
+  **226 tracked files / zero findings**; local scans include untracked skill files.
+  Provider controls remain absent from the session. A credential-free CLI read
+  lists Playwright configured but not exposed, and no Supabase MCP entry. A cached
+  **0.0.83** server initializes, but its supported Chrome-extension tabs operation
+  fails; known default locations have no prior MCP profile. No raw response is
+  exposed, provider navigation requested or MCP configuration changed. The owned
+  probe process is cleaned up. Authenticated browser restoration is still needed
+  before private deployment preflight. No
+  deployment, key rotation, sender/backup change or operator acceptance occurs.
+  Render incident **215476446235862 remains OPEN**. Phase 0 remains in progress;
+  Phase 1 is unstarted.
+  [New evidence](evidence/phase0-development-routing-and-ci-2026-10-18.json).
+- Final repository checks pass: **32 Markdown / 369 local links / five fenced
+  JSON**, **268 local source files / zero credential findings**, two tested source
+  hashes, retained full-result equality and whitespace. Source is unchanged from
+  the fully qualified `cbacc0a`; the consolidated evidence update is local.
+
+### Authenticated staging deployment preflight — 2026-10-18 UTC
+
+- Restored the supported Playwright extension connection to the signed-in Brave
+  Default profile. Inspected only the existing staging service/project; no
+  deployment, provider setting, credential, schema, backup or resource change.
+- Render confirms Live `c5d5414fef28a4a5170d605b61d878797786acbd` /
+  `dep-db8efpon74is73epb8ng`, no active deployment displayed, `main`, Singapore,
+  Free, Auto Deploy Off and expected root/build/start/readiness configuration.
+  Saved environment values pass private project/runtime/database/verified-TLS
+  classifications, with explicit session port 5432, no routing overrides and
+  a matching CA secret file. Values were remasked and excluded from evidence.
+- Two read-only Supabase catalog queries confirm restricted runtime privileges,
+  no training-owner membership, migration `0003`, 11 forced-RLS tables, required
+  grants and denial to PUBLIC/API roles. Independent predicate review matches
+  all 12 expected owner policies. No user records or password verifiers queried.
+- Render lists exact `cbacc0a` separately from the already-merged PR #4 revision.
+  Selecting the qualified full SHA enables Deploy commit; Cancel closes the
+  dialog without submission. Usage is **2 / 500 included pipeline minutes**.
+- A fresh readiness request first times out at transport level; the bounded
+  follow-up passes `/healthz` **200**, `/readyz` **200** with expected body and
+  unauthenticated `/v1/me` **401** at 16:11 UTC. Timeout cause is unconfirmed.
+  No unchanged regression or authenticated-write qualification was rerun.
+- Initial tab-list output echoed the supplied browser extension credential in
+  its connection URL. Subsequent output is restricted to selected metadata; no
+  value is retained in repository evidence, and no revocation or log purge is
+  claimed. A bounded scan of 11 new local console files finds no matches for the
+  checked token-parameter/database-URL/secret-key/JWT patterns; this does not
+  clear conversation or tool history, or constitute comprehensive log clearance.
+- The updated plan requires separate explicit approval for exact-SHA deployment,
+  targeted controlled-account hosted checks and at most one rollback to captured
+  `c5d5414` using current credentials. Render incident **215476446235862 remains
+  OPEN**; Phase 0 remains in progress and Phase 1 unstarted.
+  [New preflight evidence](evidence/phase0-staging-deployment-preflight-2026-10-18.json),
+  [approval plan](../infra/staging/PHASE0_CHANGE_PLAN.md).
+
+### Authorized exact-SHA staging deployment — 2026-10-18 UTC
+
+- Received explicit approval for one exact `cbacc0a` deployment, targeted
+  controlled-account qualification and at most one conditional code rollback to
+  captured `c5d5414` using current configuration/credentials. Fresh preflight
+  reconfirms the same Live baseline, no active deployment, expected saved
+  settings/transport and **2 / 500 included pipeline minutes** used.
+- Submitted **cbacc0ab74d8d5bf7e54aff7a13d27267bf8cfdd** once at **16:27:59 UTC**
+  through the exact-commit selector, creating **dep-dbaf73ijnfac73fg5l20**.
+  Render confirms the candidate **Live at 16:31:43 UTC** and displays **1m10s**
+  duration. No latest-main substitution, merge, Blueprint or resource operation.
+- At **16:32 UTC**, public `/healthz` and `/readyz` return **200**, with expected
+  readiness body; unauthenticated `/v1/me` returns **401**. Saved service settings
+  pass at **16:44 UTC**; private environment/project/runtime/TLS/CA/query/override
+  classifications pass at **16:45 UTC**, and values are remasked. No credentials,
+  provider settings, schema, database or backups were changed. Rollback unused.
+- The credential-gated hosted Flutter case is **not executed** yet. Existing
+  in-memory qualification sessions are unavailable. Before requesting new OTPs,
+  recipient identity checks find that the controlled inbox is outside Brave's
+  connected Default profile; the user confirms another browser/profile. An
+  alternate mail connector returns tool unavailable. Connecting the actual
+  recipient profile is the remaining immediate human dependency. No OTP request,
+  code, new identity, authenticated-sync success or test failure is invented.
+- The four preflight evidence files were staged after documentation/JSON/secret/
+  whitespace checks, but Git could not unlock the configured SSH signing key.
+  No commit was created and signing configuration was preserved. This does not
+  alter the deployed source or authorize an unsigned commit/publication.
+  Render incident **215476446235862 remains OPEN**. Phase 0 remains in progress;
+  Phase 1 is unstarted.
+  [Deployment evidence](evidence/phase0-staging-security-deployment-2026-10-18.json).
+
+### Manual hosted authentication attempt and delivery diagnosis — 2026-10-18 UTC
+
+- Added an ignored local native masked-entry helper around the existing loopback
+  qualification bridge. The operator reads email independently; no email-browser
+  access is required. Codes are cleared from the input before one-time submission,
+  and SDK sessions remain in memory. Local synthetic checks cover masking,
+  inactive/invalid input, one-time consumption, duplicate rejection, Origin/Host/
+  header rejection and bounded request size. No real codes were entered.
+- Extended the hosted lifecycle test to replay the same frozen operation twice,
+  check accepted/duplicate receipts, and leave acknowledgements unapplied before
+  restart recovery. Targeted Dart formatting and analysis pass. This new assertion
+  was **not reached** in the real attempt and is not hosted qualification evidence.
+- Render's exact Live `cbacc0a` is reconfirmed at **17:13:57 UTC**. The operator
+  starts the lifecycle case; its Account A challenge is recorded at
+  **17:20:15.525 UTC**. Supabase's correlated initial `/otp` log at
+  **17:20:18 UTC** returns **200** without an error. Its actor matches configured
+  Account A. The test's immediate resend returns **429** with
+  `over_email_send_rate_limit` and a **56-second** per-user wait. No SMTP
+  authentication/transport error appears in these two entries; this is not a
+  downstream delivery guarantee or a complete mail-provider audit.
+- The case times out after its bounded recipient-entry wait, with **zero codes
+  submitted and zero new verified identities**. It does not reach authenticated
+  Render synchronization, refresh, restart, receipt replay or A/B isolation. The
+  operator reports no received message. All further OTP requests/test restarts
+  are stopped while recipient/delivery diagnosis is unresolved; no rollback is
+  justified by this pre-verification timeout alone.
+- Read-only saved SMTP inspection at **17:40:48 UTC** confirms custom SMTP enabled,
+  expected Google host/TLS port, matching sender/login and a masked password
+  control; the password value is not read. At **17:42:05 UTC**, the saved Magic
+  Link/OTP template contains the literal `{{ .Token }}` marker and expected
+  staging-code subject. No provider settings are edited. A read-only local window
+  shows the exact recipient privately for operator comparison with All Mail,
+  Spam and Trash; its visibility/recipient response remains pending.
+- No passing regression or CI rerun, signing bypass, new commit, publication or
+  provider mutation. Render incident **215476446235862 remains OPEN**. Phase 0
+  remains in progress; Phase 1 is unstarted.
+  [Updated deployment evidence](evidence/phase0-staging-security-deployment-2026-10-18.json).
+
+### Manual post-deployment qualification and final-A failure — 2026-10-19 UTC
+
+- The operator confirms Account A's recipient matches the inbox and locates the
+  original email. Its old code is not used. An explicitly authorized fresh run
+  uses masked native entry with no email-browser access. A manual-mode flag skips
+  automatic resend and incorrect-code probes; other lifecycle assertions remain.
+  Dart formatting is unchanged and targeted analysis passes with **no issues**
+  in **129.2 seconds**. A stub runner verifies manual-mode environment forwarding
+  without provider requests. No application/runtime source is changed.
+- The real Flutter SDK verifies A at **06:41:16 UTC**, refreshes at **06:41:17**,
+  proves accepted/duplicate receipt replay at **06:41:34**, then passes file-backed
+  restart and pending-work sign-out/refresh-token revocation. B verifies at
+  **06:42:11** as a distinct subject. Its local store and hosted feed exclude A's
+  workout; cross-owner mutation returns `not_found` at **06:42:12**. These HTTP
+  paths accept only successful status-200 contract responses; no raw auth tokens
+  or response bodies are retained in evidence.
+- The bridge records **three fresh request completions and three submissions**.
+  The third submission is for returning to A. Flutter stops at
+  `test/hosted_auth_lifecycle_test.dart:140:15` with the sanitized error
+  **`Hosted verification failed: invalid_or_expired_code`**. Final A verification,
+  pending recovery and final hosted bootstrap do not pass. This application
+  category alone cannot distinguish an incorrect, stale or expired entered code
+  from other provider verification rejection; the precise Auth HTTP status/code
+  is not yet observed. No inference of an application or deployed-code regression.
+- Read-only post-failure public checks pass health/readiness **200** and
+  unauthenticated identity **401**. This run uses the existing staging URL; the
+  private Live revision was last confirmed as exact `cbacc0a` on Oct 18 at
+  **17:13:57 UTC**, and is not freshly rechecked on Oct 19. The provider-log MCP
+  connection has not completed despite the operator allowing the connection;
+  bounded transport diagnostics stop pending the extension's connection action.
+  No email access or provider mutation is attempted.
+- Confirmed local harness defect: the final native screen only says "Test stopped
+  or failed," hiding the rejected account step and category. A safe local result
+  summary and next-window display now identify **step 3/3, return to A,
+  verification, `invalid_or_expired_code`**, with preserved passing checkpoints.
+  Six parser cases and a stubbed UI check pass, including unknown-text rejection
+  and ANSI formatting. These checks make **zero provider requests**; the existing
+  failed process/bridge results are preserved. The fix does not restart the run.
+- All OTP requests/restarts are stopped at the user's instruction. No signing
+  bypass, commit, CI rerun, publication, rollback, provider setting or credential
+  change. Render incident **215476446235862 remains OPEN**. Phase 0 remains in
+  progress and Phase 1 unstarted.
+  [Preserved partial qualification and failure evidence](evidence/phase0-staging-security-deployment-2026-10-18.json).
+
+### Return-to-A harness review and controlled retry preparation — 2026-10-19 UTC
+
+- Preserved the failed hosted run's seven passing checkpoints, final-A failure,
+  original source digest and explicit incomplete status. Its transient loopback
+  bridge is now unreachable; sanitized repository evidence remains available.
+  The existing MCP relay has no established browser connection. No reconnection
+  attempt is repeated. Manual read-only Auth-log lookup is requested for Oct 19
+  **06:40–06:46 UTC / 12:10–12:16 IST**, selecting the final failed `POST /verify`
+  after B's **06:42:11 UTC** success. Only timestamp, HTTP status, `error_code`
+  and request ID are requested; no raw request/body or credential disclosure.
+- Source review finds both A legs use the same label and frozen configured
+  recipient. Successful sign-out clears the session, challenge email and local
+  account before the next request; awaited operations serialize account changes.
+  A synthetic native UI exercise confirms every new A/B/A challenge clears old
+  input, step 3 explicitly says return to A, and submission binds to challenge 3
+  with the masked input cleared before sending. The bridge consumes each code
+  once. No incorrect-recipient, automatic code-reuse or account-state defect is
+  established. The precise earlier provider rejection remains unconfirmed.
+- A separate concrete pacing defect is reproduced: the old per-account cooldown
+  starts before the request completes. With 15 seconds of simulated latency,
+  it waits **46 instead of 61 seconds** after acknowledgement; the A/B/A case
+  waits **36 instead of 51**. Both tests fail before the correction. The extracted
+  test helper now records successful completion time, retains independent A/B
+  clocks, and never retries a failed request. The actual hosted lifecycle uses
+  this helper. This is not claimed as the cause of an already-accepted final-A
+  challenge's verification rejection.
+- All **four** focused scheduling tests pass after the fix, with zero skips or
+  provider requests. Formatting passes; targeted analysis of the lifecycle,
+  scheduling helper and tests reports **no issues** in **30.7 seconds**. The
+  synthetic native UI check also makes zero provider requests. No passing full
+  regressions or remote CI are repeated; application/runtime source is unchanged.
+- One controlled fresh-OTP A → B → A run is prepared for explicit approval:
+  existing staging API, at most three requests, at least 61 seconds after A's
+  prior request completion before returning to A, no automatic resends or wrong
+  code probes, masked local entry and stop on failure. Each step uses its own
+  newly requested message; final A pending recovery and hosted bootstrap must
+  pass in the same complete run. No additional OTP has been requested, no new
+  run started, and no provider/deployment configuration changed. Existing passes
+  do not promote the incomplete post-deployment end-to-end gate to qualified.
+  Render incident **215476446235862 remains OPEN**; Phase 0 remains in progress.
+  [Review and retry preparation](evidence/phase0-staging-security-deployment-2026-10-18.json).
