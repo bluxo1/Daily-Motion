@@ -1295,3 +1295,30 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   operation fails; no provider navigation/configuration change or raw output.
   Human browser reconnection remains necessary before private preflight.
   [Evidence](evidence/phase0-development-routing-and-ci-2026-10-18.json).
+
+## 2026-10-20 IST — PR #6 integration recovery
+
+- PR #6's original auth head `950a946` passed CI; bad merge `b2cfee9` added broken
+  Dart and clock/delay defaults. Main was reset/pushed back to healthy `8ba5a98`
+  after merge; the PR's merged metadata persists. [Reflog audit](INTEGRATION_RECOVERY.md).
+- Preserve five prior worktrees, their staged/unstaged patches and HEADs. Recovery
+  uses `fix/phase0-pr6-integration-recovery` in its own worktree from `8ba5a98`;
+  a local preservation ref retains `b2cfee9`. No main update or force-push.
+- Recover reviewed cooldown/stale-challenge/redaction/qualification sources,
+  preserving newer main evidence. Fix a reproduced bridge false PASS for skipped
+  children with an exact full A/B/A completion guard. Defaults use real time and
+  timers. Local: **35 targeted Flutter**, **161 full Flutter / 12 skips**, **39
+  focused Python**, **148 full Python / 56 database-dependent skips**; Docker
+  startup fails without database/reset action. Ruff/mypy and four generated
+  artifacts pass; no schema/contract/dependency/ADR changes.
+- GitHub-signed source `e3da9d0` matches the reviewed index; [PR #7](https://github.com/bluxo1/Daily-Motion/pull/7)
+  is open. Its [source CI](https://github.com/bluxo1/Daily-Motion/actions/runs/39306127033)
+  passes all three jobs: **204 Python / zero skips**, **55 PostgreSQL + 9 live
+  Flutter HTTP cases**, Linux/Mac each **161 Flutter / 12 skips**, Android modes,
+  unsigned iOS debug/release and generated checks. Reconcile the matrix only now.
+- No provider settings, OTPs, keys or deployments. Oct 19 final-A remains
+  incomplete. Render **215476446235862 stays OPEN**. Main protection is documented
+  as a recommendation, not applied. Hardware/signing, native storage/backup/
+  accessibility/physical p95, trusted-key/provider and recovery/operator review
+  gates remain open. Phase 0 **in progress**; Phase 1 unstarted.
+  [Recovery evidence](evidence/phase0-integration-recovery-2026-10-20.json).

@@ -1,8 +1,22 @@
 # Implementation phases
 
-Updated: 2026-10-18 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
+Updated: 2026-10-20 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
 
-**Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, interaction prototypes, Windows fault tests and native qualification harnesses are implemented. All three remote jobs pass on authorized `d655e1f`, `a4f0003` and `cbacc0a` in push/PR CI; `a4f0003` push macOS required one retry. The final reviewed source `cbacc0a` passes 165 Python tests with zero skipped locally and in each remote API job; mobile passes 151 with 12 explicit skips per runner. [IMPLEMENTATION.md](IMPLEMENTATION.md) records exact scope and earlier runner recovery. The [audited evidence matrix](PHASE0_EVIDENCE.md) reconciles foundation completion with the separate external acceptance. Remaining trusted-key/provider, managed recovery/operator review, signing, physical hardware secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
+**Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, interaction prototypes, Windows fault tests and native qualification harnesses are implemented. Recovered source `e3da9d0` on PR #7 passes all three remote jobs; details follow below. [IMPLEMENTATION.md](IMPLEMENTATION.md) records current counts, historical qualification and earlier runner recovery. The [audited evidence matrix](PHASE0_EVIDENCE.md) separates foundation proof from external acceptance. Trusted-key/provider, managed recovery/operator review, signing, physical secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
+
+**Latest integration recovery:** PR #6 was marked merged, then main was reset and
+pushed back to healthy `8ba5a98`. [PR #7](https://github.com/bluxo1/Daily-Motion/pull/7)
+recovers reviewed auth changes without the bad merge's clock/delay defaults.
+Its source `e3da9d0` passes all three [PR CI jobs](https://github.com/bluxo1/Daily-Motion/actions/runs/39306127033):
+**204 Python / zero skipped**, including 55 PostgreSQL cases and 9 live Flutter
+HTTP cases; each mobile runner passes **161 Flutter / 12 skips**, Android builds
+and unsigned iOS debug/release. Local Windows passes 161 Flutter / 12 skips;
+local Python passes 148 / 56 database-dependent skips because Docker failed to
+start. Existing worktrees/staged changes and main are preserved. This closes
+source integration validation, not PR review/merge or any hosted/physical gate.
+The failed hosted return-to-A result remains incomplete; Render incident
+**215476446235862 remains OPEN**. No provider, OTP, key or deployment action.
+No additional Phase 0 checkbox is closed by this recovery.
 
 Mumbai Supabase / Singapore Render **staging was verified on `c5d5414` on Oct 15**, with real
 TLS/RLS/readiness evidence after credential rotation. Both earlier controlled inbox

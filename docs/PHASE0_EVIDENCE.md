@@ -1,7 +1,9 @@
 # Phase 0 evidence reconciliation
 
-Audited through 2026-10-19 (IST); latest continuation on
-`docs/phase0-hosted-smtp-2026-10-17` from merged `main` (`c9a8370`).
+Audited through 2026-10-20 (IST). Recovery PR #7 starts from healthy remote
+`main` (`8ba5a98`); its reviewed source is `e3da9d0`. The recovery remains a PR,
+not a direct update to main. The earlier PR #6 merge was removed by a reset/push;
+[the integration audit](INTEGRATION_RECOVERY.md) records the evidence.
 [ROADMAP.md](ROADMAP.md) remains the scope authority. This matrix distinguishes
 implemented foundation work from its separate physical/provider acceptance.
 [IMPLEMENTATION.md](IMPLEMENTATION.md) records commands, counts and environments;
@@ -19,9 +21,32 @@ the overall Phase 0 exit gate.
 | Aggregate CAS, exact receipts, shadow/working separation, committed feed and consistent bootstrap | Real restricted-role PostgreSQL, live Flutter HTTP, atomic page/cursor and staged snapshot fault/restart tests | Complete for implemented protocol foundation; no physical-device inference |
 | Account-disable races, erased transport/snapshots and migrations | Real owner locks/retirement/redaction tests, file-backed pending deletion and additive migration tests | Complete for foundation erasure barriers; public export/deletion jobs are Phase 1 |
 | Additive checked API/contracts and fixtures | Generated OpenAPI/Dart DTO/limits, shared fixtures, byte-for-byte reproduction checks and fail-closed parsing tests | Complete for current version; four generated outputs include Drift |
-| CI format/static/tests/docs and security basics | Three actual remote jobs, secret guard, release synthetic-auth rejection, safe logging tests, runtime-role/forced-RLS guard and real database attacks | Complete for implemented baseline; not a comprehensive security certification |
+| CI format/static/tests/docs and security basics | Three actual remote jobs, including recovered source `e3da9d0` in [PR #7 CI](https://github.com/bluxo1/Daily-Motion/actions/runs/39306127033); secret guard, release synthetic-auth rejection, safe logging tests, runtime-role/forced-RLS guard and real database attacks | Complete for implemented baseline; not a comprehensive security certification |
 | Managed Mumbai region, backups, processor arrangements and review ownership | Public desk review/operator checklist in [infra/QUALIFICATION.md](../infra/QUALIFICATION.md), plus actual Mumbai staging PostgreSQL 17.11; observed free plan without managed backups | Staging region/database verified; managed backup/restore, processor and named operator/reviewer acceptance outstanding |
 | Physical iPhone and Android acceptance, signed installation, native protection/backup/accessibility and durable-save p95 | Device procedures and native harnesses in [DEVICE_QUALIFICATION.md](DEVICE_QUALIFICATION.md); safe [emulator evidence](evidence/phase0-windows-native-2026-10-13.json) explicitly ineligible | External hardware/signing/provider acceptance outstanding |
+
+## Integration recovery — 2026-10-20
+
+The original auth head `950a946` was reviewed against bad merge `b2cfee9` and
+healthy main `8ba5a98`. Recovery excludes malformed Dart, a fixed default clock
+and a no-op delay. Successful-request cooldown, stale-challenge invalidation,
+bounded qualification and redacted diagnostics now pass new regressions. A
+separate reproduced false PASS for skipped hosted tests is fixed: the operator
+bridge requires a complete ordered A/B/A lifecycle and consumed challenges.
+
+Only after all three source PR CI jobs passed was this matrix reconciled.
+Remote API: **204 Python / zero skipped**, including **55 PostgreSQL cases** and
+the harness executing **9 live Flutter HTTP cases**. Each Linux/macOS mobile job:
+**161 Flutter / 12 explicit skips**, plus Android builds and unsigned iOS
+debug/release. Local Windows: **161 Flutter / 12 skips**, **148 Python / 56 skips**;
+Docker startup failed, so the missing local database cases were qualified by CI,
+not reported as local passes. All four generated outputs reproduce unchanged.
+
+These are source-integration and desktop/database proofs. They do not repeat or
+close the incomplete Oct 19 hosted return-to-A run, trusted-key rotation, SMTP
+capacity/operator acceptance, phone hardware or physical p95 gates. Render
+**215476446235862 remains OPEN**. No provider setting, OTP, key or deployment
+action occurred. [Exact recovery evidence](evidence/phase0-integration-recovery-2026-10-20.json).
 
 ## Scope corrections
 

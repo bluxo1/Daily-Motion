@@ -93,8 +93,20 @@ documentation links and the credential scan pass. An isolated original-versus-
 recovered bridge execution reproduces zero-exit/skipped output reporting PASS
 before the fix and failing closed afterward; it sends no provider requests.
 
-Native CI and its real PostgreSQL/connected suites must pass before reconciling
-the Phase 0 evidence matrix. Earlier dated hosted results remain historical
-evidence; the failed return-to-A run and provider/hardware/operator blockers
-remain open. No production delivery, trusted-key rotation, phone storage or
-physical performance qualification follows from these local tests.
+The recovered source `e3da9d0448fc57215d70b88a9d1e45d410a2af9d` is a GitHub-verified
+signed commit whose tree matches the reviewed local index. Local signing settings
+remain enabled. [PR #7](https://github.com/bluxo1/Daily-Motion/pull/7) targets main;
+no merge or main update is performed.
+
+All three [source PR CI jobs](https://github.com/bluxo1/Daily-Motion/actions/runs/39306127033)
+pass: **204 Python / zero skipped**, including 55 real PostgreSQL cases and the
+harness executing nine live Flutter HTTP cases; each Linux/macOS runner passes
+**161 Flutter / 12 explicit skips**. Android debug/profile/release plus prototype
+debug and unsigned iOS debug/release compilation pass. All four generated-output
+checks pass. This is compilation and desktop/database evidence, not phone proof.
+
+Only after this passing integration was the Phase 0 matrix reconciled. Earlier
+dated hosted results remain historical evidence; the failed return-to-A run and
+provider/hardware/operator blockers remain open. No production delivery,
+trusted-key rotation, phone storage or physical performance qualification follows
+from these tests. [Machine-readable recovery results](evidence/phase0-integration-recovery-2026-10-20.json).
