@@ -104,6 +104,37 @@ void main() {
     expect(account.owner, testOwner);
     expect(gateway.calls, 2);
   });
+  test('resend cooldown starts after a slow OTP request completes', () async {
+    provider.requestOperation = () async {
+      clock = clock.add(const Duration(seconds: 75));
+    };
+    await account.requestOtp('synthetic@example.test');
+    await account.requestOtp('synthetic@example.test', resend: true);
+
+    expect(account.state.code, 'throttled');
+    expect(provider.requests, 1);
+    clock = clock.add(const Duration(seconds: 60));
+    await account.requestOtp('synthetic@example.test', resend: true);
+    expect(account.state.phase, AccountPhase.codeSent);
+    expect(provider.requests, 2);
+  });
+  test('failed request for B cannot verify the previous A challenge', () async {
+    await account.requestOtp('a@example.test');
+    provider.requestFailure = const AuthFailure('network_unavailable');
+    await account.requestOtp('b@example.test');
+    var verifications = 0;
+    provider.verification = () async {
+      verifications++;
+      return provider.session;
+    };
+    await account.verifyOtp('123456');
+
+    expect(verifications, 0);
+    expect(account.state.code, 'invalid_or_expired_code');
+    expect(account.local, null);
+    expect(await storage.restoreSession() == null, true);
+    expect(gateway.calls, 0);
+  });
   test('expired token and failed refresh permit logging, correction, completion and history', () async {
     await signIn();
     final id = await record();

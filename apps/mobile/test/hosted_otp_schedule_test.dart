@@ -19,6 +19,34 @@ void main() {
     );
   });
 
+  test('default clock follows current time instead of a fixed test date', () {
+    final real = HostedOtpSchedule();
+    final before = DateTime.now();
+    final observed = real.now();
+    final after = DateTime.now();
+    expect(!observed.isBefore(before) && !observed.isAfter(after), true);
+  });
+
+  testWidgets('default delay waits for its timer before sending', (
+    tester,
+  ) async {
+    final realDelay = HostedOtpSchedule(now: () => clock);
+    var calls = 0;
+    await realDelay.request('A', () async {
+      calls++;
+    });
+    clock = clock.add(const Duration(seconds: 60));
+    final pending = realDelay.request('A', () async {
+      calls++;
+    });
+
+    await tester.pump(const Duration(milliseconds: 999));
+    expect(calls, 1);
+    await tester.pump(const Duration(milliseconds: 1));
+    await pending;
+    expect(calls, 2);
+  });
+
   test(
     'slow acknowledgement still leaves a full cooldown for return to A',
     () async {
@@ -70,5 +98,30 @@ void main() {
     expect(calls, 1);
     expect(schedule.accountCount, 0);
     expect(waits, isEmpty);
+  });
+
+  test('failure stops further requests in this run', () async {
+    await expectLater(
+      schedule.request('A', () async => throw StateError('synthetic failure')),
+      throwsStateError,
+    );
+    var calls = 0;
+    await expectLater(
+      schedule.request('A', () async => calls++),
+      throwsStateError,
+    );
+    expect(calls, 0);
+  });
+
+  test('three-request A B A budget prevents any fourth send', () async {
+    var calls = 0;
+    for (final account in ['A', 'B', 'A']) {
+      await schedule.request(account, () async => calls++);
+    }
+    await expectLater(
+      schedule.request('B', () async => calls++),
+      throwsStateError,
+    );
+    expect(calls, 3);
   });
 }
