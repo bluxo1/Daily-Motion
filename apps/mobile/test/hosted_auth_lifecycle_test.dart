@@ -16,6 +16,7 @@ import 'package:http/http.dart' as http;
 import 'repository_test.dart' show recordPayload;
 import 'support/auth_fakes.dart' show MemoryProtectedStorage;
 import 'support/auth_rejection.dart';
+import 'support/hosted_otp_schedule.dart';
 
 /// Real hosted providers and SQLite; memory storage does not qualify native keys.
 /// The operator bridge supplies inbox codes in memory, never in test arguments.
@@ -86,32 +87,21 @@ void main() {
         syncTransport: (_, token) => HttpSyncTransport(config.api, token),
       )..foreground(false);
       var account = controller();
-      final requests = <String, DateTime>{};
-      var invalidCodeChecked = false;
+      final requests = HostedOtpSchedule();
+      // Freeze recipients once. A later bridge/UI change cannot retarget a leg.
+      final addresses = <String, String>{};
       Future<String> signIn(String label) async {
-        final previous = requests[label];
-        if (previous != null) {
-          final remaining = previous
-              .add(const Duration(seconds: 61))
-              .difference(DateTime.now().toUtc());
-          if (remaining > Duration.zero) await Future<void>.delayed(remaining);
-        }
-        final address = (await operatorCall('GET', '/account/$label'))['email'];
-        final requestedAt = DateTime.now().toUtc();
-        await account.requestOtp(address as String);
-        if (account.state.phase != AccountPhase.codeSent) {
-          throw StateError('Hosted OTP request failed: ${account.state.code}');
-        }
-        requests[label] = requestedAt;
-        if (requests.length == 1 && !invalidCodeChecked) {
-          await expectLater(
-            provider.request(address),
-            throwsA(
-              isA<AuthFailure>().having((e) => e.code, 'code', 'throttled'),
-            ),
-          );
-          await event('provider_resend_throttle_passed');
-        }
+        final address = addresses[label]!;
+        late DateTime requestedAt;
+        await requests.request(label, () async {
+          requestedAt = DateTime.now().toUtc();
+          await account.requestOtp(address);
+          if (account.state.phase != AccountPhase.codeSent) {
+            throw StateError(
+              'Hosted OTP request failed: ${account.state.code}',
+            );
+          }
+        });
         final challenge = await operatorCall('POST', '/challenge', {
           'account': label,
           'requested_at': requestedAt.toIso8601String(),
@@ -121,19 +111,7 @@ void main() {
           final result = await operatorCall('GET', '/code/${challenge['id']}');
           final code = result['code'];
           if (code is String && RegExp(r'^\d{6}$').hasMatch(code)) {
-            if (!invalidCodeChecked) {
-              final wrong =
-                  '${code.substring(0, 5)}${(int.parse(code[5]) + 1) % 10}';
-              await account.verifyOtp(wrong);
-              expect(account.state.code, 'invalid_or_expired_code');
-              invalidCodeChecked = true;
-              await event('incorrect_code_rejected');
-            }
             await account.verifyOtp(code);
-            if (account.canRetryInitialization &&
-                account.state.code == 'timeout') {
-              await account.retryInitialization();
-            }
             if (account.state.phase != AccountPhase.authenticated) {
               throw StateError(
                 'Hosted verification failed: ${account.state.code}',
@@ -148,6 +126,14 @@ void main() {
       }
 
       try {
+        for (final label in ['A', 'B']) {
+          addresses[label] =
+              (await operatorCall('GET', '/account/$label'))['email'] as String;
+        }
+        if (addresses['A']!.trim().toLowerCase() ==
+            addresses['B']!.trim().toLowerCase()) {
+          throw StateError('Distinct controlled recipients are required');
+        }
         final ownerA = await signIn('A');
         final beforeRefresh = (await storage.restoreSession())!;
         await account.refresh(force: true);
@@ -165,10 +151,10 @@ void main() {
           recordPayload((await repository.workout(root))!),
         );
         account.foreground(true);
-        await account.coordinator!.synchronize(force: true);
+        await account.coordinator!.synchronize();
+        account.foreground(false);
         expect(account.coordinator!.status.phase, SyncPhase.synchronized);
         expect(await repository.pendingCount(), 0);
-        account.foreground(false);
         await repository.commit(
           root,
           'record_set',
@@ -176,6 +162,26 @@ void main() {
         );
         final frozen = (await repository.prepareHead(root))!;
         final attackPayload = (jsonDecode(frozen) as Json)['payload'];
+        final uncertainTransport = HttpSyncTransport(
+          config.api,
+          () async => refreshed.accessToken,
+        );
+        try {
+          final body = canonicalJson({
+            'schema_version': 1,
+            'operations': [jsonDecode(frozen)],
+          });
+          final first = await uncertainTransport.push(body);
+          final replay = await uncertainTransport.push(body);
+          final accepted = first.results.single as Json;
+          expect(accepted['status'], 'accepted');
+          expect(replay.results.single, {...accepted, 'status': 'duplicate'});
+          // Leave both responses uninstalled to exercise receipt recovery below.
+          expect(await repository.prepareHead(root), frozen);
+        } finally {
+          uncertainTransport.close();
+        }
+        await event('retry_receipt_replay_passed');
         await account.close();
         account = controller();
         await account.restore();
@@ -255,7 +261,8 @@ void main() {
         expect(await signIn('A'), ownerA);
         expect(await account.local!.repository.prepareHead(root), frozen);
         account.foreground(true);
-        await account.coordinator!.synchronize(force: true);
+        await account.coordinator!.synchronize();
+        account.foreground(false);
         expect(account.coordinator!.status.phase, SyncPhase.synchronized);
         expect(await account.local!.repository.pendingCount(), 0);
         final current = (await storage.restoreSession())!;

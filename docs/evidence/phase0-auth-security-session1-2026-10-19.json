@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "phase": 0,
+  "session": 1,
+  "scope": "Authentication and security qualifications; local verification and preparation only",
+  "branch": "phase0/auth-security",
+  "worktree": "E:/Motion/worktrees/auth-security",
+  "base_revision": "57a4494df84c414bf5d2572fdf65c47f77bb8d1a",
+  "shared_roadmap_and_status_documents_edited": false,
+  "phase0_complete": false,
+  "phase1_started": false,
+  "preserved_historical_evidence": [
+    {
+      "path": "docs/evidence/phase0-hosted-auth-flow-2026-10-18.json",
+      "scope": "Earlier complete hosted lifecycle; dated evidence remains valid"
+    },
+    {
+      "path": "docs/evidence/phase0-provider-qualification-2026-10-18.json",
+      "scope": "Earlier hardened lifecycle, provider refresh/revocation and real elapsed OTP expiry"
+    },
+    {
+      "path": "docs/evidence/phase0-staging-deployment-preflight-2026-10-18.json",
+      "sha256": "22c8e411ae8faf32090834c479f6dcd83d58729439df0c853a832cbb3184e29f",
+      "matches_original_uncommitted_checkpoint": true,
+      "git_content_sha256": "22c8e411ae8faf32090834c479f6dcd83d58729439df0c853a832cbb3184e29f",
+      "sha256_scope": "Raw preserved original checkpoint bytes; Git normalizes text line endings only"
+    },
+    {
+      "path": "docs/evidence/phase0-staging-security-deployment-2026-10-18.json",
+      "sha256": "0685ba20aad44215c62d5d8972fabad7ac99e8779221de441b92771b170b664a",
+      "matches_original_uncommitted_checkpoint": true,
+      "scope": "Exact cbacc0a deployment, seven passed checkpoints and rejected final A verification",
+      "git_content_sha256": "0685ba20aad44215c62d5d8972fabad7ac99e8779221de441b92771b170b664a",
+      "sha256_scope": "Raw preserved original checkpoint bytes; Git normalizes text line endings only"
+    }
+  ],
+  "confirmed_defects": [
+    {
+      "component": "Application account controller",
+      "defect": "Provider request latency consumes the resend cooldown",
+      "before_fix": "A simulated 75-second request allowed an immediate resend; expected throttled regression failed",
+      "fix": "Successful request completion establishes a fresh 60-second resend boundary; a request-start boundary remains for ambiguous failures",
+      "after_fix": "Immediate resend is denied without another provider call; resend succeeds after the full cooldown",
+      "cause_of_historical_rejected_otp_established": false
+    },
+    {
+      "component": "Application account controller",
+      "defect": "Failed new recipient request leaves the previous recipient challenge usable",
+      "before_fix": "Request A, fail request B, then verify performed one provider verification and initialized A; expected zero provider verifications regression failed",
+      "fix": "Invalidate the prior challenge before starting a new provider request",
+      "after_fix": "Verification has no recipient, calls no provider verification or API initialization, and persists no session",
+      "cause_of_historical_rejected_otp_established": false
+    },
+    {
+      "component": "Older ignored operator bridge",
+      "defect": "Regex-filtered raw diagnostics do not hide opaque refresh material",
+      "before_fix": "Synthetic opaque refresh marker is returned by /diagnostic; one regression failed while five boundary checks passed",
+      "fix": "Promote reviewed runner sources; retain and expose allowlisted failure metadata only",
+      "after_fix": "Opaque marker never reaches diagnostic or result responses or retained bridge state",
+      "actual_credential_disclosure_through_this_route_observed": false
+    }
+  ],
+  "hosted_candidate_hardening": {
+    "prior_uncommitted_completion_based_pacing_preserved": true,
+    "per_account_cooldown_seconds": 61,
+    "recipient_lookup_frozen_for_entire_run": true,
+    "distinct_recipient_preflight": true,
+    "maximum_otp_requests": 3,
+    "request_failure_stops_further_sends": true,
+    "automatic_resends_removed_for_all_modes": true,
+    "incorrect_code_probes_removed": true,
+    "automatic_initialization_retry_removed": true,
+    "previous_receipt_replay_assertions_preserved": true,
+    "new_hosted_runs": 0,
+    "new_otp_requests": 0,
+    "new_codes_submitted": 0,
+    "new_hosted_acceptance_claimed": false
+  },
+  "local_verification": {
+    "flutter_command": "flutter test --no-pub test/auth_account_test.dart test/auth_provider_test.dart test/auth_rejection_test.dart test/auth_widget_test.dart test/hosted_otp_schedule_test.dart --reporter expanded --concurrency=1",
+    "flutter_passed": 53,
+    "flutter_failed": 0,
+    "flutter_skipped": 0,
+    "flutter_reporter_elapsed": "02:36",
+    "before_fix_failing_application_regressions": 2,
+    "python_command": "uv run --no-sync pytest -q tests/test_auth.py tests/test_auth_rotation.py tests/test_auth_qualification_bridge.py",
+    "python_passed": 35,
+    "python_failed": 0,
+    "python_skipped": 0,
+    "python_duration_seconds": 0.4,
+    "python_format_files_checked": 36,
+    "python_format_and_lint_passed": true,
+    "mypy_source_files": 10,
+    "mypy_passed": true,
+    "dart_format_changed_files_checked": 5,
+    "dart_format_passed": true,
+    "flutter_analysis": "No issues found",
+    "postgresql_integration_executed_in_this_session": false,
+    "remote_ci_run_for_this_candidate": false,
+    "physical_device_or_native_hardware_qualification_implied": false,
+    "flutter_analysis_duration_seconds": 145.3
+  },
+  "jwks_local_qualification": {
+    "library": "PyJWT 2.15.1",
+    "ephemeral_private_keys_only_in_test_process": true,
+    "real_jwt_signature_and_jwks_cache_logic": true,
+    "network_discovery_controlled_without_provider_calls": true,
+    "untrusted_jku_header_does_not_select_discovery_origin": true,
+    "standby_old_and_new_signers_accepted": true,
+    "unknown_key_fetch_cooldown_seconds": 30,
+    "new_key_discovered_after_cooldown": true,
+    "known_revoked_key_remains_trusted_while_cached": true,
+    "explicit_process_local_invalidation_rejects_old_and_accepts_current": true,
+    "key_set_cache_ttl_seconds": 300,
+    "expired_cache_rechecks_and_rejects_revoked_key": true,
+    "expired_cache_with_discovery_outage_fails_closed": true,
+    "unknown_key_outage_does_not_erase_unexpired_current_trust": true,
+    "indefinite_per_key_cache_enabled": false,
+    "supabase_edge_cache_or_hosted_worker_rotation_qualified": false,
+    "public_cache_reset_endpoint_added": false
+  },
+  "read_only_hosted_observations": {
+    "public_jwks": {
+      "observed_at_utc": "2026-10-19T14:46:17.888523+00:00",
+      "http_status": 200,
+      "public_key_count": 1,
+      "algorithms": [
+        "ES256"
+      ],
+      "key_values_or_ids_retained": false
+    },
+    "supabase_auth_logs": "Isolated browser is at provider sign-in; exact failed verification metadata unavailable",
+    "render_support": "Isolated browser is at Render login; no new Support response observed",
+    "provider_browser_sign_in_attempted": false,
+    "last_deployed_revision_from_preserved_evidence": "cbacc0ab74d8d5bf7e54aff7a13d27267bf8cfdd",
+    "live_revision_freshly_reverified": false,
+    "hosted_settings_changes": 0,
+    "deployments": 0,
+    "key_rotations": 0,
+    "cost_incurring_operations": 0
+  },
+  "historical_rejection_diagnosis": {
+    "application_category": "invalid_or_expired_code",
+    "exact_provider_cause": "UNCONFIRMED",
+    "log_lookup_date_utc": "2026-10-19",
+    "log_lookup_window_utc": "06:40-06:46",
+    "preceding_B_success_utc": "06:42:11",
+    "requested_fields": [
+      "timestamp",
+      "HTTP status",
+      "error_code",
+      "request_id"
+    ],
+    "raw_logs_codes_sessions_or_recipient_addresses_requested": false,
+    "user_acknowledged_lookup_request": true,
+    "diagnostic_fields_received": false,
+    "new_attempt_approval_received": false
+  },
+  "smtp_proposal": {
+    "last_observed_email_limit_per_hour": 30,
+    "nominal_messages_per_day_at_current_limit": 720,
+    "published_consumer_gmail_daily_threshold": 500,
+    "proposed_email_limit_per_hour": 10,
+    "nominal_messages_per_day_at_proposed_limit": 240,
+    "proposal_is_not_an_account_wide_daily_cap_or_delivery_guarantee": true,
+    "operator_sender_wide_usage_monitoring_and_dedicated_sender_required": true,
+    "change_approved_or_applied": false,
+    "sources_checked": [
+      "https://support.google.com/mail/answer/22839?hl=en",
+      "https://supabase.com/docs/guides/auth/rate-limits"
+    ]
+  },
+  "rotation_preparation": {
+    "plan": "infra/staging/AUTH_SECURITY_QUALIFICATION.md",
+    "status": "AWAITING_EXPLICIT_APPROVAL_AND_AUTHENTICATED_OPERATOR_ACCESS",
+    "provider_generated_ES256_standby_only": true,
+    "old_token_must_be_unexpired_when_rejected": true,
+    "provider_and_process_cache_actions_must_be_distinguished": true,
+    "worker_restart_or_deployment_requires_separate_explicit_scope": true,
+    "automatic_rollback_or_permanent_key_deletion": false,
+    "executed": false,
+    "source": "https://supabase.com/docs/guides/auth/signing-keys"
+  },
+  "render_incident": {
+    "support_reference": "215476446235862",
+    "status": "OPEN",
+    "human_revocation_confirmation_observed": false,
+    "old_hook_rejection_proven": false,
+    "hook_invoked": false,
+    "new_support_message_sent": false,
+    "blueprint_repair_or_resource_changes": false
+  },
+  "publication": {
+    "commit_authorized": true,
+    "commit_created": false,
+    "commit_blocker": "Configured SSH signing key failed to decrypt; user asked to unlock locally",
+    "signing_bypassed": false,
+    "push_merge_or_deploy_performed": false,
+    "commit_shas": []
+  },
+  "session4_coordination": {
+    "coordinator_terminal": "term_9d8d8005-d8ec-425a-9b61-db159408d462",
+    "progress_input_accepted": true,
+    "progress_request_id": "c05bd167-7ed7-4251-823c-50b20a01c28e",
+    "receiving_turn_start_observed": false,
+    "shared_status_edits_deferred_to_session4": true
+  },
+  "recorded_at_utc": "2026-10-19T15:01:05.597483+00:00",
+  "operator_runner": {
+    "source_directory": "tools/auth_security",
+    "launch_after_approval": "python tools/auth_security/manual_otp_entry.py",
+    "root_is_dedicated_worktree": true,
+    "private_configuration_client_keys_only": true,
+    "private_inputs_ignored_by_git": true,
+    "sdk_junction_to_existing_pinned_sdk": true,
+    "private_inputs_preflight_passed": true,
+    "reviewed_sources_import_without_starting_server_or_loading_private_inputs": true,
+    "raw_reporter_output_exposed_or_retained_in_bridge_state": false,
+    "unrelated_inherited_DM_settings_removed": true,
+    "post_only_mutations": true,
+    "single_use_A_B_A_challenges_maximum": 3,
+    "configuration_wrong_target_or_extra_keys_rejected": true,
+    "failed_child_startup_stops_safely": true,
+    "gui_or_bridge_started": false,
+    "new_provider_requests_from_runner": 0,
+    "before_fix_regression_failed": 1,
+    "focused_bridge_tests_passed": 20
+  },
+  "source_sha256": {
+    "apps/mobile/lib/auth/account_controller.dart": "20269fa0e755dd6d96866f48934d2a228b6876cc965eb8aa3feb094e83427dd8",
+    "apps/mobile/test/auth_account_test.dart": "33b0dccbab46c9ae76946194524148738de11e5f379577c18536e3d3beec4406",
+    "apps/mobile/test/hosted_auth_lifecycle_test.dart": "09e9dd887ebaac2f450193cfba46fff6132b664f2a32e01c8312da18210b374b",
+    "apps/mobile/test/support/hosted_otp_schedule.dart": "ec1c4da048cd3636805d16c0638ce52a8160d8336ac1cf69963d91b907fee59c",
+    "apps/mobile/test/hosted_otp_schedule_test.dart": "7cdd6e628bfbef65f4330ab0b6627d51f9f5dfb1afc6c2cc108446d8111ba285",
+    "services/api/tests/test_auth_rotation.py": "62f14e8f15f009edc91ad4074e99664838222e005969146952aa9e562f98b38e",
+    "services/api/tests/test_auth_qualification_bridge.py": "88cb4c495b5ad1bdd79040fd29ebff3cb83f54de0924533d7c6620b059ffaa0d",
+    "tools/auth_security/operator_bridge.py": "08b49af1cd7ae4885340c65996f0106da49f97ca004d89e74db994d1c3415bd4",
+    "tools/auth_security/manual_otp_entry.py": "e27d7ddb15f67ed9f564b7b0b627e2fdf9eb53d28d17c9f87208a9c6736bc0a6",
+    "infra/staging/AUTH_SECURITY_QUALIFICATION.md": "f1a4abb90c830a344d62863ac84f697d44c3e18b135647c9ddfb4e48d9b422f6"
+  },
+  "source_sha256_scope": "Reviewed source bytes normalized to repository LF before staging; matches Git content",
+  "repository_validation": {
+    "markdown_files": 34,
+    "relative_links_checked": 378,
+    "fenced_json_examples": 5,
+    "credential_guard_files": 238,
+    "credential_guard_findings": 0,
+    "changed_relative_markdown_links_reviewed": true,
+    "staged_whitespace_check_passed": true,
+    "raw_historical_and_source_digests_verified": true
+  }
+}
