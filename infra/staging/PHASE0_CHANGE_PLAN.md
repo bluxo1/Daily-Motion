@@ -1,6 +1,10 @@
 # Phase 0 staging change approval plan
 
-**Staging deployment prepared; not authorized or executed.** Phase 0 remains in progress; Phase 1 is
+**Exact-SHA deployment was explicitly authorized and executed on 2026-10-18.**
+Public health/readiness pass. Oct 19 manual qualification passes A/B authentication,
+refresh, sync, receipts, restart and cross-owner denial, but final A verification
+is rejected; full A → B → A recovery remains pending diagnosis.
+Phase 0 remains in progress; Phase 1 is
 unstarted. `d655e1f` passed both remote CI runs. The routing follow-up `a4f0003`
 is also published with green push/PR CI, including 145 Python tests; push macOS
 needed one failed-job retry. A wider review then finds a separate development
@@ -11,19 +15,54 @@ in both push/PR CI, with 165 Python / zero skipped and 151 Flutter / 12 explicit
 skips on each mobile runner. Deployment candidate:
 `cbacc0ab74d8d5bf7e54aff7a13d27267bf8cfdd`.
 [Results and current CI status](../../docs/evidence/phase0-development-routing-and-ci-2026-10-18.json).
+[New private provider preflight](../../docs/evidence/phase0-staging-deployment-preflight-2026-10-18.json).
+[Authorized deployment result](../../docs/evidence/phase0-staging-security-deployment-2026-10-18.json).
 
 ## 1. Deployment and rollback
 
 **Target:** existing Render service `daily-motion-staging-api`,
 `srv-db7p5knavr4c7392dasg`; existing Supabase project `pulruylvpehwftwqcvct`.
-The last observed Live revision is `c5d5414` / `dep-db8efpon74is73epb8ng`;
-capture the actual current revision before executing any change.
+The authenticated readback at **16:07 UTC on Oct 18** confirms Live revision
+`c5d5414fef28a4a5170d605b61d878797786acbd` /
+`dep-db8efpon74is73epb8ng`, with no active/queued deployment displayed.
+Saved settings confirm `main`, Singapore, Free, expected build/start/root/health
+commands, no pre-deploy command and service **Auto Deploy Off**. PR #4 was already
+merged externally; the exact `cbacc0a` entry remains distinct from merge revision
+`4329ba6`. Selecting its full-SHA entry enables **Deploy commit**; the dialog was
+cancelled without submission. Do not select **Deploy latest commit**.
 
-1. Obtain approval for the exact follow-up SHA after its CI is green, one manual
-   deployment on the existing service, and bounded code rollback if qualification
-   fails. Restore authenticated provider/browser control first; this session
-   currently has GitHub/CLI access but exposes no browser, Supabase or Render
-   control integration. No fresh provider configuration readback is claimed.
+Saved environment readback passes intended-project/runtime-login/database,
+explicit session-pooler port 5432, `verify-full`, matching CA secret file, permitted
+unique query keys and absence of routing overrides. Read-only Supabase catalogs
+confirm restricted runtime privileges, no owner membership, migration `0003`,
+11 forced-RLS tables, required grants, 12 exact owner-policy definitions and
+denied PUBLIC/API-role training access. No user rows or password verifiers were
+read. At **16:11 UTC**, public health/readiness return **200**, and unauthenticated
+`/v1/me` returns **401**; an earlier readiness transport timeout remains recorded
+with unconfirmed cause. Billing shows **2 / 500 included pipeline minutes used**.
+These are dated preflight facts; recheck revision, queue, configuration and budget
+immediately before an approved deployment.
+
+**Authorized execution:** exact `cbacc0a` was submitted at **16:27:59 UTC** as
+`dep-dbaf73ijnfac73fg5l20`; Render confirms it Live at **16:31:43 UTC**, with a
+displayed build/deploy duration of 1m10s. Public checks at **16:32 UTC** return
+health/readiness 200 and unauthenticated identity 401. Saved service settings
+and private transport/authentication classifications pass again after deployment.
+No configuration, credential, Blueprint, schema or resource changes were made.
+No rollback was used. The Oct 18 native manual-entry attempt times out awaiting
+Account A's code; the operator later confirms the recipient and finds the email.
+An authorized fresh Oct 19 run verifies distinct A/B identities and passes hosted
+sync, refresh, accepted/duplicate receipts, file restart, pending sign-out and
+cross-owner denial. Its third submission, returning to A, fails verification with
+`invalid_or_expired_code`; final pending recovery/bootstrap is not reached. There
+is no established application/deployment regression or basis for rollback.
+
+1. Explicit approval was received for one manual deployment of exact
+   `cbacc0ab74d8d5bf7e54aff7a13d27267bf8cfdd` on the existing service, its bounded
+   controlled-account hosted qualification, and one code rollback if qualification
+   fails. Authenticated Playwright access to Render and Supabase is restored;
+   fresh provider readback is recorded above. No new credential or provider
+   configuration change is part of this deployment request.
 2. Read preflight configuration privately: one intended database host, explicit
    database, verified TLS/root certificate, no connection-query overrides or
    `PGHOSTADDR`/`PGSERVICE`/`PGSERVICEFILE`/`PGOPTIONS`; an omitted port must have no
@@ -45,8 +84,10 @@ capture the actual current revision before executing any change.
    memory. This new server revision justifies that targeted retest; repeat the
    longer OTP-expiry/lifecycle qualification only if a new failure warrants it.
 5. On failed readiness, initialization/sync or owner isolation, stop qualification
-   and execute the approved rollback. Prefer a manual deploy of the recorded
-   previous code SHA using **current** environment values. A platform rollback
+   and execute the approved rollback. The captured rollback SHA is
+   `c5d5414fef28a4a5170d605b61d878797786acbd`; stop for renewed approval if the live
+   baseline has changed before execution. Prefer a manual deploy of this previous
+   code SHA using **current** environment values. A platform rollback
    can reuse historical environment variables; use it only after private
    confirmation of credential/configuration equivalence and artifact availability.
    Recheck revision, health/readiness and owner denial. Perform no database restore
@@ -99,13 +140,31 @@ operator/privacy/processor acceptance remain unqualified.
 [Recovery package](../RECOVERY.md),
 [provider backup capabilities](https://supabase.com/docs/guides/platform/backups).
 
-## Next approval
+## Current authorization and remaining dependency
 
-After authenticated browser restoration and private preflight, authorize one
-manual deployment of that exact qualified revision to the existing staging API
-and bounded code rollback to the captured prior SHA, using current environment
-values and the checks above. Publication of `cbacc0a` is already authorized;
-this plan grants no staging-change permission. Deployment,
-signing-key changes, sender limits, hosted backups and operator acceptance remain
-separate decisions. Physical Android/iPhone, signing, native storage/backup,
-accessibility and physical durable-save p95 evidence still require hardware/access.
+The approved exact-SHA deployment is executed; the conditional code rollback is
+unused. The latest continuation requires new explicit approval before one fresh
+controlled-account qualification run. The existing OTP rejection alone does not
+justify rollback.
+The operator can read email independently and enter codes in the native masked
+qualification window; inbox automation is not required. The original recipient/
+email search dependency is resolved. Exact Auth-log correlation remains pending;
+manual read-only lookup instructions are supplied because the extension remains
+disconnected. Recipient/challenge/account-state review finds no demonstrated
+mixup. A separate confirmed cooldown defect is fixed and locally verified: wait
+61 seconds from successful request completion, independently for A/B. The generic
+failure display also identifies the failed account step/category. Successful
+earlier checkpoints and the failed third submission remain preserved.
+
+**Prepared approval scope:** one complete A → B → A run on the existing staging
+API; at most three fresh OTP requests, no automatic resend or incorrect-code
+probe, masked local entry for each new message, per-account pacing and stop on
+failure. Final A pending-work recovery and hosted bootstrap must pass in this
+same run before end-to-end qualification is claimed. No OTP or run is started
+while approval is pending. No provider or deployment settings are changed.
+
+Any additional deployment or provider change needs separate approval.
+Signing-key changes, sender limits, hosted backups
+and operator acceptance remain separate decisions. Physical Android/iPhone,
+signing, native storage/backup, accessibility and physical durable-save p95
+evidence still require hardware/access.
