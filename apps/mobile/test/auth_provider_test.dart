@@ -212,6 +212,10 @@ void main() {
             expect(options.first['synchronizable'], 'false');
           } else {
             expect(options.first['storageCipherAlgorithm'], contains('GCM'));
+            expect(
+              options.every((value) => value['resetOnError'] == 'false'),
+              true,
+            );
           }
           await storage.removePersistedSession();
           expect(saved, isEmpty);

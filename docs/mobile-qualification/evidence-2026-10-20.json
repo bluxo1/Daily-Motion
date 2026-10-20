@@ -1,0 +1,343 @@
+{
+  "schema_version": 1,
+  "track": "phase0/mobile-qualification",
+  "date_ist": "2026-10-20",
+  "baseline_commit": "57a4494df84c414bf5d2572fdf65c47f77bb8d1a",
+  "mobile_source_sha256": "011a0a9b97eda3829885da40acd71e9102824052dd6d83b60c59c1c17e2d9372",
+  "source_commit": "e5ece1e61993156d2409b6c9f7be1e68ca05d942",
+  "validation": {
+    "flutter_analyze": {
+      "success": true,
+      "seconds": 51.6,
+      "sdk": "installed pinned SDK; task-local Pub/temp"
+    },
+    "dart_format": {
+      "success": true,
+      "files": 61,
+      "changed": 0
+    },
+    "frozen_dependencies": {
+      "success": true,
+      "lockfile_changed": false
+    },
+    "static_native_configuration": {
+      "success": true,
+      "hardware_evidence": false
+    }
+  },
+  "environment": {
+    "host": "Windows-11-10.0.26300-SP0",
+    "flutter": "3.47.7",
+    "dart": "3.13.5"
+  },
+  "ordinary_flutter": {
+    "success": true,
+    "duration_ms": 142483,
+    "counts": {
+      "success": 161,
+      "skipped": 12
+    },
+    "by_suite": {
+      "auth_account_test.dart": {
+        "success": 25
+      },
+      "auth_provider_test.dart": {
+        "success": 14
+      },
+      "auth_rejection_test.dart": {
+        "success": 3
+      },
+      "auth_widget_test.dart": {
+        "success": 3
+      },
+      "batch_test.dart": {
+        "success": 3
+      },
+      "connected_http_test.dart": {
+        "skipped": 9
+      },
+      "contract_test.dart": {
+        "success": 3
+      },
+      "controller_test.dart": {
+        "success": 1
+      },
+      "domain_test.dart": {
+        "success": 4
+      },
+      "durable_benchmark_test.dart": {
+        "success": 3
+      },
+      "history_read_test.dart": {
+        "success": 1
+      },
+      "hosted_auth_lifecycle_test.dart": {
+        "skipped": 1
+      },
+      "hosted_otp_expiry_test.dart": {
+        "skipped": 1
+      },
+      "hosted_staging_test.dart": {
+        "skipped": 1
+      },
+      "mobile_qualification_widget_test.dart": {
+        "success": 5
+      },
+      "native_installation_test.dart": {
+        "success": 2
+      },
+      "platform_widget_test.dart": {
+        "success": 3
+      },
+      "process_kill_test.dart": {
+        "success": 3
+      },
+      "repository_test.dart": {
+        "success": 10
+      },
+      "rest_timer_test.dart": {
+        "success": 15
+      },
+      "routine_prototype_test.dart": {
+        "success": 4
+      },
+      "sync_recovery_test.dart": {
+        "success": 27
+      },
+      "sync_test.dart": {
+        "success": 18
+      },
+      "transport_test.dart": {
+        "success": 11
+      },
+      "widget_test.dart": {
+        "success": 3
+      }
+    },
+    "raw_sha256": "e1776364a9f0bcf5514e1ddc21c1c6921c9ab3513989659073b9186f2b283b5a",
+    "command": "flutter test --no-pub --concurrency=1 --machine",
+    "provider_requests": 0,
+    "shared_postgresql_databases_touched": 0,
+    "skips": {
+      "connected_http": 9,
+      "hosted_provider": 3
+    },
+    "raw_log": ".tools/evidence/flutter-tests-verified.jsonl"
+  },
+  "regression_scope": [
+    "timer cancellation failure preserves timer and returns safe retry feedback",
+    "correction keyboard advances to reason and submits from its Done action",
+    "recorded set semantics include outcome, load, reps and effort",
+    "planned load uses its prescribed kg/lb unit",
+    "320px / 200 percent text correction sheet with keyboard and modal back",
+    "Android secure storage disables destructive reset on error",
+    "native harness refuses a normal app installation before opening synthetic files",
+    "incomplete benchmark/workload cannot qualify; failed durations are retained",
+    "hard kill targets actual Dart VM and drains pipes before SQLite recovery"
+  ],
+  "retained_failures": [
+    "early isolated SDK loading attempts interrupted without test results",
+    "new widget tests initially had ambiguous/lazy finders and late semantics disposal; corrected test setup",
+    "full suite before final finder correction: 160 passed, 12 skipped, 1 failed",
+    "next full suite: 160 passed, 12 skipped, during_commit reopening hit SQLITE_BUSY after launcher-only kill",
+    "targeted hard-kill rerun after termination fix: all 3 passed",
+    "final full suite: 161 passed, 12 skipped, 0 failed",
+    "additional reboot attempt after default Flutter drive teardown failed because the driver had uninstalled the synthetic app; guard rejected missing database; preserved-installation offline reboot rerun passed",
+    "first release compile interrupted by stopping task Gradle daemon after APK packaging but before command completion: exit 1 after 745.4 seconds; successful rerun required",
+    "first native build interrupted to isolate Flutter Gradle plugin outputs and correct read-only cache root",
+    "first task-owned emulator attempt remained offline and was stopped; no native runtime pass from that attempt",
+    "second task-owned emulator attempt stopped during cold-build memory pressure; no runtime pass from that attempt",
+    "task-local SDK analysis attempt failed because examples directory was omitted from SDK copy; installed pinned SDK rerun passed"
+  ],
+  "physical_device_sample_count": 0,
+  "physical_p95_us": null,
+  "hardware_gates_closed": false,
+  "available_windows_emulator_checks_complete": true,
+  "remaining_external_acceptance": [
+    "representative physical Android and iPhone; supported Mac/Xcode",
+    "operator-managed signing, signed installation and upgrade continuity",
+    "actual Keychain/Keystore protection, lock/reinstall/key-loss and backup/transfer",
+    "hardware process eviction/reboot/suspension/clock and disk/power faults",
+    "TalkBack/VoiceOver and OEM/Apple keyboard, gesture and back navigation",
+    "physical profile durable-save p95 <= 100000 us and separate realistic sync/long-history workloads",
+    "separately qualified release instrumentation and evidence collection"
+  ],
+  "scope_exclusions": [
+    "no provider resource changes",
+    "no signing identity changes",
+    "no shared status/roadmap edits",
+    "no Phase 1 work",
+    "no merge, push, deploy or publication"
+  ],
+  "native": {
+    "source_commit": "e5ece1e61993156d2409b6c9f7be1e68ca05d942",
+    "mobile_source_sha256": "011a0a9b97eda3829885da40acd71e9102824052dd6d83b60c59c1c17e2d9372",
+    "android_emulator": {
+      "avd": "dm_session3_api36",
+      "serial": "emulator-5580",
+      "adb_server_port": 5038,
+      "api": 36,
+      "os": "16",
+      "architecture": "x86_64",
+      "physical": false,
+      "application_id": "com.dailymotion.training.daily_motion.qualification",
+      "debug_certificate_sha256": "06e0f44184d86a44da8ad4de70f2aa7272e698a448865e4d0703b277d8baeab0",
+      "seed_build": {
+        "success": true,
+        "gradle_seconds": 429.8,
+        "apk_sha256": "8eb7775204c60322d0571cf83defed194ccde4fe9be8172e486938a45d5d904a"
+      },
+      "recover_build": {
+        "success": true,
+        "gradle_seconds": 527.6,
+        "apk_sha256": "2156de12ffa122d48e77ca2bd35e1ed264460633c660c062d83107164fc66d24"
+      },
+      "build_command": "flutter build apk --debug --target=integration_test/native_storage_test.dart --dart-define=DM_NATIVE_STAGE=STAGE --dart-define=DM_BUILD_REVISION=source-sha256-011a0a9b97eda3829885da40acd71e9102824052dd6d83b60c59c1c17e2d9372",
+      "drive_command": "flutter drive --no-pub --driver=test_driver/qualification_driver.dart --target=integration_test/native_storage_test.dart --debug --use-application-binary=STAGE_APK -d emulator-5580 (seed additionally --keep-app-running)",
+      "reports": {
+        "seed": {
+          "report": "android-emulator-seed-2026-10-20.json",
+          "report_sha256": "4d552663b32701d7147ce73378d898b36c4f3cdabe9b9be9287a03114eb3bfc6",
+          "driver_exit_code": 0
+        },
+        "recover": {
+          "report": "android-emulator-recover-2026-10-20.json",
+          "report_sha256": "87037c7a5a8d5b8abc2393defd5d486710032e298a4713223e2ee73ff90f01de",
+          "driver_exit_code": 0
+        }
+      },
+      "external_termination": {
+        "physical_hardware": false,
+        "method": "adb shell am force-stop",
+        "device": "emulator-5580",
+        "pid_after": "",
+        "application_id": "com.dailymotion.training.daily_motion.qualification",
+        "seed_driver_kept_app_running": true,
+        "timestamp_utc": "2026-10-20T16:45:41.2664139Z",
+        "live_pid_before": "5570",
+        "adb_server_port": 5038
+      },
+      "recovery_assertions_passed": true,
+      "packaged_debug_manifest": {
+        "allow_backup": false,
+        "full_backup_content": false,
+        "back_callback_enabled": true,
+        "debuggable": true,
+        "cleartext_allowed_for_debug_tooling": true,
+        "cloud_backup_excluded_domains": 9,
+        "device_transfer_excluded_domains": 9
+      },
+      "no_hardware_gate_satisfied": true,
+      "offline_reboot": {
+        "operation": {
+          "serial": "emulator-5580",
+          "boot_count_before": 5,
+          "method": "targeted adb reboot of task-owned AVD",
+          "physical": false,
+          "seed_driver_kept_app_running": true,
+          "live_pid_before": "5921",
+          "timestamp_utc": "2026-10-20T17:07:26.6142669Z",
+          "database_exists_before": true,
+          "boot_count_after": 6,
+          "database_exists_before_recovery_driver": true,
+          "pid_after_boot_before_driver": "",
+          "post_boot_verified_utc": "2026-10-20T17:10:35.8256069Z"
+        },
+        "network_state": {
+          "airplane_mode": "enabled",
+          "default_network": "Active default network: none",
+          "timestamp_utc": "2026-10-20T17:04:11.9423384Z",
+          "wifi_on": "0",
+          "physical": false,
+          "mobile_data_disabled": true
+        },
+        "reports": {
+          "reboot-seed": {
+            "report": "android-emulator-reboot-seed-2026-10-20.json",
+            "report_sha256": "c28d1ba1152ee90763857771bf12f7d76268e06584c1fd9e023147c09dc96977",
+            "driver_exit_code": 0
+          },
+          "reboot-recover": {
+            "report": "android-emulator-reboot-recover-2026-10-20.json",
+            "report_sha256": "7e87548e6fcc27fe82ad2be324092973b971ba8952b81e29ec1b2dacd545ee7b",
+            "driver_exit_code": 0
+          }
+        },
+        "assertions_passed": true,
+        "recovery_driver_kept_installation": true
+      },
+      "profile_collector": {
+        "report": "android-emulator-profile-benchmark-2026-10-20.json",
+        "report_sha256": "9fc650a5f18e8c3b80bbb0665dda62c03e926dd514934dbcc6c5a645ae460af7",
+        "driver_exit_code": 0,
+        "build_success": true,
+        "gradle_seconds": 814.7,
+        "target_platform": "android-x64",
+        "apk_sha256": "bbf5d3010ab4207415790af4f7ab191769462e6bd00a502cbee1e99e58b5598c",
+        "sample_count": 200,
+        "warmup_count": 32,
+        "history_roots": 100,
+        "failure_count": 0,
+        "p95_us": 43171,
+        "physical_performance_evidence": false,
+        "target_met": false,
+        "build_mode": "profile",
+        "profile_debug_certificate_sha256": "06e0f44184d86a44da8ad4de70f2aa7272e698a448865e4d0703b277d8baeab0",
+        "packaged_manifest": {
+          "debuggable": true,
+          "allow_backup": false,
+          "full_backup_content": false,
+          "cleartext_override_present": false
+        },
+        "drive_command": "flutter drive --no-pub --driver=test_driver/qualification_driver.dart --target=integration_test/durable_save_benchmark_test.dart --profile --use-application-binary=PROFILE_APK -d emulator-5580",
+        "default_driver_cleanup_removed_synthetic_installation": true
+      },
+      "invalid_reboot_attempt": {
+        "driver_exit_code": 1,
+        "report": "android-emulator-invalid-reboot-attempt-2026-10-20.json",
+        "reason": "Previous default Flutter driver teardown uninstalled the test app. Recovery correctly rejected an absent database before opening SQLite. This attempt does not establish reboot data loss.",
+        "remediation": "Keep every intermediate drive installation, verify file/PID/boot counter before and after targeted reboot; repeated offline reboot recovery passed."
+      }
+    },
+    "ios": {
+      "current_revision_compile_executed": false,
+      "runtime_executed": false,
+      "reason": "Windows host; no supported Mac/Xcode, signed iPhone or dedicated provisioning available"
+    },
+    "android_release_compile": {
+      "success": true,
+      "exit_code": 0,
+      "gradle_seconds": 223.3,
+      "source_commit": "e5ece1e61993156d2409b6c9f7be1e68ca05d942",
+      "target_platform": "android-arm64",
+      "entrypoint": "lib/main.dart",
+      "application_id": "com.dailymotion.training.daily_motion.qualification",
+      "apk_sha256": "ea32cc3d2bc5ed35319962812dcf8c5c44384082c916ab804e45c637bd4cc214",
+      "apk_bytes": 22043765,
+      "command": "flutter build apk --release --target-platform=android-arm64 --dart-define=DM_BUILD_REVISION=e5ece1e61993156d2409b6c9f7be1e68ca05d942 (DM_QUALIFICATION_BUILD=1)",
+      "unsigned": true,
+      "signature_verification_exit_code": 1,
+      "signature_verification_reason": "Missing META-INF/MANIFEST.MF; no release certificate configured",
+      "packaged_manifest": {
+        "allow_backup": false,
+        "full_backup_content": false,
+        "back_callback_enabled": true,
+        "debuggable_attribute_present": false,
+        "cleartext_override_present": false
+      },
+      "runtime_executed": false,
+      "signed_install_qualified": false,
+      "interrupted_prior_attempt": {
+        "exit_code": 1,
+        "gradle_seconds": 745.4,
+        "cause": "Task daemon stopped after packaging and before command completion; excluded from successful compilation evidence"
+      }
+    },
+    "task_resource_cleanup": {
+      "task_avd_stopped": true,
+      "task_adb_5038_stopped": true,
+      "task_gradle_daemon_stopped_after_successful_rerun": true,
+      "shared_adb_5037_not_stopped": true
+    }
+  }
+}

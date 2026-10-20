@@ -1,0 +1,26 @@
+{
+  "device": {
+    "platform": "android",
+    "model": "sdk_gphone64_x86_64",
+    "application_id": "com.dailymotion.training.daily_motion.qualification",
+    "os": "16",
+    "api": 36,
+    "physical": false,
+    "source": "android-native",
+    "backup_allowed": false
+  },
+  "stage": "recover",
+  "synthetic_only": true,
+  "sqlite_integrity": "ok",
+  "sqlite_foreign_keys": "ok",
+  "outbox_count": 2,
+  "secure_probe_restored": true,
+  "synthetic_session_restored": true,
+  "synthetic_owner_grant_restored": true,
+  "timer_remaining_seconds": 36,
+  "timer_approximate": false,
+  "draft_restored": true,
+  "same_process_reopen": true,
+  "previous_installation_state_required": true,
+  "external_kill_must_be_recorded_separately": true
+}

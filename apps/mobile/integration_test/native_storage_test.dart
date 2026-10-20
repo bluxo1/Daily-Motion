@@ -8,6 +8,7 @@ import 'package:daily_motion/data/database.dart';
 import 'package:daily_motion/data/workout_repository.dart';
 import 'package:daily_motion/domain/workout.dart';
 import 'package:daily_motion/platform/device_services.dart';
+import 'package:daily_motion/qualification/native_installation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:path/path.dart' as path;
@@ -30,6 +31,7 @@ void main() {
   ) async {
     expect({'smoke', 'seed', 'recover', 'cleanup'}, contains(stage));
     final information = await const DeviceServices().information();
+    requireQualificationInstallation(information);
     final support = await getApplicationSupportDirectory();
     await DeviceServices.prepareStorage(support);
     final directory = Directory(
@@ -43,6 +45,7 @@ void main() {
     if (stage == 'cleanup') {
       await protected.delete(probe);
       await sessions.removePersistedSession();
+      await protected.delete(sessions.ownerKey);
       if (await directory.exists()) await directory.delete(recursive: true);
       binding.reportData = {
         'device': information,
@@ -85,11 +88,13 @@ void main() {
         await sessions.saveSession(
           testSession(testOwner, DateTime.now().toUtc()),
         );
+        await sessions.saveOwner(testOwner, unlocked: true);
         workouts = await repo.workouts();
       }
       expect(workouts, hasLength(1));
       final id = workouts.single['aggregate_id'] as String;
       final frozen = await repo.prepareHead(id);
+      repo.dispose();
       await database.close();
       database = TrainingDatabase.open(file);
       repo = WorkoutRepository(
@@ -110,8 +115,13 @@ void main() {
         await protected.read(probe),
         sha256.convert(utf8.encode(frozen!)).toString(),
       );
-      expect(await repo.restDisplay(id), isNotNull);
+      final timer = await repo.restDisplay(id);
+      expect(timer, isNotNull);
+      expect(timer!.remainingSeconds, inInclusiveRange(0, 120));
       expect((await sessions.restoreSession())!.user.id, testOwner);
+      final grant = (await sessions.restoreOwner())!;
+      expect(grant['owner'], testOwner);
+      expect(grant['unlocked'], true);
       expect(
         (await database.customSelect('PRAGMA integrity_check').getSingle())
             .data
@@ -119,20 +129,29 @@ void main() {
             .single,
         'ok',
       );
+      expect(
+        await database.customSelect('PRAGMA foreign_key_check').get(),
+        isEmpty,
+      );
       binding.reportData = {
         'device': information,
         'stage': stage,
         'synthetic_only': true,
         'sqlite_integrity': 'ok',
+        'sqlite_foreign_keys': 'ok',
         'outbox_count': 2,
         'secure_probe_restored': true,
         'synthetic_session_restored': true,
+        'synthetic_owner_grant_restored': true,
+        'timer_remaining_seconds': timer.remainingSeconds,
+        'timer_approximate': timer.uncertain,
         'draft_restored': true,
         'same_process_reopen': true,
         'previous_installation_state_required': stage == 'recover',
         'external_kill_must_be_recorded_separately': true,
       };
     } finally {
+      repo.dispose();
       await database.close();
     }
   });

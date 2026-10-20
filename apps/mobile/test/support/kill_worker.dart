@@ -59,7 +59,7 @@ Future<void> main(List<String> args) async {
   await repo.saveDraft(set, {'reps': '7'});
   final frozen = await repo.prepareHead(id);
   stdout.writeln(
-    'SEEDED ${jsonEncode({'id': id, 'set': set, 'frozen': frozen})}',
+    'SEEDED ${jsonEncode({'id': id, 'set': set, 'frozen': frozen, 'process_id': pid})}',
   );
   if (stage == 'during_commit') {
     await db.customStatement(

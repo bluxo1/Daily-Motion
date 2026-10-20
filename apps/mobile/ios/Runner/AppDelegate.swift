@@ -63,6 +63,7 @@ import Darwin
           let physical = true
           #endif
           result(["platform": "ios", "model": model,
+                  "application_id": Bundle.main.bundleIdentifier ?? "",
                   "os": UIDevice.current.systemVersion, "physical": physical, "source": "ios-native"])
         default: result(FlutterMethodNotImplemented)
         }

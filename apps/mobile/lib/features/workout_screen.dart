@@ -8,6 +8,27 @@ import '../domain/rest_timer.dart';
 import 'workout_controller.dart';
 import 'sync_provider.dart';
 
+String _performanceSummary(Json values) {
+  final load = values['load'] as Json?;
+  final effort = values['effort'] as Json?;
+  return [
+    if (load != null) '${load['value']} ${load['unit']}',
+    if (values['reps'] != null) '${values['reps']} reps',
+    if (effort != null)
+      '${(effort['scale'] as String).toUpperCase()} ${effort['value']}',
+  ].join(' · ');
+}
+
+String _setSummary(Json item) {
+  final observation = item['observation'] as Json?;
+  if (observation == null) {
+    return 'Planned ${_performanceSummary(item['planned'] as Json)} · unperformed';
+  }
+  final actual = observation['actual'] as Json?;
+  return '${observation['execution_status']} · '
+      '${actual == null ? 'No performance recorded' : _performanceSummary(actual)}';
+}
+
 class WorkoutScreen extends ConsumerStatefulWidget {
   final String sessionId;
   const WorkoutScreen({super.key, required this.sessionId});
@@ -22,6 +43,21 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen>
   var finishing = false;
   var readingTimer = false;
   var suspended = false;
+
+  Future<void> cancelTimer() async {
+    try {
+      await ref.read(repositoryProvider).cancelTimer(widget.sessionId);
+      if (mounted) setState(() => timerDisplay = null);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Rest timer could not be cancelled. Retry.'),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -165,11 +201,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen>
                 title: Text(
                   'Set ${index + 1} · ${sets[index]['set_class']} · ${sets[index]['set_purpose']}',
                 ),
-                subtitle: Text(
-                  sets[index]['observation'] == null
-                      ? 'Planned ${sets[index]['planned']['load']['value']} kg × ${sets[index]['planned']['reps']} · unperformed'
-                      : '${sets[index]['observation']['execution_status']} · ${sets[index]['observation']['actual'] == null ? 'No performance recorded' : '${sets[index]['observation']['actual']['load']['value']} ${sets[index]['observation']['actual']['load']['unit']} × ${sets[index]['observation']['actual']['reps']}'}',
-                ),
+                subtitle: Text(_setSummary(sets[index])),
                 trailing: sets[index]['observation'] == null
                     ? null
                     : IconButton(
@@ -213,12 +245,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen>
                         ),
                       ),
                       TextButton(
-                        onPressed: () async {
-                          await ref
-                              .read(repositoryProvider)
-                              .cancelTimer(widget.sessionId);
-                          if (mounted) setState(() => timerDisplay = null);
-                        },
+                        onPressed: cancelTimer,
                         child: const Text('Cancel'),
                       ),
                     ],
@@ -489,9 +516,11 @@ class _SetEditorState extends ConsumerState<SetEditor> {
             labelText: 'Actual effort (optional)',
           ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          textInputAction: TextInputAction.done,
+          textInputAction: widget.correction
+              ? TextInputAction.next
+              : TextInputAction.done,
           onChanged: (_) => unawaited(preserve()),
-          onSubmitted: (_) => save(),
+          onSubmitted: widget.correction ? null : (_) => save(),
         ),
         if (widget.correction) ...[
           const SizedBox(height: 12),
@@ -501,6 +530,7 @@ class _SetEditorState extends ConsumerState<SetEditor> {
             maxLength: 240,
             decoration: const InputDecoration(labelText: 'Correction reason'),
             textInputAction: TextInputAction.done,
+            onSubmitted: (_) => save(),
           ),
         ],
         const SizedBox(height: 20),

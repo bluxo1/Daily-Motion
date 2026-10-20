@@ -6,6 +6,7 @@ import 'package:daily_motion/domain/workout.dart';
 import 'package:daily_motion/features/workout_controller.dart';
 import 'package:daily_motion/platform/device_services.dart';
 import 'package:daily_motion/qualification/durable_benchmark.dart';
+import 'package:daily_motion/qualification/native_installation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,6 +23,7 @@ void main() {
     tester,
   ) async {
     final device = await const DeviceServices().information();
+    requireQualificationInstallation(device);
     final mode = kReleaseMode
         ? 'release'
         : kProfileMode
@@ -46,6 +48,8 @@ void main() {
       overrides: [repositoryProvider.overrideWithValue(repo)],
     );
     final warmupSamples = <int>[];
+    var completed = false;
+    var historyRoots = 0;
     try {
       await repo.initialize();
       // Fixed declared history and warmups, not discarded inconvenient samples.
@@ -57,6 +61,7 @@ void main() {
           recordPayload((await repo.workout(id))!),
         );
         await repo.commit(id, 'complete_session', {});
+        historyRoots++;
       }
       await container.read(workoutsProvider.future);
       final controller = container.read(workoutsProvider.notifier);
@@ -81,6 +86,9 @@ void main() {
           watch.stop();
           if (i < 32) {
             warmupSamples.add(watch.elapsedMicroseconds);
+            if (!acknowledged) {
+              benchmark.record(watch.elapsed, acknowledged: false);
+            }
             expect(acknowledged, true);
           } else {
             benchmark.record(watch.elapsed, acknowledged: acknowledged);
@@ -90,34 +98,43 @@ void main() {
         expect(container.read(workoutsProvider).hasError, false);
         if (i % 3 == 2) await controller.finish(id);
       }
-      binding.reportData = {
-        ...benchmark.report(
-          warmups: 32,
-          historyRoots: 100,
-          scenario: 'offline_repository_no_provider',
-          buildRevision: const String.fromEnvironment(
+      completed = true;
+    } finally {
+      try {
+        container.dispose();
+        repo.dispose();
+        await database.close();
+        await directory.delete(recursive: true);
+      } catch (_) {
+        completed = false;
+        rethrow;
+      } finally {
+        binding.reportData = {
+          ...benchmark.report(
+            warmups: warmupSamples.length,
+            historyRoots: historyRoots,
+            scenario: 'offline_repository_no_provider',
+            buildRevision: const String.fromEnvironment(
+              'DM_BUILD_REVISION',
+              defaultValue: 'unrecorded',
+            ),
+            completed: completed,
+          ),
+          'warmup_samples_us': warmupSamples,
+          'synthetic_only': true,
+          'same_process': true,
+          'revision': const String.fromEnvironment(
             'DM_BUILD_REVISION',
             defaultValue: 'unrecorded',
           ),
-        ),
-        'warmup_samples_us': warmupSamples,
-        'synthetic_only': true,
-        'same_process': true,
-        'revision': const String.fromEnvironment(
-          'DM_BUILD_REVISION',
-          defaultValue: 'unrecorded',
-        ),
-      };
-      expect(benchmark.failures, 0);
-      expect(binding.reportData!['sample_count'], 200);
-      // Debug/emulator runs can verify mechanics, never pass the phone latency gate.
-      if (device['physical'] == true && mode != 'debug') {
-        expect(binding.reportData!['target_met'], true);
+        };
       }
-    } finally {
-      container.dispose();
-      await database.close();
-      await directory.delete(recursive: true);
+    }
+    expect(benchmark.failures, 0);
+    expect(binding.reportData!['sample_count'], 200);
+    // Debug/emulator runs can verify mechanics, never pass the phone latency gate.
+    if (device['physical'] == true && mode != 'debug') {
+      expect(binding.reportData!['target_met'], true);
     }
   }, timeout: const Timeout(Duration(minutes: 15)));
 }

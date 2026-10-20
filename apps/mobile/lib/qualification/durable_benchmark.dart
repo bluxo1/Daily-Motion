@@ -6,10 +6,16 @@ class DurableBenchmark {
   final Map<String, dynamic> device;
   final String mode;
   final List<int> _samples = [];
+  final List<Map<String, dynamic>> _failedMeasurements = [];
   int failures = 0;
   DurableBenchmark(this.device, this.mode);
   void record(Duration elapsed, {required bool acknowledged}) {
     if (!acknowledged || elapsed.isNegative) {
+      _failedMeasurements.add({
+        'attempt': _samples.length + failures + 1,
+        'elapsed_us': elapsed.inMicroseconds,
+        'acknowledged': acknowledged,
+      });
       failures++;
       return;
     }
@@ -21,6 +27,7 @@ class DurableBenchmark {
     required int historyRoots,
     required String scenario,
     String buildRevision = 'unrecorded',
+    bool completed = false,
   }) {
     final ordered = [..._samples]..sort();
     int percentile(double fraction) => ordered.isEmpty
@@ -36,6 +43,10 @@ class DurableBenchmark {
         (device['os'] as String).isNotEmpty &&
         buildRevision != 'unrecorded' &&
         buildRevision.length >= 7 &&
+        completed &&
+        warmups == 32 &&
+        historyRoots >= 100 &&
+        scenario.trim().isNotEmpty &&
         ordered.length >= 200 &&
         failures == 0;
     return {
@@ -43,6 +54,7 @@ class DurableBenchmark {
       'device': device,
       'build_mode': mode,
       'build_revision': buildRevision,
+      'run_completed': completed,
       'measurement': 'WorkoutController.record invocation through successful Future completion; includes durable SQLite commit and projection refresh',
       'clock': 'Dart Stopwatch monotonic',
       'percentile_method': 'nearest-rank ceil(p * n), all samples retained',
@@ -51,6 +63,9 @@ class DurableBenchmark {
       'scenario': scenario,
       'sample_count': ordered.length,
       'failure_count': failures,
+      'failed_measurements': List<Map<String, dynamic>>.unmodifiable(
+        _failedMeasurements,
+      ),
       'samples_us': List<int>.unmodifiable(_samples),
       'p50_us': percentile(.5),
       'p95_us': percentile(.95),
