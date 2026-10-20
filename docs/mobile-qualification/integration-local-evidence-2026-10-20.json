@@ -1,0 +1,270 @@
+{
+  "baseline_main": "0e64b310a2f4e1a2f12deb1896cc61d2137451e0",
+  "source_commits": [
+    "e5ece1e61993156d2409b6c9f7be1e68ca05d942",
+    "7806046f1b196a6537e681717513a44663938176"
+  ],
+  "ordinary_flutter": {
+    "success": true,
+    "duration_ms": 167079,
+    "counts": {
+      "success": 171,
+      "skipped": 12
+    },
+    "raw_sha256": "ffe3cc79f9adc4c1637bd7cbefa505345c248a240eb124bd020d5eb2b42ea6f8",
+    "by_suite": {
+      "auth_account_test.dart": {
+        "success": 27
+      },
+      "auth_provider_test.dart": {
+        "success": 14
+      },
+      "auth_rejection_test.dart": {
+        "success": 3
+      },
+      "auth_widget_test.dart": {
+        "success": 3
+      },
+      "batch_test.dart": {
+        "success": 3
+      },
+      "connected_http_test.dart": {
+        "skipped": 9
+      },
+      "contract_test.dart": {
+        "success": 3
+      },
+      "controller_test.dart": {
+        "success": 1
+      },
+      "domain_test.dart": {
+        "success": 4
+      },
+      "durable_benchmark_test.dart": {
+        "success": 3
+      },
+      "history_read_test.dart": {
+        "success": 1
+      },
+      "hosted_auth_lifecycle_test.dart": {
+        "skipped": 1
+      },
+      "hosted_otp_expiry_test.dart": {
+        "skipped": 1
+      },
+      "hosted_otp_schedule_test.dart": {
+        "success": 8
+      },
+      "hosted_staging_test.dart": {
+        "skipped": 1
+      },
+      "mobile_qualification_widget_test.dart": {
+        "success": 5
+      },
+      "native_installation_test.dart": {
+        "success": 2
+      },
+      "platform_widget_test.dart": {
+        "success": 3
+      },
+      "process_kill_test.dart": {
+        "success": 3
+      },
+      "repository_test.dart": {
+        "success": 10
+      },
+      "rest_timer_test.dart": {
+        "success": 15
+      },
+      "routine_prototype_test.dart": {
+        "success": 4
+      },
+      "sync_recovery_test.dart": {
+        "success": 27
+      },
+      "sync_test.dart": {
+        "success": 18
+      },
+      "transport_test.dart": {
+        "success": 11
+      },
+      "widget_test.dart": {
+        "success": 3
+      }
+    }
+  },
+  "connected_base": {
+    "python_harness_cases": 6,
+    "flutter_http_cases": 9,
+    "skipped": 0,
+    "seconds": 22.887,
+    "junit_sha256": "d99cc72932be18aff586e594234bcbdc2aa1496fcd16296789ddd7c77b26e73b",
+    "raw_log_sha256": "8496fa44b87254d6808ad1c85becd718706cb4716284479d52185356efcdf8af"
+  },
+  "restore_compatibility": {
+    "implementation_commit": "77e5124bf8e0065dbcaf39c919f0e33cc616f93f",
+    "paths": [
+      "apps/mobile/lib/data/sync_repository.dart",
+      "apps/mobile/lib/data/workout_repository.dart",
+      "apps/mobile/test/restore_recovery_test.dart"
+    ],
+    "overlay_included_in_pr": false,
+    "full_flutter": {
+      "success": true,
+      "duration_ms": 151921,
+      "counts": {
+        "success": 177,
+        "skipped": 12
+      },
+      "raw_sha256": "3f31290f2863586b06828835e34104e897468bbf3975d24138013b6c3cab149c",
+      "by_suite": {
+        "auth_account_test.dart": {
+          "success": 27
+        },
+        "auth_provider_test.dart": {
+          "success": 14
+        },
+        "auth_rejection_test.dart": {
+          "success": 3
+        },
+        "auth_widget_test.dart": {
+          "success": 3
+        },
+        "batch_test.dart": {
+          "success": 3
+        },
+        "connected_http_test.dart": {
+          "skipped": 9
+        },
+        "contract_test.dart": {
+          "success": 3
+        },
+        "controller_test.dart": {
+          "success": 1
+        },
+        "domain_test.dart": {
+          "success": 4
+        },
+        "durable_benchmark_test.dart": {
+          "success": 3
+        },
+        "history_read_test.dart": {
+          "success": 1
+        },
+        "hosted_auth_lifecycle_test.dart": {
+          "skipped": 1
+        },
+        "hosted_otp_expiry_test.dart": {
+          "skipped": 1
+        },
+        "hosted_otp_schedule_test.dart": {
+          "success": 8
+        },
+        "hosted_staging_test.dart": {
+          "skipped": 1
+        },
+        "mobile_qualification_widget_test.dart": {
+          "success": 5
+        },
+        "native_installation_test.dart": {
+          "success": 2
+        },
+        "platform_widget_test.dart": {
+          "success": 3
+        },
+        "process_kill_test.dart": {
+          "success": 3
+        },
+        "repository_test.dart": {
+          "success": 10
+        },
+        "restore_recovery_test.dart": {
+          "success": 6
+        },
+        "rest_timer_test.dart": {
+          "success": 15
+        },
+        "routine_prototype_test.dart": {
+          "success": 4
+        },
+        "sync_recovery_test.dart": {
+          "success": 27
+        },
+        "sync_test.dart": {
+          "success": 18
+        },
+        "transport_test.dart": {
+          "success": 11
+        },
+        "widget_test.dart": {
+          "success": 3
+        }
+      }
+    },
+    "connected": {
+      "python_harness_cases": 6,
+      "flutter_http_cases": 9,
+      "skipped": 0,
+      "seconds": 16.888,
+      "junit_sha256": "60808658fb289c3fdfc6ed54cfce83914384116c6a29e32e977504a22d1e1651",
+      "raw_log_sha256": "c1b90b76bf120650a33b7c8bd667041dbdb0c823446ec0da4a0650eae6804bd1"
+    },
+    "overlay_patch_sha256": "866a1dde1959d174f309f5b143f393f121d917ca24e672f74a72e86061cc1706"
+  },
+  "retained_infrastructure_failures": [
+    "Log-decoding error prevented initial overlay application; duplicate base run passed and was not counted as overlay evidence.",
+    "Task-owned PostgreSQL process was unavailable: initial overlay connected run had six setup errors; after restarting only port 26483, all connected cases passed."
+  ],
+  "physical_device_sample_count": 0,
+  "physical_p95_us": null,
+  "hardware_gates_closed": false,
+  "new_native_runtime_executed": false,
+  "historical_native_reports_preserved": true,
+  "provider_resources_changed": false,
+  "shared_databases_touched": false,
+  "task_postgresql": {
+    "version": "17.11",
+    "port": 26483,
+    "database": "daily_motion_test",
+    "separate_cluster": true,
+    "stopped": true
+  },
+  "ci": "Results must be reviewed on the exact PR head; historical Session 3 builds are not current integration CI.",
+  "integration_mobile_tree": "b61267ac75e396e436284121d1b5c4b6d0b867c1",
+  "validation": {
+    "flutter_analyze": {
+      "success": true,
+      "seconds": 12.0
+    },
+    "dart_format": {
+      "files": 63,
+      "changed": 0,
+      "success": true
+    },
+    "drift_codegen": {
+      "success": true,
+      "generated_diff": false
+    },
+    "frozen_dependencies": {
+      "success": true,
+      "lockfile_changed": false
+    },
+    "python_ruff": {
+      "success": true
+    },
+    "strict_mypy": {
+      "success": true,
+      "source_script_files": 13
+    },
+    "native_configuration": {
+      "success": true
+    },
+    "archived_receipt_validator": {
+      "success": true,
+      "tamper_regressions_passed": 4
+    },
+    "docs_secrets_whitespace": {
+      "success": true
+    }
+  }
+}

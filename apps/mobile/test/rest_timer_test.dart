@@ -353,6 +353,7 @@ void main() {
       historyRoots: 100,
       scenario: 'unit_guard_fixture_not_device_evidence',
       buildRevision: revision,
+      completed: true,
     );
     expect(report('unrecorded')['physical_performance_evidence'], false);
     expect(report('fixture123')['physical_performance_evidence'], true);

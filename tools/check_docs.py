@@ -6,7 +6,7 @@ from pathlib import Path
 from urllib.parse import unquote
 
 root = Path(__file__).resolve().parents[1]
-paths = [root / "README.md", *sorted((root / "docs").glob("*.md"))]
+paths = [root / "README.md", *sorted((root / "docs").rglob("*.md"))]
 paths.append(root / "contracts/README.md")
 paths.extend(sorted((root / "infra").rglob("*.md")))
 links = examples = 0

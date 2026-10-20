@@ -54,6 +54,8 @@ jobs:
       - run: git diff --exit-code -- ../../apps/mobile/lib/sync/transport_contract.dart ../../apps/mobile/lib/sync/transport_limits.dart
       - run: uv run --no-sync python ../../tools/check_docs.py
       - run: uv run --no-sync python ../../tools/check_native_config.py
+      - run: uv run --no-sync python ../../tools/check_mobile_qualification.py
+      - run: uv run --no-sync python -m unittest discover -s ../../tools/tests -p test_mobile_qualification.py
   mobile:
     strategy:
       matrix:
@@ -96,3 +98,13 @@ jobs:
         run: flutter build ios --debug --no-codesign
       - if: runner.os == 'macOS'
         run: flutter build ios --release --no-codesign
+      - if: runner.os == 'Linux'
+        run: flutter build apk --debug -t integration_test/native_storage_test.dart
+        env:
+          DM_QUALIFICATION_BUILD: "1"
+      - if: runner.os == 'Linux'
+        run: flutter build apk --profile -t integration_test/durable_save_benchmark_test.dart --dart-define=DM_BUILD_REVISION=${{ github.sha }}
+        env:
+          DM_QUALIFICATION_BUILD: "1"
+      - if: runner.os == 'macOS'
+        run: flutter build ios --debug --no-codesign -t integration_test/native_storage_test.dart

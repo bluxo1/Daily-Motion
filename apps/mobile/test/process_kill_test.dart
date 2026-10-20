@@ -41,7 +41,11 @@ void main() {
           stage,
         ]);
         final boundary = Completer<void>();
+        final stdoutClosed = Completer<void>();
+        final stderrClosed = Completer<void>();
         Map<String, dynamic>? seeded;
+        var terminated = false;
+        var launcherExited = false;
         final errors = <String>[];
         final stdout = process.stdout
             .transform(utf8.decoder)
@@ -53,12 +57,13 @@ void main() {
               if (line == 'KILL_BOUNDARY' && !boundary.isCompleted) {
                 boundary.complete();
               }
-            });
+            }, onDone: stdoutClosed.complete);
         final stderr = process.stderr
             .transform(utf8.decoder)
-            .listen(errors.add);
+            .listen(errors.add, onDone: stderrClosed.complete);
         unawaited(
           process.exitCode.then((code) {
+            launcherExited = true;
             if (!boundary.isCompleted) {
               boundary.completeError(
                 StateError(
@@ -71,8 +76,14 @@ void main() {
         try {
           await boundary.future.timeout(const Duration(seconds: 90));
           expect(seeded, isNotNull);
-          expect(process.kill(ProcessSignal.sigkill), true);
+          // `dart run` can launch a separate VM. Kill the process holding SQLite,
+          // then drain its inherited pipes before reopening the database.
+          final workerPid = seeded!['process_id'] as int;
+          terminated = Process.killPid(workerPid, ProcessSignal.sigkill);
+          expect(terminated, true);
           await process.exitCode.timeout(const Duration(seconds: 10));
+          await Future.wait([stdoutClosed.future, stderrClosed.future])
+              .timeout(const Duration(seconds: 10));
           final db = TrainingDatabase.open(file);
           final repo = WorkoutRepository(db, testOwner);
           try {
@@ -109,7 +120,12 @@ void main() {
             await db.close();
           }
         } finally {
-          process.kill(ProcessSignal.sigkill);
+          if (!terminated) {
+            if (seeded?['process_id'] case final int workerPid) {
+              Process.killPid(workerPid, ProcessSignal.sigkill);
+            }
+          }
+          if (!launcherExited) process.kill(ProcessSignal.sigkill);
           await process.exitCode.timeout(const Duration(seconds: 10));
           await stdout.cancel();
           await stderr.cancel();

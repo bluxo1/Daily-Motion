@@ -42,6 +42,7 @@ class MainActivity : FlutterActivity() {
                             Build.HARDWARE in listOf("goldfish", "ranchu")
                         result.success(mapOf(
                             "platform" to "android", "model" to Build.MODEL,
+                            "application_id" to packageName,
                             "os" to Build.VERSION.RELEASE, "api" to Build.VERSION.SDK_INT,
                             "physical" to !emulator, "source" to "android-native",
                             "backup_allowed" to (applicationInfo.flags and ApplicationInfo.FLAG_ALLOW_BACKUP != 0)

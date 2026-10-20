@@ -22,7 +22,9 @@ class PlatformProtectedStorage implements ProtectedStorage {
               accessibility: KeychainAccessibility.unlocked_this_device,
               synchronizable: false,
             ),
-            aOptions: AndroidOptions(),
+            // Preserve protected grants/ciphertext when the platform reports an
+            // error. Automatic reset can turn a recoverable fault into data loss.
+            aOptions: AndroidOptions(resetOnError: false),
           );
   @override
   Future<String?> read(String key) async {
