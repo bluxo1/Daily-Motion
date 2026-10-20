@@ -3,8 +3,8 @@
 Audited through 2026-10-21 (IST). Protected main is `5975999`, containing merged
 PR #7 authentication and PR #8 mobile qualification. Session 2 recovery source
 `77e5124`/`ddbd418` is reviewed on that base in a separate PR branch. Local
-**180 Flutter / 12 explicit skips**, **237 Python / zero skips**, **14 PostgreSQL
-recovery cases**, **13 target guards**, and **9 connected Flutter HTTP cases**
+**180 Flutter / 12 explicit skips**, **242 Python / zero skips**, **14 PostgreSQL
+recovery cases**, **18 boundary/control guards**, and **9 connected Flutter HTTP cases**
 pass. This closes **no outstanding Phase 0 acceptance gate**; hosted recovery,
 deletion-ledger/admission, hardware, provider and operator work remain open.
 [New integration review](RECOVERY_INTEGRATION.md). The earlier PR #6 merge was removed by a reset/push;

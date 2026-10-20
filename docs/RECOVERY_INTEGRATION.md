@@ -56,9 +56,9 @@ existing local or hosted application database was selected.
 | Unfixed higher-revision regression | One failure reproduced before fixing runtime |
 | Focused file-backed SQLite recovery | 9 passed |
 | Ordinary Flutter | 180 passed, 12 explicit skips; 134.01 seconds |
-| Full Python/real PostgreSQL | 237 passed, zero skipped; 106.24 seconds |
+| Full Python/real PostgreSQL after Docker follow-up | 242 passed, zero skipped; 91.78 seconds |
 | Recovery cases within Python total | 14; all 11 application tables populated |
-| Recovery target guards within Python total | 13 |
+| Recovery boundary/control guards within Python total | 18 |
 | Connected Flutter through Python wrapper | 9 passed, zero skipped; real JWT/HTTP/SQLite/PostgreSQL, simulated provider identity |
 | Connected report guards within Python total | 6 passed |
 | Separate Python report validator unittest suite | 9 passed |
@@ -75,6 +75,25 @@ and retry, repeated fencing, WAL restart, RLS/owner isolation, checksums, receip
 and retirement. Required PR CI checks the published head's Android configurations
 and unsigned iOS builds. This local checkpoint claims no future remote result and
 does not qualify physical phones or hosted recovery.
+
+### Docker CI follow-up
+
+The first signed integration head `4990d36` passed 237 local Python cases, but
+both first remote API jobs failed the real Docker crash/restart case: **233
+passed, one failed, four errors**. Preserve [the PR failure](https://github.com/bluxo1/Daily-Motion/actions/runs/39503847150)
+and [push failure](https://github.com/bluxo1/Daily-Motion/actions/runs/39503752481).
+The failure was readiness/connection refusal at the original Docker host port.
+The lab requested an ephemeral binding; Docker can reassign it at restart while
+existing SQLAlchemy engines retain the first URL.
+
+The forward fix reserves an explicit loopback port, verifies the binding on each
+start, and separates create/start so a failed startup retains verified owned
+container/volume identity for cleanup. It preserves the crash test and 45-second
+readiness limit. Five additional control tests simulate the Docker command
+boundary to test bad bindings and startup-failure cleanup; they do not substitute
+for real database tests. The local full rerun passes **242 / zero skipped**, with
+the same 14 native PostgreSQL recovery and nine HTTP cases; final Docker-path
+qualification requires new-head CI. See [follow-up evidence](evidence/phase0-recovery-docker-ci-2026-10-21.json).
 
 ## Hook investigation
 

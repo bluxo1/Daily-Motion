@@ -79,17 +79,21 @@ class RecoveryLab:
         # Do not pull images, reuse containers, mount host files or select Compose services.
         image = self.checked("image", "inspect", "postgres:17.7", "--format", "{{.Id}}")
         self.image = image.decode().strip()
+        # An empty Docker HostPort can be reassigned on restart. Existing SQLAlchemy
+        # engines must still address this exact lab after a simulated crash.
+        with socket.socket() as reservation:
+            reservation.bind(("127.0.0.1", 0))
+            self.port = reservation.getsockname()[1]
         self.container = (
             self.checked(
-                "run",
-                "--detach",
+                "create",
                 "--pull=never",
                 "--label",
                 f"daily-motion.recovery={self.label}",
                 "--name",
                 f"dm-recovery-{self.label}",
                 "--publish",
-                "127.0.0.1::5432",
+                f"127.0.0.1:{self.port}:5432",
                 "--volume",
                 "/var/lib/postgresql/data",
                 "--env",
@@ -105,16 +109,25 @@ class RecoveryLab:
         )
         if not re.fullmatch(r"[0-9a-f]{64}", self.container):
             raise RuntimeError("Invalid newly created recovery container ID")
+        # Record the generated object before starting: a failed port bind must
+        # still leave cleanup enough identity to remove this container/volume.
         details = json.loads(self.checked("inspect", self.container))[0]
-        binding = details["NetworkSettings"]["Ports"]["5432/tcp"]
-        assert len(binding) == 1 and binding[0]["HostIp"] == "127.0.0.1"
-        self.port = int(binding[0]["HostPort"])
+        if details["Config"]["Labels"].get("daily-motion.recovery") != self.label:
+            raise RuntimeError("Disposable recovery container identity changed")
         self.volume = next(
             mount["Name"]
             for mount in details["Mounts"]
             if mount["Destination"] == "/var/lib/postgresql/data"
         )
+        self.checked("start", self.container)
+        self.assert_binding()
         self.wait_ready()
+
+    def assert_binding(self) -> None:
+        details = json.loads(self.checked("inspect", self.container))[0]
+        binding = details["NetworkSettings"]["Ports"]["5432/tcp"]
+        if binding != [{"HostIp": "127.0.0.1", "HostPort": str(self.port)}]:
+            raise RuntimeError("Disposable PostgreSQL loopback binding changed")
 
     def engine(self, database: str, *, runtime: bool = False) -> Engine:
         return create_engine(
@@ -212,6 +225,7 @@ class RecoveryLab:
     def crash_restart(self) -> None:
         self.checked("kill", "--signal=KILL", self.container)
         self.checked("start", self.container)
+        self.assert_binding()
         self.wait_ready()
 
 

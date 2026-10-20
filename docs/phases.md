@@ -4,7 +4,7 @@ Updated: 2026-10-21 (IST). This is the execution checklist for the accepted plan
 
 Protected main `5975999` contains merged PR #7 authentication and PR #8 mobile
 qualification. Session 2 recovery integration passes **180 Flutter / 12 explicit
-skips**, **237 Python / zero skips**, **14 PostgreSQL recovery cases** and
+skips**, **242 Python / zero skips**, **14 PostgreSQL recovery cases** and
 **9 connected Flutter HTTP cases** locally. **All outstanding Phase 0 gates below
 stay open.** No hosted restore/provider operation or Phase 1 work is authorized.
 [Review, hook audit and remaining recovery limits](RECOVERY_INTEGRATION.md).

@@ -1355,3 +1355,21 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   **215476446235862 remains OPEN**. No ADR change or Phase 1 work.
   [Integration review](RECOVERY_INTEGRATION.md) and
   [local evidence](evidence/phase0-recovery-integration-2026-10-21.json).
+
+### 2026-10-21 IST — Recovery PR #9 Docker qualification follow-up
+
+- Published signed integration `4990d36`, matching the reviewed tree, on PR #9
+  against protected `5975999`. No signing override or main update. Both initial
+  remote API jobs failed Docker crash/restart readiness: **233 passed, one
+  failed, four errors**; preserve runs `39503847150` and `39503752481`.
+- Root cause is the lab's ephemeral host binding with engine URLs retained over
+  restart. A forward fix selects an explicit loopback port, verifies it after
+  every start, checks owned identity and separates create/start for safe cleanup
+  on startup failure. Do not weaken the crash test, timeout or no-skip gate.
+- Five new simulated Docker-boundary controls pass; full real native PostgreSQL
+  regression reruns **242 Python / zero skipped**, including **14 recovery**,
+  **18 boundary/control guards** and **9 live Flutter HTTP cases**. Alembic
+  `0003` and cleanup pass again. Original 237-case local evidence stays dated.
+- Requalify the Docker backend in new-head CI before recommending merge. No
+  hosted/provider work, merge, history rewrite or Phase 0 gate closure.
+  [Follow-up evidence](evidence/phase0-recovery-docker-ci-2026-10-21.json).
