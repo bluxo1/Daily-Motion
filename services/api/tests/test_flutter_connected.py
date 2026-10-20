@@ -23,6 +23,45 @@ from daily_motion.config import settings
 from daily_motion.main import app
 
 
+def connected_passed(output: str) -> bool:
+    events = []
+    for line in output.splitlines():
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(event, dict):
+            events.append(event)
+    cases = [
+        event
+        for event in events
+        if event.get("type") == "testDone" and event.get("hidden") is False
+    ]
+    return (
+        len(cases) == 9
+        and all(case.get("skipped") is False and case.get("result") == "success" for case in cases)
+        and any(event.get("type") == "done" and event.get("success") is True for event in events)
+    )
+
+
+@pytest.mark.parametrize("fault", [None, "skip", "failure", "empty", "incomplete", "hidden"])
+def test_connected_report_cannot_claim_skipped_or_incomplete_success(fault: str | None) -> None:
+    cases = [
+        {"type": "testDone", "hidden": False, "skipped": False, "result": "success"}
+        for _ in range(9)
+    ]
+    if fault == "skip":
+        cases[0]["skipped"] = True
+    elif fault == "failure":
+        cases[0]["result"] = "error"
+    elif fault == "empty":
+        cases.clear()
+    elif fault == "hidden":
+        cases[0]["hidden"] = True
+    events = cases + ([] if fault == "incomplete" else [{"type": "done", "success": True}])
+    assert connected_passed("\n".join(json.dumps(event) for event in events)) is (fault is None)
+
+
 def test_flutter_http_with_real_postgres(
     owner: UUID, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -114,7 +153,7 @@ def test_flutter_http_with_real_postgres(
             DM_SYNC_TOKEN_B=other_token,
         )
         result = subprocess.run(
-            [flutter, "test", "test/connected_http_test.dart", "--reporter", "expanded"],
+            [flutter, "test", "test/connected_http_test.dart", "--machine"],
             cwd=root / "apps/mobile",
             env=env,
             capture_output=True,
@@ -123,8 +162,9 @@ def test_flutter_http_with_real_postgres(
             errors="replace",
             timeout=180,
         )
-        assert result.returncode == 0, result.stdout + result.stderr
-        print("Connected Flutter HTTP/PostgreSQL result:\n" + result.stdout)
+        assert result.returncode == 0, "Connected Flutter HTTP/PostgreSQL process failed"
+        assert connected_passed(result.stdout), "Connected cases were skipped, failed or incomplete"
+        print("Connected Flutter HTTP/PostgreSQL: 9 passed, zero skipped")
     finally:
         server.should_exit = True
         thread.join(timeout=10)

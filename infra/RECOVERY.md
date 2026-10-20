@@ -5,6 +5,10 @@ It does not qualify hosted backup/restore. Phase 0 remains in progress and
 Phase 1 has not started. [Qualification dependencies](QUALIFICATION.md) remain
 authoritative for operator access and approvals.
 
+The [hosted strategy and approval choices](HOSTED_RECOVERY_STRATEGY.md) specify
+proposed RPO/RTO, retention, encryption, custody, cost budgets and isolated-target
+requirements. They do not authorize a paid plan or hosted operation.
+
 ## Local PostgreSQL rehearsal — 2026-10-18
 
 Read the existing synthetic `daily_motion_test` database in the repository's
@@ -46,6 +50,73 @@ cleanup. The first helper attempt failed before its rollback check; initializati
 timing was suspected but not independently reproduced. Stronger startup checks
 were applied. A later immediate cleanup inspection also required bounded waiting.
 [Actual results](../docs/evidence/phase0-recovery-and-connection-guards-2026-10-18.json).
+
+## Independent qualification and restore timeline safety — 2026-10-20
+
+Session 2 reviewed that evidence independently. Its source/restored fingerprints
+match, and its missing-role/corrupt-archive results support the recorded local
+claim. The one-off helper was not checked in, five tables were empty, and no
+interrupted restore or restored application retry was exercised. Those are
+coverage limits; the record never established hosted or physical recovery.
+
+The repeatable lab is now checked in under
+[`tests/test_recovery.py`](../services/api/tests/test_recovery.py). It creates a
+new local cluster and synthetic accounts, populates all 11 tables, and restores
+only into generated disposable databases. It does not consume `DM_TEST_ADMIN_URL`
+or select an existing Compose database. Archives stay in memory. Metadata/content
+fingerprints include rows, forced RLS, policies, constraints, indexes and grants.
+
+Run from `services/api/` after the frozen development dependencies are installed:
+
+```powershell
+$env:DM_RUN_RECOVERY = '1'
+uv run --no-sync pytest tests/test_recovery.py tests/test_recovery_target.py -q
+```
+
+The default backend requires the locally cached PostgreSQL 17.7 Docker image
+and an allowlisted local Docker socket. It creates only its own container and
+anonymous volume, with PostgreSQL published on a random loopback port; both are
+removed after testing. Local synthetic trust authentication is confined to this
+disposable lab and is not a hosted credential-restoration result.
+
+On this Windows host Docker Desktop could not initialize its engine. The actual
+qualified path instead used EDB's portable PostgreSQL **17.11** binaries, linked
+from the [official Windows download page](https://www.postgresql.org/download/windows/).
+The native alternative installs no service, creates a unique data directory under
+this worktree's ignored `.tools/recovery-labs/`, binds loopback, stops the exact
+data-directory server and verifies removal:
+
+```powershell
+$env:DM_RUN_RECOVERY = '1'
+$env:DM_RECOVERY_PG_BIN = 'E:\Motion\Daily-Motion-worktrees\recovery\.tools\postgres\pgsql\bin'
+uv run --no-sync pytest tests/test_recovery.py tests/test_recovery_target.py -q
+```
+
+Do not describe the Docker branch as executed merely because the native tests
+pass. PostgreSQL immediate shutdown/restart checks local WAL crash recovery with
+`fsync`, `synchronous_commit` and `full_page_writes` enabled; it does not simulate
+physical storage/power loss. Complete results and limits belong in the
+[track evidence](../docs/RECOVERY_QUALIFICATION.md).
+
+A disaster restore must also fence its **timeline**. Reusing generation/feed
+positions after rewind can make a cursor silently skip divergent new changes.
+After comparing the restored archive, execute
+[`recovery/restore_fence.sql`](recovery/restore_fence.sql) in one stop-on-error
+transaction against the **approved new target only**. It creates fresh owner feed
+generations, advances the erasure fence, requires bootstrap from the restored
+position and invalidates transient snapshots while preserving historical receipts.
+Then reconcile the external deletion ledger and client branches before access.
+Changing generations alone does not make old clients or reused root revisions
+safe for immediate writes.
+
+The client recovery fix preserves working data when the restored generation has
+a divergent equal/lower root revision or omits a previously acknowledged root.
+It installs the restored server shadow separately, marks attention/conflict and
+pauses the affected outbox without changing frozen requests or branch bases.
+Further local logging remains available. Unchanged roots continue normally;
+explicit review/resolution UI remains Phase 1 work. Rollback to the old client
+would reintroduce these restore hazards, so a hosted reopening plan must identify
+qualified client versions. No schema migration or API contract change is required.
 
 ## Hosted recovery approval package
 

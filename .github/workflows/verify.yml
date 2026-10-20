@@ -22,6 +22,7 @@ jobs:
     env:
       DM_TEST_ADMIN_URL: postgresql+psycopg://dm_admin:synthetic-ci-only@127.0.0.1:5432/daily_motion_test
       DM_RUN_CONNECTED: "1"
+      DM_RUN_RECOVERY: "1"
     defaults:
       run:
         working-directory: services/api
@@ -45,7 +46,10 @@ jobs:
       - run: uv run --no-sync ruff format --check . ../../tools
       - run: uv run --no-sync ruff check . ../../tools
       - run: uv run --no-sync mypy --strict src scripts
-      - run: uv run --no-sync pytest -q
+      - run: docker image inspect postgres:17.7 --format '{{.Id}}'
+      - run: uv run --no-sync pytest -q --junitxml=../../.tools/python-ci.xml
+      - run: uv run --no-sync python ../../tools/check_python_results.py ../../.tools/python-ci.xml
+      - run: uv run --no-sync python -m unittest discover -s ../../tools/tests -p test_python_results.py
       - run: uv run --no-sync python scripts/export_openapi.py
       - run: git diff --exit-code -- ../../contracts/openapi.json
       - run: uv run --no-sync python ../../tools/generate_transport.py

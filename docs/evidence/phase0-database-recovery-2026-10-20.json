@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-20T16:14:00.084004+00:00",
+  "scope": "Session 2 Phase 0 database and recovery; isolated local synthetic databases only",
+  "commit_signing": "Local commits unsigned via per-command override after configured signing key remained locked; signing configuration unchanged",
+  "branch": "phase0/recovery",
+  "base_revision": "57a4494df84c414bf5d2572fdf65c47f77bb8d1a",
+  "implementation_revision": "77e5124bf8e0065dbcaf39c919f0e33cc616f93f",
+  "source_sha256": {
+    "apps/mobile/lib/data/sync_repository.dart": "0cb134282453af6c33155698a6a0172c5d1dc346b58c7cb27007333da442884a",
+    "apps/mobile/lib/data/workout_repository.dart": "6a56d79739892f1c9cd5c51bcb6b626a99f25fa2717dc10e7eb1fd3ab66e2bfe",
+    "apps/mobile/test/restore_recovery_test.dart": "72c9793e56cc4c7e76be47c5a28a37114dd3228153e6fb4be08f0873f6a4859c",
+    "services/api/tests/recovery_lab.py": "4e1cf2f1194c4b499eeb8e67b2e79999c3893e7dd75c830fcba142083566884b",
+    "services/api/tests/test_recovery.py": "875368794605a48335ef1cb3729fe8d3f2ec37d57aee8ea834916b10c0785ff2",
+    "services/api/tests/test_recovery_target.py": "42385eccd446effe684e58caff129107e8b6be526eab106186da4f0913e8cf32",
+    "infra/recovery/restore_fence.sql": "41695a4e150f3e99d85d01ec3589e664762b98d1c70eb4c0e0ecdece872ed4ae"
+  },
+  "existing_restore_audit": {
+    "evidence": "phase0-recovery-and-connection-guards-2026-10-18.json",
+    "source_and_restore_fingerprints_match": true,
+    "historical_missing_acl_role_and_truncation_atomicity_recorded": true,
+    "historical_helper_checked_in": false,
+    "historical_empty_tables": [
+      "account_retirements",
+      "observations",
+      "profiles",
+      "retired_ids",
+      "snapshots"
+    ],
+    "new_qualification_uses_no_existing_database": true
+  },
+  "local_postgresql": {
+    "backend": "native",
+    "restore_seconds": [
+      0.364888,
+      0.296656,
+      0.342173,
+      0.916546,
+      0.322942,
+      0.352617,
+      0.279031
+    ],
+    "server_version": "17.11",
+    "archive_bytes": 33199,
+    "archive_sha256": "5b83eeaeaadd3b208c55728a84091429a2d91f32614a7c84d6d172bbdefc45ea",
+    "source_fingerprint": {
+      "revision": "0003",
+      "rows": {
+        "account_retirements": {
+          "count": 1,
+          "sha256": "625d18af473dee246caa2e9973d395952dabfde3402a79425b79157cc75b31fe"
+        },
+        "changes": {
+          "count": 8,
+          "sha256": "c58ae12b9f49dcb4b6083a0176515e90e9583bd33ce40899f026f37a0ad57e5f"
+        },
+        "exercises": {
+          "count": 2,
+          "sha256": "6f54e3462c5d0b670ca6d04edb3149e57fbe53a4c552fdfae2ee4b44a78adfc4"
+        },
+        "observations": {
+          "count": 2,
+          "sha256": "ea9e83b5e60e0172855abe0bb3055ad432d898201580d2c62b31c938f805bc52"
+        },
+        "owner_state": {
+          "count": 3,
+          "sha256": "c4c28ab8de70ee6d502f4b550fd977622b364aaf784eeac870fdc8e8857d4119"
+        },
+        "profiles": {
+          "count": 3,
+          "sha256": "e371ce268a177dfcedee5eb545a6d5be49ae22b9386bc90e6cdf588502b04355"
+        },
+        "receipts": {
+          "count": 8,
+          "sha256": "87479bd4cb15da9f1c49339572edcbbf33301c41ff01751e05b8584807a585a8"
+        },
+        "retired_ids": {
+          "count": 5,
+          "sha256": "09a55070c0579cfe364dc1dee6a4d3705a3af0815437c59fda8e77e44178dfff"
+        },
+        "sets": {
+          "count": 6,
+          "sha256": "7ab4f80579db904c29b0ec2a43b30c6c75a1fa534c2ce6ee7c7f9702662aada9"
+        },
+        "snapshots": {
+          "count": 2,
+          "sha256": "6de832b14518e7ba816f396a592e0db98f3140aea7c9bc801297a83ad150aa30"
+        },
+        "workouts": {
+          "count": 2,
+          "sha256": "d51dab427f9b8abd0325f7f8e8f55d93300f9b7a8c07a953dc853dd506e98963"
+        }
+      },
+      "metadata": {
+        "rls": "353b99d8dc72bf962ae14a5d5ed4f6c6469e1d93ed8ea1651949d64ca6efd0bb",
+        "policies": "aab294e6c48ecc36bfa9fc18195a7daa8ced948dc6d2b1675600835fa9b2a00c",
+        "constraints": "7a963745a95118c6de1c721b6be5cc1205b91c1cc2460e929a3602b2cd7f2221",
+        "indexes": "9ea4282c359adb75e9131e23b2ae572eb54ff21c9de7ed06c8cc02af7958b947",
+        "grants": "fc54bad5fbbfe72f6b915c7b165f5b781f5d186290fa872e7813a8e31820cafd"
+      }
+    },
+    "discarded_timeline_cursor_reuse_reproduced": true,
+    "new_generation_restore_fence_verified": true,
+    "cleanup_confirmed": true
+  },
+  "qualification": {
+    "postgresql_recovery_and_target_guards": {
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0
+    },
+    "recovery_database_cases": 11,
+    "target_guard_cases": 13,
+    "covered_attacks": [
+      "missing ACL role with atomic rollback",
+      "corrupt archive header",
+      "truncated archive",
+      "post-data interrupted restore with preexisting sentinel preservation and clean retry",
+      "irreversible account retirement downgrade denied without data loss",
+      "all-table forced RLS and owner isolation; absent pooled context fails closed",
+      "cross-owner reassignment and composite foreign-key rejection",
+      "duplicate receipt uniqueness and immutable retirement marker",
+      "forced RLS removed then runtime denied; repair restores readiness",
+      "restored FastAPI receipt retry, digest mismatch, current revision and pull sequence",
+      "restored snapshot checksums, cross-owner token denial and retirement suppression",
+      "backend termination rolls back flushed projection, receipt and feed effects",
+      "discarded-timeline cursor reuse reproduced; fresh-generation operator fence verified",
+      "immediate PostgreSQL shutdown and WAL recovery preserves acknowledged restored data"
+    ],
+    "full_python_with_local_postgresql_and_connected_flutter": {
+      "passed": 178,
+      "failed": 0,
+      "skipped": 0
+    },
+    "connected_flutter_http_cases_passed": 9,
+    "ordinary_flutter": {
+      "passed": 157,
+      "skipped": 12,
+      "failed": 0
+    },
+    "flutter_skips": {
+      "local_connected_cases_run_separately": 9,
+      "hosted_credential_gated_cases_not_run": 3
+    },
+    "new_restore_client_cases": 6,
+    "restore_and_account_focused_cases_passed": 31,
+    "physical_devices_tested": false,
+    "ruff_check": "passed",
+    "ruff_format_check": "35 files passed",
+    "mypy": "10 source files passed",
+    "flutter_analyze": "passed"
+  },
+  "confirmed_defects": [
+    {
+      "problem": "Reused generation/position after restore skips divergent feed content",
+      "remedy": "Tested isolated-target generation/epoch/snapshot fence; keep access closed pending deletion/branch reconciliation"
+    },
+    {
+      "problem": "Equal/lower restored root revision ignored; pending request can use reused revision",
+      "remedy": "Normalize and compare across generations, retain working branch, install restored shadow and persist private upload fence"
+    },
+    {
+      "problem": "Previously acknowledged workout absent from backup deleted locally",
+      "remedy": "Preserve as a conflict across file reopening; continued logging cannot resume upload"
+    }
+  ],
+  "intermediate_failures": [
+    "Docker Desktop failed to initialize before DB acceptance; Docker path not qualified by native results",
+    "Native startup helpers initially timed out; background pipe handling/readiness corrected, exact lab servers stopped and directories removed",
+    "First selected SQLite run: 100 passed, 1 hard-kill worker startup timeout; serial rerun: all 3 kill stages passed",
+    "Original client: 4 restore regressions failed and unchanged-root control passed; 6 final client cases pass",
+    "Overbroad draft guard paused an account-return fixture; replaced by explicit private session metadata; full final suite passes",
+    "Overlapping Flutter run encountered a loaded SQLite DLL before acceptance; final mobile runs sequentially",
+    "Trust-auth full Python attempt: 176 passed, 2 password-rotation failures; fresh SCRAM selection: 2 passed; final SCRAM full run: 178 passed"
+  ],
+  "hosted_strategy": {
+    "document": "infra/HOSTED_RECOVERY_STRATEGY.md",
+    "price_sources_checked_on": "2026-10-19",
+    "proposed_retention_days": 7,
+    "policy_maximum_days": 35,
+    "recommendation": "Option B: Pro daily plus independent encrypted daily export for synthetic Phase 0",
+    "proposed_daily_route_rpo_hours": 24,
+    "proposed_daily_route_rto_hours": 8,
+    "approval_ids_open": [
+      "REC-01",
+      "REC-02",
+      "REC-03",
+      "REC-04",
+      "REC-05",
+      "REC-06"
+    ],
+    "approved_or_purchased": false,
+    "provider_sources": [
+      "https://supabase.com/pricing",
+      "https://supabase.com/docs/guides/platform/backups",
+      "https://supabase.com/docs/guides/platform/clone-project",
+      "https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore",
+      "https://cloud.google.com/storage/pricing",
+      "https://cloud.google.com/kms/pricing"
+    ]
+  },
+  "limits": {
+    "hosted_database_access_export_reset_or_restore": false,
+    "production_credentials_or_personal_data_accessed": false,
+    "archive_retained_at_rest": false,
+    "retained_encrypted_offsite_backup_qualified": false,
+    "supabase_auth_identity_restore_qualified": false,
+    "hosted_rpo_rto_measured": false,
+    "small_synthetic_archive_restore_seconds_are_not_rto": true,
+    "local_postgresql_authentication": "Synthetic trust in recovery lab; separate SCRAM-auth regression lab",
+    "production_deletion_ledger_and_erasure_highwater_replay_qualified": false,
+    "physical_power_loss_or_phone_backup_qualified": false,
+    "schema_or_api_contract_changed": false,
+    "remote_ci_or_deployment_or_merge_performed": false,
+    "phase0_complete": false,
+    "phase1_started": false
+  }
+}

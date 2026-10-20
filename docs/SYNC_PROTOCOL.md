@@ -131,6 +131,17 @@ Pending branches retain their original bases during recovery. A final validation
 request reduces the activation race window but cannot recall already-issued
 responses; the next authenticated contact enforces any newer erasure epoch.
 
+A disaster restore can change generation while reusing, lowering or raising root
+revisions on a divergent timeline. Revision order across that boundary does not
+prove ancestry. Preserve divergent acknowledged local work, including work absent
+from the backup, as an explicit conflict; install the restored shadow separately
+and durably pause affected uploads across logging/restart. Retired IDs remain
+authoritative. This client safeguard does not bind old push envelopes to a
+generation: keep restored writes closed until qualified-client admission, branch
+reconciliation and independent deletion-ledger/erasure high-water replay. The
+[restore procedure](../infra/RECOVERY.md) owns operator steps; local tests do not
+qualify reopening a hosted restored environment.
+
 ## Deletion, logout, and account lifecycle
 
 An explicit permanent workout deletion checks its root revision, immediately removes its current projection/analytics eligibility, retires root and child IDs and emits a tombstone. Under the same acceptance guard, advance `erasure_epoch` and redact that root's personal values from older feed bodies while preserving feed positions/receipt metadata; mark those entries redacted for transport, not as old live observations. Invalidate existing owner bootstrap tokens and enqueue their page cleanup so an old snapshot cannot serve erased values. In-flight exports/predictions/assistant evidence carry their captured epoch and recheck it before storing/publishing derived payload; stale work is discarded/recomputed, not permitted to recreate erased copies. Personal values in revisions, materialized copies and dependent intelligence records enter the purge process defined in [SECURITY.md](SECURITY.md). Use private no-store transport responses; previously issued network responses cannot be recalled. Deleting an exercise instance through an ordinary historical correction retains correction history; permanent data erasure is distinct and clearly labeled.
