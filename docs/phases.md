@@ -1,10 +1,17 @@
 # Implementation phases
 
-Updated: 2026-10-20 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
+Updated: 2026-10-21 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
+
+Protected main `5975999` contains merged PR #7 authentication and PR #8 mobile
+qualification. Session 2 recovery integration passes **180 Flutter / 12 explicit
+skips**, **242 Python / zero skips**, **14 PostgreSQL recovery cases** and
+**9 connected Flutter HTTP cases** locally. **All outstanding Phase 0 gates below
+stay open.** No hosted restore/provider operation or Phase 1 work is authorized.
+[Review, hook audit and remaining recovery limits](RECOVERY_INTEGRATION.md).
 
 **Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, interaction prototypes, Windows fault tests and native qualification harnesses are implemented. Recovered source `e3da9d0` on PR #7 passes all three remote jobs; details follow below. [IMPLEMENTATION.md](IMPLEMENTATION.md) records current counts, historical qualification and earlier runner recovery. The [audited evidence matrix](PHASE0_EVIDENCE.md) separates foundation proof from external acceptance. Trusted-key/provider, managed recovery/operator review, signing, physical secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
 
-**Latest integration recovery:** PR #6 was marked merged, then main was reset and
+**Historical PR #7 pre-merge checkpoint:** PR #6 was marked merged, then main was reset and
 pushed back to healthy `8ba5a98`. [PR #7](https://github.com/bluxo1/Daily-Motion/pull/7)
 recovers reviewed auth changes without the bad merge's clock/delay defaults.
 Its source `e3da9d0` passes all three [PR CI jobs](https://github.com/bluxo1/Daily-Motion/actions/runs/39306127033):

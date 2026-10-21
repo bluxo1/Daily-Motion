@@ -1,0 +1,196 @@
+{
+  "recorded_at_utc": "2026-10-20T21:48:56.715868+00:00",
+  "phase": "Phase 0 in progress; Phase 1 not started",
+  "scope": "prepublication local recovery integration; not hosted or physical qualification",
+  "base_main": "5975999bdb617b54a3c4e644ad07604a81fad025",
+  "source_commits": [
+    "77e5124bf8e0065dbcaf39c919f0e33cc616f93f",
+    "ddbd41878af5c62d8af12e322be3540247c79b09"
+  ],
+  "source_commits_signed": false,
+  "integration_signing": "required; no command signing override; signature and tree must be verified at publication",
+  "original_worktrees_preserved": [
+    {
+      "head": "8ba5a980a4dcd2e31ce8cb6246176a522b912f39",
+      "head_index_worktree_unchanged": true
+    },
+    {
+      "head": "57a4494df84c414bf5d2572fdf65c47f77bb8d1a",
+      "head_index_worktree_unchanged": true
+    },
+    {
+      "head": "7806046f1b196a6537e681717513a44663938176",
+      "head_index_worktree_unchanged": true
+    },
+    {
+      "head": "67faa996b88f97991bd91a888d60aa988859ad41",
+      "head_index_worktree_unchanged": true
+    },
+    {
+      "head": "24f63b6789207397d8ccf28f58e958665e1f863f",
+      "head_index_worktree_unchanged": true
+    },
+    {
+      "head": "ddbd41878af5c62d8af12e322be3540247c79b09",
+      "head_index_worktree_unchanged": true
+    },
+    {
+      "head": "950a9463df62f2df7bef2d9237410d095b4b80e4",
+      "head_index_worktree_unchanged": true
+    }
+  ],
+  "runtime_and_test_sha256": {
+    "apps/mobile/lib/data/sync_repository.dart": "7ceae9bc8f7f1e5a76997b69835fc44a6ba9e386e04d08d89e16bf4f4063e627",
+    "apps/mobile/lib/data/workout_repository.dart": "6a56d79739892f1c9cd5c51bcb6b626a99f25fa2717dc10e7eb1fd3ab66e2bfe",
+    "apps/mobile/test/restore_recovery_test.dart": "5ff06eea85070477518f3e046bca4a1d998d76e01ebe05305dcb4405dfdd0e5b",
+    "services/api/tests/recovery_lab.py": "4e1cf2f1194c4b499eeb8e67b2e79999c3893e7dd75c830fcba142083566884b",
+    "services/api/tests/test_recovery.py": "f406c89dbccd31f7b6bc05784c0d993147962dfde8c90b3fe6dd627069672e8c",
+    "services/api/tests/test_flutter_connected.py": "e9d0e8ea50318083a73e7fa4abbfa446ed3a301802b8ebb2bd7bdea50583532b",
+    "infra/recovery/restore_fence.sql": "41695a4e150f3e99d85d01ec3589e664762b98d1c70eb4c0e0ecdece872ed4ae",
+    "tools/check_python_results.py": "9a32f38729ee2935eab14a107fa3f15e6485b410972fd4656453b8ec30bd4a62",
+    ".github/workflows/verify.yml": "15be6f3aab3fed20040e139caf9fb58b1700b8cb48d86e2210bd1afa00f56ab9"
+  },
+  "generated_sha256": {
+    "contracts/openapi.json": "26ecbc2a9fbb73b121ad09e3de50223fe0b587e362072b45f02221a356ab0505",
+    "apps/mobile/lib/sync/transport_contract.dart": "05f51f20a5894ec0593dc8ce1772859a5f3045846cbf3678416290e0e0cece35",
+    "apps/mobile/lib/sync/transport_limits.dart": "ac1d90aa6394abf6a47b15d9c6190876763d411e617a3d9c9cae1a61e78ce262",
+    "apps/mobile/lib/data/database.g.dart": "0eb97c9a7e73ff40aab722fe587280dad9d686a20faef4a96e65895cade7645e"
+  },
+  "pr7_pr8_api_contract_migration_paths_unchanged": true,
+  "environment": {
+    "os": "Windows",
+    "flutter": "3.47.7",
+    "dart": "3.13.5",
+    "python": "3.13.14",
+    "postgres": "native 17.11, newly generated disposable local clusters",
+    "runtime_roles": [
+      "dm_test_runtime",
+      "dm_recovery_runtime"
+    ],
+    "provider_identity": "simulated; real JWT, HTTP, SQLite and PostgreSQL",
+    "dependencies": "frozen locks"
+  },
+  "tests": {
+    "flutter_full": {
+      "exit_code": 0,
+      "passed": 180,
+      "skipped": 12,
+      "failed": 0,
+      "seconds": 134.01,
+      "completed": true
+    },
+    "flutter_recovery_focused": {
+      "passed": 9,
+      "skipped": 0,
+      "included_in_full": true
+    },
+    "python_full": {
+      "passed": 237,
+      "skipped": 0,
+      "seconds": 106.24
+    },
+    "postgres_recovery": {
+      "passed": 14,
+      "included_in_python_total": true,
+      "nonempty_application_tables": 11
+    },
+    "recovery_target_guards": {
+      "passed": 13,
+      "included_in_python_total": true
+    },
+    "connected_flutter_http": {
+      "passed": 9,
+      "skipped": 0,
+      "python_wrapper_included_in_python_total": true
+    },
+    "connected_report_guards": {
+      "passed": 6,
+      "included_in_python_total": true
+    },
+    "python_result_unittest": {
+      "passed": 9,
+      "separate_suite": true
+    },
+    "mobile_receipt_unittest": {
+      "passed": 4,
+      "separate_suite": true
+    }
+  },
+  "checks": {
+    "flutter_analysis_issues": 0,
+    "dart_format_files": 64,
+    "ruff_formatted_files": 47,
+    "strict_mypy_files": 13,
+    "migration_head_and_repeat_upgrade": "0003",
+    "generated_identical_files": 4,
+    "drift_generator_seconds": 58,
+    "drift_generator_outputs": 125,
+    "disposable_database_cleanup_confirmed": true,
+    "documentation_markdown_files": 40,
+    "documentation_local_links": 441,
+    "documentation_json_examples": 5,
+    "credential_guard_files": 267,
+    "credential_guard_findings": 0
+  },
+  "ci_at_checkpoint": {
+    "status": "awaiting publication; do not infer future remote success",
+    "required_checks": [
+      "api",
+      "mobile (ubuntu-24.04)",
+      "mobile (macos-15-intel)"
+    ],
+    "recovery_enabled": true,
+    "junit_zero_skip_and_actual_http_guard": true
+  },
+  "adversarial_fixes": [
+    {
+      "case": "divergent restored revision higher than acknowledged revision",
+      "before": "one targeted failure: synchronized instead of attention",
+      "after": "working observations preserved, restored shadow installed separately, durable upload fence"
+    },
+    {
+      "case": "recovery tests skipped without opt-in or connected empty/skip output exits zero",
+      "after": "CI enables recovery; JUnit and Flutter machine-event gates fail closed"
+    }
+  ],
+  "hook_audit": {
+    "oct17_visible_failures": [
+      "Security Guidance 2.0.10 unusable WSL Bash",
+      "Claude Memory missing Bun",
+      "Windows notification argv limit error206"
+    ],
+    "saved_oct19_repair": {
+      "enabled_trusted": 52,
+      "loading_errors": 0,
+      "loading_warnings": 0,
+      "launch_security_probes": 22,
+      "notification_tests": 16,
+      "helper_tests": 8
+    },
+    "session2_automatic_commit_stop_review": "coverage not established: successful source commits classified unsuccessful; empty review set",
+    "precise_mapping_vs_worktree_cause": "unproven without historical raw hook input",
+    "independent_review": true,
+    "installed_git_safety_hook_bypassed": false,
+    "global_hook_changes": false
+  },
+  "remaining_risks": [
+    "generation-unbound push envelopes require restored-write isolation and qualified client admission",
+    "independent deletion-ledger and erasure high-water replay unqualified",
+    "explicit conflict-resolution UI deferred",
+    "hosted recovery, retention/custody and REC-01 through REC-06 unapproved",
+    "all outstanding Phase 0 physical/provider/operator gates remain open"
+  ],
+  "boundaries": {
+    "hosted_databases_accessed": false,
+    "hosted_restores": false,
+    "otp_requested": false,
+    "deployments": false,
+    "provider_changes": false,
+    "key_rotations": false,
+    "merge_authorized": false,
+    "phase0_complete": false,
+    "adr_changes": false,
+    "render_incident_215476446235862": "OPEN"
+  },
+  "source_hash_normalization": "UTF-8 source files with CRLF normalized to LF, matching Git text blobs"
+}

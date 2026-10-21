@@ -1,8 +1,13 @@
 # Phase 0 evidence reconciliation
 
-Audited through 2026-10-20 (IST). Recovery PR #7 starts from healthy remote
-`main` (`8ba5a98`); its reviewed source is `e3da9d0`. The recovery remains a PR,
-not a direct update to main. The earlier PR #6 merge was removed by a reset/push;
+Audited through 2026-10-21 (IST). Protected main is `5975999`, containing merged
+PR #7 authentication and PR #8 mobile qualification. Session 2 recovery source
+`77e5124`/`ddbd418` is reviewed on that base in a separate PR branch. Local
+**180 Flutter / 12 explicit skips**, **242 Python / zero skips**, **14 PostgreSQL
+recovery cases**, **18 boundary/control guards**, and **9 connected Flutter HTTP cases**
+pass. This closes **no outstanding Phase 0 acceptance gate**; hosted recovery,
+deletion-ledger/admission, hardware, provider and operator work remain open.
+[New integration review](RECOVERY_INTEGRATION.md). The earlier PR #6 merge was removed by a reset/push;
 [the integration audit](INTEGRATION_RECOVERY.md) records the evidence.
 [ROADMAP.md](ROADMAP.md) remains the scope authority. This matrix distinguishes
 implemented foundation work from its separate physical/provider acceptance.

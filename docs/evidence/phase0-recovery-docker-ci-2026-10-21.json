@@ -1,0 +1,73 @@
+{
+  "recorded_at_utc": "2026-10-20T22:02:17.483878+00:00",
+  "scope": "Docker lab qualification follow-up; no hosted operation",
+  "base_main": "5975999bdb617b54a3c4e644ad07604a81fad025",
+  "first_signed_integration": "4990d36bab726ddd8cc146cf5bc77b9cf1abf8b4",
+  "prior_local_evidence": "phase0-recovery-integration-2026-10-21.json",
+  "preserved_initial_ci_failures": [
+    {
+      "run": "39503847150",
+      "job": "118907717444",
+      "head": "4990d36bab726ddd8cc146cf5bc77b9cf1abf8b4",
+      "url": "https://github.com/bluxo1/Daily-Motion/actions/runs/39503847150",
+      "safe_summary": [
+        "FAILED tests/test_recovery.py::test_postgresql_crash_preserves_acknowledged_restore - RuntimeError: Disposable PostgreSQL did not become ready",
+        "1 failed, 233 passed, 4 errors in 68.86s (0:01:08)"
+      ],
+      "historical_run_preserved": true
+    },
+    {
+      "run": "39503752481",
+      "job": "118907402508",
+      "head": "4990d36bab726ddd8cc146cf5bc77b9cf1abf8b4",
+      "url": "https://github.com/bluxo1/Daily-Motion/actions/runs/39503752481",
+      "safe_summary": [
+        "FAILED tests/test_recovery.py::test_postgresql_crash_preserves_acknowledged_restore - RuntimeError: Disposable PostgreSQL did not become ready",
+        "1 failed, 233 passed, 4 errors in 71.03s (0:01:11)"
+      ],
+      "historical_run_preserved": true
+    }
+  ],
+  "observed_failure": "PostgreSQL readiness and subsequent connection refusal at original Docker host port after kill/start",
+  "diagnosis": "ephemeral Docker publish request plus retained SQLAlchemy engine URLs; preserve explicit loopback mapping across restart",
+  "discarded_timeline_or_database_loss_claimed": false,
+  "forward_fix": [
+    "explicit reserved loopback port",
+    "create before start with validated container ID and ownership label",
+    "retain owned volume identity for startup-failure cleanup",
+    "verify exact original loopback binding after start and restart",
+    "preserve 45-second readiness timeout and WAL/crash assertions"
+  ],
+  "control_tests": {
+    "total_boundary_controls": 18,
+    "additional_simulated_docker_boundary_cases": 5,
+    "actual_database_tests_replaced": false
+  },
+  "local_full_python": {
+    "passed": 242,
+    "skipped": 0,
+    "seconds": 91.78,
+    "postgres_recovery_cases": 14,
+    "connected_flutter_http_cases": 9,
+    "provider_identity": "simulated; real local HTTP/JWT/SQLite/PostgreSQL"
+  },
+  "native_backend": "new disposable PostgreSQL 17.11 clusters; not Docker qualification",
+  "migration_and_cleanup": {
+    "migration_head_and_repeated_upgrade": "0003",
+    "exit_code": 0,
+    "cleanup_confirmed": true,
+    "seconds": 118.05,
+    "postgres_backend": "new disposable native PostgreSQL 17.11",
+    "hosted_operations": false
+  },
+  "docker_ci_followup": "pending signed-head publication; consult PR checks",
+  "files_sha256_lf": {
+    "services/api/tests/recovery_lab.py": "0f4ff9cc67ac1a8b2359717a7791de73c4aac51229ff3c25ab2e2712e4dccc0c",
+    "services/api/tests/test_recovery_target.py": "8a0b0de4e80f683a3138bc80659955ed7588575a50ffdae04deb08d138d8ece6"
+  },
+  "phase0_outstanding_gates_closed": false,
+  "merge_authorized": false,
+  "signing_disabled": false,
+  "history_rewritten": false,
+  "hosted_provider_actions": false
+}

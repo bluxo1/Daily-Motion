@@ -399,6 +399,7 @@ extension SynchronizationRepository on WorkoutRepository {
   Future<void> _installConnectedRemote(
     Json projection, {
     required bool external,
+    bool generationChanged = false,
   }) async {
     validateTransport('RootProjection', projection);
     projection = contractDefaults(
@@ -504,7 +505,7 @@ extension SynchronizationRepository on WorkoutRepository {
     }
     final shadow = await db
         .customSelect(
-          'SELECT revision FROM shadows WHERE session_id=?',
+          'SELECT revision,projection FROM shadows WHERE session_id=?',
           variables: [Variable(id)],
         )
         .getSingleOrNull();
@@ -541,8 +542,16 @@ extension SynchronizationRepository on WorkoutRepository {
         }
       }
     }
+    // Revisions order roots within one server timeline. A restored generation
+    // can reuse or rewind them; retain divergent local work for explicit review.
+    final restoredBranch =
+        generationChanged &&
+        shadow != null &&
+        _recoveryProjection(shadow.readNullable<String>('projection')) !=
+            _recoveryProjection(canonicalJson(projection));
     if (shadow != null &&
-        shadow.read<int>('revision') >= projection['revision']) {
+        shadow.read<int>('revision') >= projection['revision'] &&
+        !restoredBranch) {
       return;
     }
     await db.customStatement(
@@ -562,16 +571,48 @@ extension SynchronizationRepository on WorkoutRepository {
         )
         .getSingleOrNull();
     final previous = await _read(id);
-    if (pending != null || drafts != null || previous?['conflict'] == true) {
+    if (pending != null ||
+        drafts != null ||
+        previous?['conflict'] == true ||
+        restoredBranch) {
       if (external) {
         await db.customStatement(
           'UPDATE sessions SET has_conflict=1,branch_base=coalesce(branch_base,?) WHERE id=?',
           [shadow?.read<int>('revision') ?? 0, id],
         );
+        if (generationChanged) await _pauseRestoredBranch(id);
       }
     } else {
       await _write(projection, (previous?['local_seq'] as int? ?? 0) + 1);
     }
+  }
+
+  Future<void> _pauseRestoredBranch(String id) async {
+    // This private session marker is excluded from rendered/domain projections.
+    // It remains until explicit branch resolution; historical receipts stay intact.
+    await db.customStatement(
+      "UPDATE sessions SET metadata=json_set(metadata,'\$._restore_conflict',1) WHERE id=?",
+      [id],
+    );
+    await db.customStatement(
+      "UPDATE outbox SET state='conflict',last_error='restore_conflict' WHERE session_id=? AND state='pending'",
+      [id],
+    );
+  }
+
+  String _recoveryProjection(String? encoded) {
+    if (encoded == null) return canonicalJson(null);
+    final normalized = contractDefaults(
+      jsonDecode(encoded),
+      transportSchemas['RootProjection'] as Json,
+      transportSchemas,
+    ) as Json;
+    for (final item in allSets(normalized)) {
+      final observation = item['observation'] as Json?;
+      // This optional nullable field has no exported schema default.
+      observation?.putIfAbsent('correction_reason', () => null);
+    }
+    return canonicalJson(normalized);
   }
 
   Future<BootstrapManifestDto?> stagedBootstrap() => db.transaction(() async {
@@ -653,6 +694,9 @@ extension SynchronizationRepository on WorkoutRepository {
     _ownerContext(current.json);
     final manifest = await stagedBootstrap();
     final meta = await syncMetadata();
+    final generationChanged =
+        meta['generation'] != null &&
+        meta['generation'] != manifest?.generation;
     if (manifest == null ||
         manifest.position > current.position ||
         manifest.position < current.minimumPosition ||
@@ -726,7 +770,11 @@ extension SynchronizationRepository on WorkoutRepository {
       );
     }
     for (final root in roots) {
-      await _installConnectedRemote(root, external: true);
+      await _installConnectedRemote(
+        root,
+        external: true,
+        generationChanged: generationChanged,
+      );
     }
     for (final row
         in await db.customSelect('SELECT session_id FROM shadows').get()) {
@@ -738,11 +786,12 @@ extension SynchronizationRepository on WorkoutRepository {
             variables: [Variable(id)],
           )
           .getSingleOrNull();
-      if (pending != null) {
+      if (pending != null || generationChanged) {
         await db.customStatement(
-          'UPDATE sessions SET has_conflict=1 WHERE id=?',
-          [id],
+          'UPDATE sessions SET has_conflict=1,branch_base=coalesce(branch_base,(SELECT revision FROM shadows WHERE session_id=?)) WHERE id=?',
+          [id, id],
         );
+        if (generationChanged) await _pauseRestoredBranch(id);
       } else {
         await db.customStatement('DELETE FROM sessions WHERE id=?', [id]);
       }

@@ -1,6 +1,43 @@
 # Phase 0 implementation evidence
 
-Updated: 2026-10-18 (IST). **Phase 0 is in progress. Phase 1 has not started.**
+Updated: 2026-10-21 (IST). **Phase 0 is in progress. Phase 1 has not started.**
+
+## Session 2 recovery integration — 2026-10-21 IST
+
+Reviewed `77e5124` plus evidence `ddbd418` against protected main `5975999`, with
+merged PR #7 authentication and PR #8 qualification retained. An isolated branch
+preserves all seven existing worktrees and historical commits. Recovery retains
+acknowledged/missing/divergent local workouts, frozen identities and original
+bases, with an upload fence surviving logging/restart. Retirement remains
+authoritative. Review reproduced and fixed higher-revision cross-generation
+overwrite. No schema, public contract, dependency or ADR changes.
+
+Local Windows, pinned Flutter 3.47.7/Dart 3.13.5, Python 3.13.14 and disposable
+native PostgreSQL 17.11: **180 ordinary Flutter passed / 12 explicit skips**,
+**9 focused SQLite recovery passed**, **242 Python passed / zero skipped**,
+including **14 PostgreSQL recovery cases**, **18 boundary/control guards** and a wrapper
+executing **9 live Flutter HTTP cases**. Provider identity is simulated;
+HTTP/JWT/SQLite/PostgreSQL are real. Separate validators pass **9 + 4 unittest
+cases**. Flutter analyze has zero issues; Ruff and strict mypy pass. Alembic
+head/repeated upgrade is `0003`; generated clusters are removed. Required PR CI
+remains the authority for the published head's native builds.
+
+The first signed head `4990d36` passed 237 local Python cases but both remote API
+jobs failed Docker crash/restart readiness (233 passed, one failed, four errors).
+A forward fix makes the lab's loopback binding explicit/stable and retains owned
+container/volume identity for failed-start cleanup. Five control regressions and
+the full local 242-case rerun pass; real Docker qualification remains gated by
+new-head CI. Historical failures remain visible. [Exact follow-up](evidence/phase0-recovery-docker-ci-2026-10-21.json).
+
+The hook audit distinguishes repaired October 17 launch failures from Session 2
+automatic security reviews that established no coverage. Independent review and
+repository/CI checks gate integration. CI now rejects skipped/incomplete Python
+or connected Flutter qualification. All outstanding Phase 0 acceptance gates stay
+open, including hosted recovery, deletion-ledger/admission and hardware/operator
+work. No provider operation or merge is authorized. [Review and exact limits](RECOVERY_INTEGRATION.md).
+
+## Earlier foundation checkpoint — 2026-10-18 IST
+
 The foundation now includes real hosted SMTP/OTP and authenticated Flutter
 functional proof, alongside the earlier Windows/native/fault harnesses.
 Physical-device, remaining provider/operator and release gates in

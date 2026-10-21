@@ -1322,3 +1322,54 @@ UTC date. The user asked when to commit and to continue. No Phase 1 work started
   accessibility/physical p95, trusted-key/provider and recovery/operator review
   gates remain open. Phase 0 **in progress**; Phase 1 unstarted.
   [Recovery evidence](evidence/phase0-integration-recovery-2026-10-20.json).
+
+### 2026-10-21 IST — Session 2 recovery integration
+
+- Protected main is `5975999`, with PR #7 auth and PR #8 mobile qualification
+  merged. Read the complete Session 2 handoff and inspect unsigned implementation
+  `77e5124` plus evidence `ddbd418`. Apply only their patch to a new branch;
+  preserve all seven original worktrees/indexes and historical commits.
+- Recovery keeps acknowledged workouts absent/divergent after restore, original
+  working branches/bases/frozen mutation bodies, and a private upload fence
+  surviving logging/restart. Retirement overrides preservation. Independent
+  review reproduces an additional higher-revision timeline overwrite; remove
+  that cross-generation revision shortcut and add real SQLite regressions.
+- Local Windows: **9 focused recovery**, **180 ordinary Flutter / 12 explicit
+  skips**, **237 Python / zero skips**, including **14 real PostgreSQL recovery**,
+  **13 target guards**, **6 connected-parser guards**, and the wrapper running
+  **9 live Flutter HTTP cases**. Separate validator unittests: **9 + 4**. Flutter
+  analyze has zero issues; Ruff/strict mypy pass. PostgreSQL 17.11 uses new local
+  disposable clusters; cleanup and repeated Alembic `0003` upgrade pass.
+- CI now enables recovery and rejects skipped/empty/incomplete acceptance.
+  Source review leaves PR #7 auth, PR #8 native/qualification and generated
+  contracts unchanged. Publication requires a verified signed exact tree; no
+  signing override, main update or merge is authorized.
+- Hook audit: Oct 17 WSL/Bun/Windows-argv launch failures have Oct 19 repair
+  evidence. Session 2 additionally skipped automatic security reviews despite
+  successful commits; coverage is not established. Independent review and
+  executable checks gate this integration; no global hook/config change.
+- Hosted writes after restore still require qualified-client admission, explicit
+  branch reconciliation and external deletion-ledger/high-water replay. REC-01
+  through REC-06 and **all outstanding Phase 0 acceptance gates stay open**.
+  No hosted DB/restore, OTP, deployment, provider or key operation. Render incident
+  **215476446235862 remains OPEN**. No ADR change or Phase 1 work.
+  [Integration review](RECOVERY_INTEGRATION.md) and
+  [local evidence](evidence/phase0-recovery-integration-2026-10-21.json).
+
+### 2026-10-21 IST — Recovery PR #9 Docker qualification follow-up
+
+- Published signed integration `4990d36`, matching the reviewed tree, on PR #9
+  against protected `5975999`. No signing override or main update. Both initial
+  remote API jobs failed Docker crash/restart readiness: **233 passed, one
+  failed, four errors**; preserve runs `39503847150` and `39503752481`.
+- Root cause is the lab's ephemeral host binding with engine URLs retained over
+  restart. A forward fix selects an explicit loopback port, verifies it after
+  every start, checks owned identity and separates create/start for safe cleanup
+  on startup failure. Do not weaken the crash test, timeout or no-skip gate.
+- Five new simulated Docker-boundary controls pass; full real native PostgreSQL
+  regression reruns **242 Python / zero skipped**, including **14 recovery**,
+  **18 boundary/control guards** and **9 live Flutter HTTP cases**. Alembic
+  `0003` and cleanup pass again. Original 237-case local evidence stays dated.
+- Requalify the Docker backend in new-head CI before recommending merge. No
+  hosted/provider work, merge, history rewrite or Phase 0 gate closure.
+  [Follow-up evidence](evidence/phase0-recovery-docker-ci-2026-10-21.json).

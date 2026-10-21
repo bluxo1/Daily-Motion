@@ -140,7 +140,8 @@ class WorkoutRepository {
     List<QueryRow> rows,
     Map<String, List<QueryRow>> sets,
   ) {
-    final state = jsonDecode(session.read<String>('metadata')) as Json;
+    final state = jsonDecode(session.read<String>('metadata')) as Json
+      ..remove('_restore_conflict');
     final exercises = <Json>[];
     for (final row in rows) {
       final exercise = jsonDecode(row.read<String>('definition')) as Json;
@@ -206,7 +207,7 @@ class WorkoutRepository {
       ..remove('conflict');
     final id = state['aggregate_id'] as String;
     await db.customStatement(
-      'INSERT INTO sessions(id,metadata,local_seq) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET metadata=excluded.metadata,local_seq=excluded.local_seq',
+      "INSERT INTO sessions(id,metadata,local_seq) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET metadata=CASE WHEN json_extract(sessions.metadata,'\$._restore_conflict')=1 THEN json_set(excluded.metadata,'\$._restore_conflict',1) ELSE excluded.metadata END,local_seq=excluded.local_seq",
       [id, canonicalJson(meta), sequence],
     );
     final exercises = (state['exercises'] as List).cast<Json>();
@@ -548,6 +549,15 @@ class WorkoutRepository {
   /// Freezing precedes HTTP. A dependent uses its own predecessor receipt, even after newer pulls.
   Future<String?> prepareHead(String id) => db.transaction(() async {
     await _guard();
+    // The local-only marker survives further logging, including on a phone
+    // that originally downloaded this root and has no historical outbox rows.
+    final restored = await db
+        .customSelect(
+          "SELECT id FROM sessions WHERE id=? AND json_extract(metadata,'\$._restore_conflict')=1",
+          variables: [Variable(id)],
+        )
+        .getSingleOrNull();
+    if (restored != null) return null;
     final row = await db
         .customSelect(
           "SELECT * FROM outbox WHERE session_id=? AND state != 'acknowledged' ORDER BY local_seq LIMIT 1",
