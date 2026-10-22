@@ -119,12 +119,14 @@ class HttpSyncTransport implements SyncTransport {
       Json decoded;
       // Reverse proxies can return HTML/empty transient errors. Status still
       // determines retryability; malformed successful responses remain terminal.
-      if (response.statusCode >= 500 || response.statusCode == 429) {
-        throw SyncFailure('http_${response.statusCode}', retryable: true);
-      }
+      final transient =
+          response.statusCode >= 500 || response.statusCode == 429;
       try {
         decoded = jsonDecode(utf8.decode(bytes)) as Json;
       } catch (_) {
+        if (transient) {
+          throw SyncFailure('http_${response.statusCode}', retryable: true);
+        }
         if (response.statusCode == 401) {
           throw const SyncFailure('authentication_required');
         }
@@ -138,12 +140,24 @@ class HttpSyncTransport implements SyncTransport {
       }
       if (response.statusCode != 200) {
         final detail = decoded['detail'];
-        final code = detail is Json && detail['code'] is String
+        var code = detail is Json && detail['code'] is String
             ? detail['code'] as String
             : 'http_${response.statusCode}';
+        // Only defined status/code pairs carry recovery meaning. A proxy error
+        // must never impersonate a bound account lifecycle denial.
+        final recoveryPause =
+            response.statusCode == 503 &&
+                [
+                  'recovery_unavailable',
+                  'recovery_metadata_unverified',
+                ].contains(code) ||
+            response.statusCode == 202 && code == 'publication_pending';
+        if (transient && !recoveryPause) {
+          code = 'http_${response.statusCode}';
+        }
         throw SyncFailure(
           code,
-          retryable: response.statusCode >= 500 || response.statusCode == 429,
+          retryable: transient || recoveryPause,
           ownerId:
               detail is Json &&
                   detail['schema_version'] == 1 &&

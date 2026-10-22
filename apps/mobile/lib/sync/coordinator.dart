@@ -144,6 +144,7 @@ class SyncCoordinator {
             'wrong_owner',
             'malformed_response',
             'snapshot_checksum',
+            'timeline_reconciliation_required',
           ].contains(meta['last_error'])) {
         _status(
           [

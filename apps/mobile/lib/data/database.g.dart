@@ -1881,6 +1881,40 @@ class Outbox extends Table with TableInfo<Outbox, OutboxData> {
     requiredDuringInsert: false,
     $customConstraints: '',
   );
+  static const VerificationMeta _wireVersionMeta = const VerificationMeta(
+    'wireVersion',
+  );
+  late final GeneratedColumn<int> wireVersion = GeneratedColumn<int>(
+    'wire_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 1 CHECK (wire_version IN (1, 2))',
+    defaultValue: const CustomExpression('1'),
+  );
+  static const VerificationMeta _originContextMeta = const VerificationMeta(
+    'originContext',
+  );
+  late final GeneratedColumn<String> originContext = GeneratedColumn<String>(
+    'origin_context',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _acceptedContextMeta = const VerificationMeta(
+    'acceptedContext',
+  );
+  late final GeneratedColumn<String> acceptedContext = GeneratedColumn<String>(
+    'accepted_context',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
   @override
   List<GeneratedColumn> get $columns => [
     mutationId,
@@ -1895,6 +1929,9 @@ class Outbox extends Table with TableInfo<Outbox, OutboxData> {
     attemptCount,
     lastError,
     requestDigest,
+    wireVersion,
+    originContext,
+    acceptedContext,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2004,6 +2041,33 @@ class Outbox extends Table with TableInfo<Outbox, OutboxData> {
         ),
       );
     }
+    if (data.containsKey('wire_version')) {
+      context.handle(
+        _wireVersionMeta,
+        wireVersion.isAcceptableOrUnknown(
+          data['wire_version']!,
+          _wireVersionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('origin_context')) {
+      context.handle(
+        _originContextMeta,
+        originContext.isAcceptableOrUnknown(
+          data['origin_context']!,
+          _originContextMeta,
+        ),
+      );
+    }
+    if (data.containsKey('accepted_context')) {
+      context.handle(
+        _acceptedContextMeta,
+        acceptedContext.isAcceptableOrUnknown(
+          data['accepted_context']!,
+          _acceptedContextMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -2065,6 +2129,18 @@ class Outbox extends Table with TableInfo<Outbox, OutboxData> {
         DriftSqlType.string,
         data['${effectivePrefix}request_digest'],
       ),
+      wireVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}wire_version'],
+      )!,
+      originContext: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}origin_context'],
+      ),
+      acceptedContext: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}accepted_context'],
+      ),
     );
   }
 
@@ -2092,6 +2168,9 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
   final int attemptCount;
   final String? lastError;
   final String? requestDigest;
+  final int wireVersion;
+  final String? originContext;
+  final String? acceptedContext;
   const OutboxData({
     required this.mutationId,
     required this.sessionId,
@@ -2105,6 +2184,9 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
     required this.attemptCount,
     this.lastError,
     this.requestDigest,
+    required this.wireVersion,
+    this.originContext,
+    this.acceptedContext,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2130,6 +2212,13 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
     }
     if (!nullToAbsent || requestDigest != null) {
       map['request_digest'] = Variable<String>(requestDigest);
+    }
+    map['wire_version'] = Variable<int>(wireVersion);
+    if (!nullToAbsent || originContext != null) {
+      map['origin_context'] = Variable<String>(originContext);
+    }
+    if (!nullToAbsent || acceptedContext != null) {
+      map['accepted_context'] = Variable<String>(acceptedContext);
     }
     return map;
   }
@@ -2158,6 +2247,13 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
       requestDigest: requestDigest == null && nullToAbsent
           ? const Value.absent()
           : Value(requestDigest),
+      wireVersion: Value(wireVersion),
+      originContext: originContext == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originContext),
+      acceptedContext: acceptedContext == null && nullToAbsent
+          ? const Value.absent()
+          : Value(acceptedContext),
     );
   }
 
@@ -2179,6 +2275,9 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
       attemptCount: serializer.fromJson<int>(json['attempt_count']),
       lastError: serializer.fromJson<String?>(json['last_error']),
       requestDigest: serializer.fromJson<String?>(json['request_digest']),
+      wireVersion: serializer.fromJson<int>(json['wire_version']),
+      originContext: serializer.fromJson<String?>(json['origin_context']),
+      acceptedContext: serializer.fromJson<String?>(json['accepted_context']),
     );
   }
   @override
@@ -2197,6 +2296,9 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
       'attempt_count': serializer.toJson<int>(attemptCount),
       'last_error': serializer.toJson<String?>(lastError),
       'request_digest': serializer.toJson<String?>(requestDigest),
+      'wire_version': serializer.toJson<int>(wireVersion),
+      'origin_context': serializer.toJson<String?>(originContext),
+      'accepted_context': serializer.toJson<String?>(acceptedContext),
     };
   }
 
@@ -2213,6 +2315,9 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
     int? attemptCount,
     Value<String?> lastError = const Value.absent(),
     Value<String?> requestDigest = const Value.absent(),
+    int? wireVersion,
+    Value<String?> originContext = const Value.absent(),
+    Value<String?> acceptedContext = const Value.absent(),
   }) => OutboxData(
     mutationId: mutationId ?? this.mutationId,
     sessionId: sessionId ?? this.sessionId,
@@ -2232,6 +2337,13 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
     requestDigest: requestDigest.present
         ? requestDigest.value
         : this.requestDigest,
+    wireVersion: wireVersion ?? this.wireVersion,
+    originContext: originContext.present
+        ? originContext.value
+        : this.originContext,
+    acceptedContext: acceptedContext.present
+        ? acceptedContext.value
+        : this.acceptedContext,
   );
   OutboxData copyWithCompanion(OutboxCompanion data) {
     return OutboxData(
@@ -2261,6 +2373,15 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
       requestDigest: data.requestDigest.present
           ? data.requestDigest.value
           : this.requestDigest,
+      wireVersion: data.wireVersion.present
+          ? data.wireVersion.value
+          : this.wireVersion,
+      originContext: data.originContext.present
+          ? data.originContext.value
+          : this.originContext,
+      acceptedContext: data.acceptedContext.present
+          ? data.acceptedContext.value
+          : this.acceptedContext,
     );
   }
 
@@ -2278,7 +2399,10 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
           ..write('state: $state, ')
           ..write('attemptCount: $attemptCount, ')
           ..write('lastError: $lastError, ')
-          ..write('requestDigest: $requestDigest')
+          ..write('requestDigest: $requestDigest, ')
+          ..write('wireVersion: $wireVersion, ')
+          ..write('originContext: $originContext, ')
+          ..write('acceptedContext: $acceptedContext')
           ..write(')'))
         .toString();
   }
@@ -2297,6 +2421,9 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
     attemptCount,
     lastError,
     requestDigest,
+    wireVersion,
+    originContext,
+    acceptedContext,
   );
   @override
   bool operator ==(Object other) =>
@@ -2313,7 +2440,10 @@ class OutboxData extends DataClass implements Insertable<OutboxData> {
           other.state == this.state &&
           other.attemptCount == this.attemptCount &&
           other.lastError == this.lastError &&
-          other.requestDigest == this.requestDigest);
+          other.requestDigest == this.requestDigest &&
+          other.wireVersion == this.wireVersion &&
+          other.originContext == this.originContext &&
+          other.acceptedContext == this.acceptedContext);
 }
 
 class OutboxCompanion extends UpdateCompanion<OutboxData> {
@@ -2329,6 +2459,9 @@ class OutboxCompanion extends UpdateCompanion<OutboxData> {
   final Value<int> attemptCount;
   final Value<String?> lastError;
   final Value<String?> requestDigest;
+  final Value<int> wireVersion;
+  final Value<String?> originContext;
+  final Value<String?> acceptedContext;
   final Value<int> rowid;
   const OutboxCompanion({
     this.mutationId = const Value.absent(),
@@ -2343,6 +2476,9 @@ class OutboxCompanion extends UpdateCompanion<OutboxData> {
     this.attemptCount = const Value.absent(),
     this.lastError = const Value.absent(),
     this.requestDigest = const Value.absent(),
+    this.wireVersion = const Value.absent(),
+    this.originContext = const Value.absent(),
+    this.acceptedContext = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   OutboxCompanion.insert({
@@ -2358,6 +2494,9 @@ class OutboxCompanion extends UpdateCompanion<OutboxData> {
     this.attemptCount = const Value.absent(),
     this.lastError = const Value.absent(),
     this.requestDigest = const Value.absent(),
+    this.wireVersion = const Value.absent(),
+    this.originContext = const Value.absent(),
+    this.acceptedContext = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : mutationId = Value(mutationId),
        sessionId = Value(sessionId),
@@ -2378,6 +2517,9 @@ class OutboxCompanion extends UpdateCompanion<OutboxData> {
     Expression<int>? attemptCount,
     Expression<String>? lastError,
     Expression<String>? requestDigest,
+    Expression<int>? wireVersion,
+    Expression<String>? originContext,
+    Expression<String>? acceptedContext,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2393,6 +2535,9 @@ class OutboxCompanion extends UpdateCompanion<OutboxData> {
       if (attemptCount != null) 'attempt_count': attemptCount,
       if (lastError != null) 'last_error': lastError,
       if (requestDigest != null) 'request_digest': requestDigest,
+      if (wireVersion != null) 'wire_version': wireVersion,
+      if (originContext != null) 'origin_context': originContext,
+      if (acceptedContext != null) 'accepted_context': acceptedContext,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2410,6 +2555,9 @@ class OutboxCompanion extends UpdateCompanion<OutboxData> {
     Value<int>? attemptCount,
     Value<String?>? lastError,
     Value<String?>? requestDigest,
+    Value<int>? wireVersion,
+    Value<String?>? originContext,
+    Value<String?>? acceptedContext,
     Value<int>? rowid,
   }) {
     return OutboxCompanion(
@@ -2425,6 +2573,9 @@ class OutboxCompanion extends UpdateCompanion<OutboxData> {
       attemptCount: attemptCount ?? this.attemptCount,
       lastError: lastError ?? this.lastError,
       requestDigest: requestDigest ?? this.requestDigest,
+      wireVersion: wireVersion ?? this.wireVersion,
+      originContext: originContext ?? this.originContext,
+      acceptedContext: acceptedContext ?? this.acceptedContext,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2468,6 +2619,15 @@ class OutboxCompanion extends UpdateCompanion<OutboxData> {
     if (requestDigest.present) {
       map['request_digest'] = Variable<String>(requestDigest.value);
     }
+    if (wireVersion.present) {
+      map['wire_version'] = Variable<int>(wireVersion.value);
+    }
+    if (originContext.present) {
+      map['origin_context'] = Variable<String>(originContext.value);
+    }
+    if (acceptedContext.present) {
+      map['accepted_context'] = Variable<String>(acceptedContext.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2489,6 +2649,9 @@ class OutboxCompanion extends UpdateCompanion<OutboxData> {
           ..write('attemptCount: $attemptCount, ')
           ..write('lastError: $lastError, ')
           ..write('requestDigest: $requestDigest, ')
+          ..write('wireVersion: $wireVersion, ')
+          ..write('originContext: $originContext, ')
+          ..write('acceptedContext: $acceptedContext, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2533,8 +2696,24 @@ class Shadows extends Table with TableInfo<Shadows, Shadow> {
     requiredDuringInsert: false,
     $customConstraints: '',
   );
+  static const VerificationMeta _recoveryContextMeta = const VerificationMeta(
+    'recoveryContext',
+  );
+  late final GeneratedColumn<String> recoveryContext = GeneratedColumn<String>(
+    'recovery_context',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
   @override
-  List<GeneratedColumn> get $columns => [sessionId, revision, projection];
+  List<GeneratedColumn> get $columns => [
+    sessionId,
+    revision,
+    projection,
+    recoveryContext,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2569,6 +2748,15 @@ class Shadows extends Table with TableInfo<Shadows, Shadow> {
         projection.isAcceptableOrUnknown(data['projection']!, _projectionMeta),
       );
     }
+    if (data.containsKey('recovery_context')) {
+      context.handle(
+        _recoveryContextMeta,
+        recoveryContext.isAcceptableOrUnknown(
+          data['recovery_context']!,
+          _recoveryContextMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -2590,6 +2778,10 @@ class Shadows extends Table with TableInfo<Shadows, Shadow> {
         DriftSqlType.string,
         data['${effectivePrefix}projection'],
       ),
+      recoveryContext: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}recovery_context'],
+      ),
     );
   }
 
@@ -2606,10 +2798,12 @@ class Shadow extends DataClass implements Insertable<Shadow> {
   final String sessionId;
   final int revision;
   final String? projection;
+  final String? recoveryContext;
   const Shadow({
     required this.sessionId,
     required this.revision,
     this.projection,
+    this.recoveryContext,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2618,6 +2812,9 @@ class Shadow extends DataClass implements Insertable<Shadow> {
     map['revision'] = Variable<int>(revision);
     if (!nullToAbsent || projection != null) {
       map['projection'] = Variable<String>(projection);
+    }
+    if (!nullToAbsent || recoveryContext != null) {
+      map['recovery_context'] = Variable<String>(recoveryContext);
     }
     return map;
   }
@@ -2629,6 +2826,9 @@ class Shadow extends DataClass implements Insertable<Shadow> {
       projection: projection == null && nullToAbsent
           ? const Value.absent()
           : Value(projection),
+      recoveryContext: recoveryContext == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recoveryContext),
     );
   }
 
@@ -2641,6 +2841,7 @@ class Shadow extends DataClass implements Insertable<Shadow> {
       sessionId: serializer.fromJson<String>(json['session_id']),
       revision: serializer.fromJson<int>(json['revision']),
       projection: serializer.fromJson<String?>(json['projection']),
+      recoveryContext: serializer.fromJson<String?>(json['recovery_context']),
     );
   }
   @override
@@ -2650,6 +2851,7 @@ class Shadow extends DataClass implements Insertable<Shadow> {
       'session_id': serializer.toJson<String>(sessionId),
       'revision': serializer.toJson<int>(revision),
       'projection': serializer.toJson<String?>(projection),
+      'recovery_context': serializer.toJson<String?>(recoveryContext),
     };
   }
 
@@ -2657,10 +2859,14 @@ class Shadow extends DataClass implements Insertable<Shadow> {
     String? sessionId,
     int? revision,
     Value<String?> projection = const Value.absent(),
+    Value<String?> recoveryContext = const Value.absent(),
   }) => Shadow(
     sessionId: sessionId ?? this.sessionId,
     revision: revision ?? this.revision,
     projection: projection.present ? projection.value : this.projection,
+    recoveryContext: recoveryContext.present
+        ? recoveryContext.value
+        : this.recoveryContext,
   );
   Shadow copyWithCompanion(ShadowsCompanion data) {
     return Shadow(
@@ -2669,6 +2875,9 @@ class Shadow extends DataClass implements Insertable<Shadow> {
       projection: data.projection.present
           ? data.projection.value
           : this.projection,
+      recoveryContext: data.recoveryContext.present
+          ? data.recoveryContext.value
+          : this.recoveryContext,
     );
   }
 
@@ -2677,37 +2886,43 @@ class Shadow extends DataClass implements Insertable<Shadow> {
     return (StringBuffer('Shadow(')
           ..write('sessionId: $sessionId, ')
           ..write('revision: $revision, ')
-          ..write('projection: $projection')
+          ..write('projection: $projection, ')
+          ..write('recoveryContext: $recoveryContext')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(sessionId, revision, projection);
+  int get hashCode =>
+      Object.hash(sessionId, revision, projection, recoveryContext);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Shadow &&
           other.sessionId == this.sessionId &&
           other.revision == this.revision &&
-          other.projection == this.projection);
+          other.projection == this.projection &&
+          other.recoveryContext == this.recoveryContext);
 }
 
 class ShadowsCompanion extends UpdateCompanion<Shadow> {
   final Value<String> sessionId;
   final Value<int> revision;
   final Value<String?> projection;
+  final Value<String?> recoveryContext;
   final Value<int> rowid;
   const ShadowsCompanion({
     this.sessionId = const Value.absent(),
     this.revision = const Value.absent(),
     this.projection = const Value.absent(),
+    this.recoveryContext = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ShadowsCompanion.insert({
     required String sessionId,
     required int revision,
     this.projection = const Value.absent(),
+    this.recoveryContext = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : sessionId = Value(sessionId),
        revision = Value(revision);
@@ -2715,12 +2930,14 @@ class ShadowsCompanion extends UpdateCompanion<Shadow> {
     Expression<String>? sessionId,
     Expression<int>? revision,
     Expression<String>? projection,
+    Expression<String>? recoveryContext,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (sessionId != null) 'session_id': sessionId,
       if (revision != null) 'revision': revision,
       if (projection != null) 'projection': projection,
+      if (recoveryContext != null) 'recovery_context': recoveryContext,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2729,12 +2946,14 @@ class ShadowsCompanion extends UpdateCompanion<Shadow> {
     Value<String>? sessionId,
     Value<int>? revision,
     Value<String?>? projection,
+    Value<String?>? recoveryContext,
     Value<int>? rowid,
   }) {
     return ShadowsCompanion(
       sessionId: sessionId ?? this.sessionId,
       revision: revision ?? this.revision,
       projection: projection ?? this.projection,
+      recoveryContext: recoveryContext ?? this.recoveryContext,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2751,6 +2970,9 @@ class ShadowsCompanion extends UpdateCompanion<Shadow> {
     if (projection.present) {
       map['projection'] = Variable<String>(projection.value);
     }
+    if (recoveryContext.present) {
+      map['recovery_context'] = Variable<String>(recoveryContext.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2763,6 +2985,7 @@ class ShadowsCompanion extends UpdateCompanion<Shadow> {
           ..write('sessionId: $sessionId, ')
           ..write('revision: $revision, ')
           ..write('projection: $projection, ')
+          ..write('recoveryContext: $recoveryContext, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4507,6 +4730,546 @@ class BootstrapPagesCompanion extends UpdateCompanion<BootstrapPage> {
   }
 }
 
+class RecoveryState extends Table
+    with TableInfo<RecoveryState, RecoveryStateData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  RecoveryState(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _singletonMeta = const VerificationMeta(
+    'singleton',
+  );
+  late final GeneratedColumn<int> singleton = GeneratedColumn<int>(
+    'singleton',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL PRIMARY KEY CHECK (singleton = 1)',
+  );
+  static const VerificationMeta _requiredMeta = const VerificationMeta(
+    'required',
+  );
+  late final GeneratedColumn<int> required = GeneratedColumn<int>(
+    'required',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 0 CHECK (required IN (0, 1))',
+    defaultValue: const CustomExpression('0'),
+  );
+  static const VerificationMeta _currentContextMeta = const VerificationMeta(
+    'currentContext',
+  );
+  late final GeneratedColumn<String> currentContext = GeneratedColumn<String>(
+    'current_context',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _highWaterMeta = const VerificationMeta(
+    'highWater',
+  );
+  late final GeneratedColumn<int> highWater = GeneratedColumn<int>(
+    'high_water',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 0 CHECK (high_water >= 0)',
+    defaultValue: const CustomExpression('0'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    singleton,
+    required,
+    currentContext,
+    highWater,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'recovery_state';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RecoveryStateData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('singleton')) {
+      context.handle(
+        _singletonMeta,
+        singleton.isAcceptableOrUnknown(data['singleton']!, _singletonMeta),
+      );
+    }
+    if (data.containsKey('required')) {
+      context.handle(
+        _requiredMeta,
+        required.isAcceptableOrUnknown(data['required']!, _requiredMeta),
+      );
+    }
+    if (data.containsKey('current_context')) {
+      context.handle(
+        _currentContextMeta,
+        currentContext.isAcceptableOrUnknown(
+          data['current_context']!,
+          _currentContextMeta,
+        ),
+      );
+    }
+    if (data.containsKey('high_water')) {
+      context.handle(
+        _highWaterMeta,
+        highWater.isAcceptableOrUnknown(data['high_water']!, _highWaterMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {singleton};
+  @override
+  RecoveryStateData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RecoveryStateData(
+      singleton: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}singleton'],
+      )!,
+      required: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}required'],
+      )!,
+      currentContext: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}current_context'],
+      ),
+      highWater: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}high_water'],
+      )!,
+    );
+  }
+
+  @override
+  RecoveryState createAlias(String alias) {
+    return RecoveryState(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class RecoveryStateData extends DataClass
+    implements Insertable<RecoveryStateData> {
+  final int singleton;
+  final int required;
+  final String? currentContext;
+  final int highWater;
+  const RecoveryStateData({
+    required this.singleton,
+    required this.required,
+    this.currentContext,
+    required this.highWater,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['singleton'] = Variable<int>(singleton);
+    map['required'] = Variable<int>(required);
+    if (!nullToAbsent || currentContext != null) {
+      map['current_context'] = Variable<String>(currentContext);
+    }
+    map['high_water'] = Variable<int>(highWater);
+    return map;
+  }
+
+  RecoveryStateCompanion toCompanion(bool nullToAbsent) {
+    return RecoveryStateCompanion(
+      singleton: Value(singleton),
+      required: Value(required),
+      currentContext: currentContext == null && nullToAbsent
+          ? const Value.absent()
+          : Value(currentContext),
+      highWater: Value(highWater),
+    );
+  }
+
+  factory RecoveryStateData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RecoveryStateData(
+      singleton: serializer.fromJson<int>(json['singleton']),
+      required: serializer.fromJson<int>(json['required']),
+      currentContext: serializer.fromJson<String?>(json['current_context']),
+      highWater: serializer.fromJson<int>(json['high_water']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'singleton': serializer.toJson<int>(singleton),
+      'required': serializer.toJson<int>(required),
+      'current_context': serializer.toJson<String?>(currentContext),
+      'high_water': serializer.toJson<int>(highWater),
+    };
+  }
+
+  RecoveryStateData copyWith({
+    int? singleton,
+    int? required,
+    Value<String?> currentContext = const Value.absent(),
+    int? highWater,
+  }) => RecoveryStateData(
+    singleton: singleton ?? this.singleton,
+    required: required ?? this.required,
+    currentContext: currentContext.present
+        ? currentContext.value
+        : this.currentContext,
+    highWater: highWater ?? this.highWater,
+  );
+  RecoveryStateData copyWithCompanion(RecoveryStateCompanion data) {
+    return RecoveryStateData(
+      singleton: data.singleton.present ? data.singleton.value : this.singleton,
+      required: data.required.present ? data.required.value : this.required,
+      currentContext: data.currentContext.present
+          ? data.currentContext.value
+          : this.currentContext,
+      highWater: data.highWater.present ? data.highWater.value : this.highWater,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RecoveryStateData(')
+          ..write('singleton: $singleton, ')
+          ..write('required: $required, ')
+          ..write('currentContext: $currentContext, ')
+          ..write('highWater: $highWater')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(singleton, required, currentContext, highWater);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RecoveryStateData &&
+          other.singleton == this.singleton &&
+          other.required == this.required &&
+          other.currentContext == this.currentContext &&
+          other.highWater == this.highWater);
+}
+
+class RecoveryStateCompanion extends UpdateCompanion<RecoveryStateData> {
+  final Value<int> singleton;
+  final Value<int> required;
+  final Value<String?> currentContext;
+  final Value<int> highWater;
+  const RecoveryStateCompanion({
+    this.singleton = const Value.absent(),
+    this.required = const Value.absent(),
+    this.currentContext = const Value.absent(),
+    this.highWater = const Value.absent(),
+  });
+  RecoveryStateCompanion.insert({
+    this.singleton = const Value.absent(),
+    this.required = const Value.absent(),
+    this.currentContext = const Value.absent(),
+    this.highWater = const Value.absent(),
+  });
+  static Insertable<RecoveryStateData> custom({
+    Expression<int>? singleton,
+    Expression<int>? required,
+    Expression<String>? currentContext,
+    Expression<int>? highWater,
+  }) {
+    return RawValuesInsertable({
+      if (singleton != null) 'singleton': singleton,
+      if (required != null) 'required': required,
+      if (currentContext != null) 'current_context': currentContext,
+      if (highWater != null) 'high_water': highWater,
+    });
+  }
+
+  RecoveryStateCompanion copyWith({
+    Value<int>? singleton,
+    Value<int>? required,
+    Value<String?>? currentContext,
+    Value<int>? highWater,
+  }) {
+    return RecoveryStateCompanion(
+      singleton: singleton ?? this.singleton,
+      required: required ?? this.required,
+      currentContext: currentContext ?? this.currentContext,
+      highWater: highWater ?? this.highWater,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (singleton.present) {
+      map['singleton'] = Variable<int>(singleton.value);
+    }
+    if (required.present) {
+      map['required'] = Variable<int>(required.value);
+    }
+    if (currentContext.present) {
+      map['current_context'] = Variable<String>(currentContext.value);
+    }
+    if (highWater.present) {
+      map['high_water'] = Variable<int>(highWater.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RecoveryStateCompanion(')
+          ..write('singleton: $singleton, ')
+          ..write('required: $required, ')
+          ..write('currentContext: $currentContext, ')
+          ..write('highWater: $highWater')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class HistoricalReceipts extends Table
+    with TableInfo<HistoricalReceipts, HistoricalReceipt> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  HistoricalReceipts(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _mutationIdMeta = const VerificationMeta(
+    'mutationId',
+  );
+  late final GeneratedColumn<String> mutationId = GeneratedColumn<String>(
+    'mutation_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _evidenceMeta = const VerificationMeta(
+    'evidence',
+  );
+  late final GeneratedColumn<String> evidence = GeneratedColumn<String>(
+    'evidence',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [mutationId, evidence];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'historical_receipts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<HistoricalReceipt> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('mutation_id')) {
+      context.handle(
+        _mutationIdMeta,
+        mutationId.isAcceptableOrUnknown(data['mutation_id']!, _mutationIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mutationIdMeta);
+    }
+    if (data.containsKey('evidence')) {
+      context.handle(
+        _evidenceMeta,
+        evidence.isAcceptableOrUnknown(data['evidence']!, _evidenceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_evidenceMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {mutationId};
+  @override
+  HistoricalReceipt map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HistoricalReceipt(
+      mutationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mutation_id'],
+      )!,
+      evidence: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}evidence'],
+      )!,
+    );
+  }
+
+  @override
+  HistoricalReceipts createAlias(String alias) {
+    return HistoricalReceipts(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class HistoricalReceipt extends DataClass
+    implements Insertable<HistoricalReceipt> {
+  final String mutationId;
+  final String evidence;
+  const HistoricalReceipt({required this.mutationId, required this.evidence});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['mutation_id'] = Variable<String>(mutationId);
+    map['evidence'] = Variable<String>(evidence);
+    return map;
+  }
+
+  HistoricalReceiptsCompanion toCompanion(bool nullToAbsent) {
+    return HistoricalReceiptsCompanion(
+      mutationId: Value(mutationId),
+      evidence: Value(evidence),
+    );
+  }
+
+  factory HistoricalReceipt.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HistoricalReceipt(
+      mutationId: serializer.fromJson<String>(json['mutation_id']),
+      evidence: serializer.fromJson<String>(json['evidence']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'mutation_id': serializer.toJson<String>(mutationId),
+      'evidence': serializer.toJson<String>(evidence),
+    };
+  }
+
+  HistoricalReceipt copyWith({String? mutationId, String? evidence}) =>
+      HistoricalReceipt(
+        mutationId: mutationId ?? this.mutationId,
+        evidence: evidence ?? this.evidence,
+      );
+  HistoricalReceipt copyWithCompanion(HistoricalReceiptsCompanion data) {
+    return HistoricalReceipt(
+      mutationId: data.mutationId.present
+          ? data.mutationId.value
+          : this.mutationId,
+      evidence: data.evidence.present ? data.evidence.value : this.evidence,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HistoricalReceipt(')
+          ..write('mutationId: $mutationId, ')
+          ..write('evidence: $evidence')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(mutationId, evidence);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HistoricalReceipt &&
+          other.mutationId == this.mutationId &&
+          other.evidence == this.evidence);
+}
+
+class HistoricalReceiptsCompanion extends UpdateCompanion<HistoricalReceipt> {
+  final Value<String> mutationId;
+  final Value<String> evidence;
+  final Value<int> rowid;
+  const HistoricalReceiptsCompanion({
+    this.mutationId = const Value.absent(),
+    this.evidence = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  HistoricalReceiptsCompanion.insert({
+    required String mutationId,
+    required String evidence,
+    this.rowid = const Value.absent(),
+  }) : mutationId = Value(mutationId),
+       evidence = Value(evidence);
+  static Insertable<HistoricalReceipt> custom({
+    Expression<String>? mutationId,
+    Expression<String>? evidence,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (mutationId != null) 'mutation_id': mutationId,
+      if (evidence != null) 'evidence': evidence,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  HistoricalReceiptsCompanion copyWith({
+    Value<String>? mutationId,
+    Value<String>? evidence,
+    Value<int>? rowid,
+  }) {
+    return HistoricalReceiptsCompanion(
+      mutationId: mutationId ?? this.mutationId,
+      evidence: evidence ?? this.evidence,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (mutationId.present) {
+      map['mutation_id'] = Variable<String>(mutationId.value);
+    }
+    if (evidence.present) {
+      map['evidence'] = Variable<String>(evidence.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HistoricalReceiptsCompanion(')
+          ..write('mutationId: $mutationId, ')
+          ..write('evidence: $evidence, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$TrainingDatabase extends GeneratedDatabase {
   _$TrainingDatabase(QueryExecutor e) : super(e);
   $TrainingDatabaseManager get managers => $TrainingDatabaseManager(this);
@@ -4531,6 +5294,8 @@ abstract class _$TrainingDatabase extends GeneratedDatabase {
   late final SyncMetadata syncMetadata = SyncMetadata(this);
   late final BootstrapStage bootstrapStage = BootstrapStage(this);
   late final BootstrapPages bootstrapPages = BootstrapPages(this);
+  late final RecoveryState recoveryState = RecoveryState(this);
+  late final HistoricalReceipts historicalReceipts = HistoricalReceipts(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4551,6 +5316,8 @@ abstract class _$TrainingDatabase extends GeneratedDatabase {
     syncMetadata,
     bootstrapStage,
     bootstrapPages,
+    recoveryState,
+    historicalReceipts,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -6385,6 +7152,9 @@ typedef $OutboxCreateCompanionBuilder = OutboxCompanion Function({
   Value<int> attemptCount,
   Value<String?> lastError,
   Value<String?> requestDigest,
+  Value<int> wireVersion,
+  Value<String?> originContext,
+  Value<String?> acceptedContext,
   Value<int> rowid,
 });
 typedef $OutboxUpdateCompanionBuilder = OutboxCompanion Function({
@@ -6400,6 +7170,9 @@ typedef $OutboxUpdateCompanionBuilder = OutboxCompanion Function({
   Value<int> attemptCount,
   Value<String?> lastError,
   Value<String?> requestDigest,
+  Value<int> wireVersion,
+  Value<String?> originContext,
+  Value<String?> acceptedContext,
   Value<int> rowid,
 });
 
@@ -6468,6 +7241,21 @@ class $OutboxFilterComposer extends Composer<_$TrainingDatabase, Outbox> {
 
   ColumnFilters<String> get requestDigest => $composableBuilder(
     column: $table.requestDigest,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get wireVersion => $composableBuilder(
+    column: $table.wireVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originContext => $composableBuilder(
+    column: $table.originContext,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get acceptedContext => $composableBuilder(
+    column: $table.acceptedContext,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -6539,6 +7327,21 @@ class $OutboxOrderingComposer extends Composer<_$TrainingDatabase, Outbox> {
     column: $table.requestDigest,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get wireVersion => $composableBuilder(
+    column: $table.wireVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originContext => $composableBuilder(
+    column: $table.originContext,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get acceptedContext => $composableBuilder(
+    column: $table.acceptedContext,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $OutboxAnnotationComposer extends Composer<_$TrainingDatabase, Outbox> {
@@ -6598,6 +7401,21 @@ class $OutboxAnnotationComposer extends Composer<_$TrainingDatabase, Outbox> {
     column: $table.requestDigest,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get wireVersion => $composableBuilder(
+    column: $table.wireVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get originContext => $composableBuilder(
+    column: $table.originContext,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get acceptedContext => $composableBuilder(
+    column: $table.acceptedContext,
+    builder: (column) => column,
+  );
 }
 
 class $OutboxTableManager
@@ -6640,6 +7458,9 @@ class $OutboxTableManager
                 Value<int> attemptCount = const Value.absent(),
                 Value<String?> lastError = const Value.absent(),
                 Value<String?> requestDigest = const Value.absent(),
+                Value<int> wireVersion = const Value.absent(),
+                Value<String?> originContext = const Value.absent(),
+                Value<String?> acceptedContext = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => OutboxCompanion(
                 mutationId: mutationId,
@@ -6654,6 +7475,9 @@ class $OutboxTableManager
                 attemptCount: attemptCount,
                 lastError: lastError,
                 requestDigest: requestDigest,
+                wireVersion: wireVersion,
+                originContext: originContext,
+                acceptedContext: acceptedContext,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -6670,6 +7494,9 @@ class $OutboxTableManager
                 Value<int> attemptCount = const Value.absent(),
                 Value<String?> lastError = const Value.absent(),
                 Value<String?> requestDigest = const Value.absent(),
+                Value<int> wireVersion = const Value.absent(),
+                Value<String?> originContext = const Value.absent(),
+                Value<String?> acceptedContext = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => OutboxCompanion.insert(
                 mutationId: mutationId,
@@ -6684,6 +7511,9 @@ class $OutboxTableManager
                 attemptCount: attemptCount,
                 lastError: lastError,
                 requestDigest: requestDigest,
+                wireVersion: wireVersion,
+                originContext: originContext,
+                acceptedContext: acceptedContext,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -6721,12 +7551,14 @@ typedef $ShadowsCreateCompanionBuilder = ShadowsCompanion Function({
   required String sessionId,
   required int revision,
   Value<String?> projection,
+  Value<String?> recoveryContext,
   Value<int> rowid,
 });
 typedef $ShadowsUpdateCompanionBuilder = ShadowsCompanion Function({
   Value<String> sessionId,
   Value<int> revision,
   Value<String?> projection,
+  Value<String?> recoveryContext,
   Value<int> rowid,
 });
 
@@ -6750,6 +7582,11 @@ class $ShadowsFilterComposer extends Composer<_$TrainingDatabase, Shadows> {
 
   ColumnFilters<String> get projection => $composableBuilder(
     column: $table.projection,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get recoveryContext => $composableBuilder(
+    column: $table.recoveryContext,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -6776,6 +7613,11 @@ class $ShadowsOrderingComposer extends Composer<_$TrainingDatabase, Shadows> {
     column: $table.projection,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get recoveryContext => $composableBuilder(
+    column: $table.recoveryContext,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $ShadowsAnnotationComposer extends Composer<_$TrainingDatabase, Shadows> {
@@ -6794,6 +7636,11 @@ class $ShadowsAnnotationComposer extends Composer<_$TrainingDatabase, Shadows> {
 
   GeneratedColumn<String> get projection => $composableBuilder(
     column: $table.projection,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get recoveryContext => $composableBuilder(
+    column: $table.recoveryContext,
     builder: (column) => column,
   );
 }
@@ -6829,11 +7676,13 @@ class $ShadowsTableManager
                 Value<String> sessionId = const Value.absent(),
                 Value<int> revision = const Value.absent(),
                 Value<String?> projection = const Value.absent(),
+                Value<String?> recoveryContext = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ShadowsCompanion(
                 sessionId: sessionId,
                 revision: revision,
                 projection: projection,
+                recoveryContext: recoveryContext,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -6841,11 +7690,13 @@ class $ShadowsTableManager
                 required String sessionId,
                 required int revision,
                 Value<String?> projection = const Value.absent(),
+                Value<String?> recoveryContext = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ShadowsCompanion.insert(
                 sessionId: sessionId,
                 revision: revision,
                 projection: projection,
+                recoveryContext: recoveryContext,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -8148,6 +8999,358 @@ typedef $BootstrapPagesProcessedTableManager =
       BootstrapPage,
       PrefetchHooks Function()
     >;
+typedef $RecoveryStateCreateCompanionBuilder = RecoveryStateCompanion Function({
+  Value<int> singleton,
+  Value<int> required,
+  Value<String?> currentContext,
+  Value<int> highWater,
+});
+typedef $RecoveryStateUpdateCompanionBuilder = RecoveryStateCompanion Function({
+  Value<int> singleton,
+  Value<int> required,
+  Value<String?> currentContext,
+  Value<int> highWater,
+});
+
+class $RecoveryStateFilterComposer
+    extends Composer<_$TrainingDatabase, RecoveryState> {
+  $RecoveryStateFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get singleton => $composableBuilder(
+    column: $table.singleton,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get required => $composableBuilder(
+    column: $table.required,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currentContext => $composableBuilder(
+    column: $table.currentContext,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get highWater => $composableBuilder(
+    column: $table.highWater,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $RecoveryStateOrderingComposer
+    extends Composer<_$TrainingDatabase, RecoveryState> {
+  $RecoveryStateOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get singleton => $composableBuilder(
+    column: $table.singleton,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get required => $composableBuilder(
+    column: $table.required,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currentContext => $composableBuilder(
+    column: $table.currentContext,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get highWater => $composableBuilder(
+    column: $table.highWater,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $RecoveryStateAnnotationComposer
+    extends Composer<_$TrainingDatabase, RecoveryState> {
+  $RecoveryStateAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get singleton =>
+      $composableBuilder(column: $table.singleton, builder: (column) => column);
+
+  GeneratedColumn<int> get required =>
+      $composableBuilder(column: $table.required, builder: (column) => column);
+
+  GeneratedColumn<String> get currentContext => $composableBuilder(
+    column: $table.currentContext,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get highWater =>
+      $composableBuilder(column: $table.highWater, builder: (column) => column);
+}
+
+class $RecoveryStateTableManager
+    extends
+        RootTableManager<
+          _$TrainingDatabase,
+          RecoveryState,
+          RecoveryStateData,
+          $RecoveryStateFilterComposer,
+          $RecoveryStateOrderingComposer,
+          $RecoveryStateAnnotationComposer,
+          $RecoveryStateCreateCompanionBuilder,
+          $RecoveryStateUpdateCompanionBuilder,
+          (
+            RecoveryStateData,
+            BaseReferences<
+              _$TrainingDatabase,
+              RecoveryState,
+              RecoveryStateData
+            >,
+          ),
+          RecoveryStateData,
+          PrefetchHooks Function()
+        > {
+  $RecoveryStateTableManager(_$TrainingDatabase db, RecoveryState table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $RecoveryStateFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $RecoveryStateOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $RecoveryStateAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> singleton = const Value.absent(),
+                Value<int> required = const Value.absent(),
+                Value<String?> currentContext = const Value.absent(),
+                Value<int> highWater = const Value.absent(),
+              }) => RecoveryStateCompanion(
+                singleton: singleton,
+                required: required,
+                currentContext: currentContext,
+                highWater: highWater,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> singleton = const Value.absent(),
+                Value<int> required = const Value.absent(),
+                Value<String?> currentContext = const Value.absent(),
+                Value<int> highWater = const Value.absent(),
+              }) => RecoveryStateCompanion.insert(
+                singleton: singleton,
+                required: required,
+                currentContext: currentContext,
+                highWater: highWater,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<RecoveryState, RecoveryStateData>(table),
+                  BaseReferences<
+                    _$TrainingDatabase,
+                    RecoveryState,
+                    RecoveryStateData
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $RecoveryStateProcessedTableManager =
+    ProcessedTableManager<
+      _$TrainingDatabase,
+      RecoveryState,
+      RecoveryStateData,
+      $RecoveryStateFilterComposer,
+      $RecoveryStateOrderingComposer,
+      $RecoveryStateAnnotationComposer,
+      $RecoveryStateCreateCompanionBuilder,
+      $RecoveryStateUpdateCompanionBuilder,
+      (
+        RecoveryStateData,
+        BaseReferences<_$TrainingDatabase, RecoveryState, RecoveryStateData>,
+      ),
+      RecoveryStateData,
+      PrefetchHooks Function()
+    >;
+typedef $HistoricalReceiptsCreateCompanionBuilder =
+    HistoricalReceiptsCompanion Function({
+      required String mutationId,
+      required String evidence,
+      Value<int> rowid,
+    });
+typedef $HistoricalReceiptsUpdateCompanionBuilder =
+    HistoricalReceiptsCompanion Function({
+      Value<String> mutationId,
+      Value<String> evidence,
+      Value<int> rowid,
+    });
+
+class $HistoricalReceiptsFilterComposer
+    extends Composer<_$TrainingDatabase, HistoricalReceipts> {
+  $HistoricalReceiptsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get mutationId => $composableBuilder(
+    column: $table.mutationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get evidence => $composableBuilder(
+    column: $table.evidence,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $HistoricalReceiptsOrderingComposer
+    extends Composer<_$TrainingDatabase, HistoricalReceipts> {
+  $HistoricalReceiptsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get mutationId => $composableBuilder(
+    column: $table.mutationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get evidence => $composableBuilder(
+    column: $table.evidence,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $HistoricalReceiptsAnnotationComposer
+    extends Composer<_$TrainingDatabase, HistoricalReceipts> {
+  $HistoricalReceiptsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get mutationId => $composableBuilder(
+    column: $table.mutationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get evidence =>
+      $composableBuilder(column: $table.evidence, builder: (column) => column);
+}
+
+class $HistoricalReceiptsTableManager
+    extends
+        RootTableManager<
+          _$TrainingDatabase,
+          HistoricalReceipts,
+          HistoricalReceipt,
+          $HistoricalReceiptsFilterComposer,
+          $HistoricalReceiptsOrderingComposer,
+          $HistoricalReceiptsAnnotationComposer,
+          $HistoricalReceiptsCreateCompanionBuilder,
+          $HistoricalReceiptsUpdateCompanionBuilder,
+          (
+            HistoricalReceipt,
+            BaseReferences<
+              _$TrainingDatabase,
+              HistoricalReceipts,
+              HistoricalReceipt
+            >,
+          ),
+          HistoricalReceipt,
+          PrefetchHooks Function()
+        > {
+  $HistoricalReceiptsTableManager(
+    _$TrainingDatabase db,
+    HistoricalReceipts table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $HistoricalReceiptsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $HistoricalReceiptsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $HistoricalReceiptsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> mutationId = const Value.absent(),
+                Value<String> evidence = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => HistoricalReceiptsCompanion(
+                mutationId: mutationId,
+                evidence: evidence,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String mutationId,
+                required String evidence,
+                Value<int> rowid = const Value.absent(),
+              }) => HistoricalReceiptsCompanion.insert(
+                mutationId: mutationId,
+                evidence: evidence,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<HistoricalReceipts, HistoricalReceipt>(table),
+                  BaseReferences<
+                    _$TrainingDatabase,
+                    HistoricalReceipts,
+                    HistoricalReceipt
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $HistoricalReceiptsProcessedTableManager =
+    ProcessedTableManager<
+      _$TrainingDatabase,
+      HistoricalReceipts,
+      HistoricalReceipt,
+      $HistoricalReceiptsFilterComposer,
+      $HistoricalReceiptsOrderingComposer,
+      $HistoricalReceiptsAnnotationComposer,
+      $HistoricalReceiptsCreateCompanionBuilder,
+      $HistoricalReceiptsUpdateCompanionBuilder,
+      (
+        HistoricalReceipt,
+        BaseReferences<
+          _$TrainingDatabase,
+          HistoricalReceipts,
+          HistoricalReceipt
+        >,
+      ),
+      HistoricalReceipt,
+      PrefetchHooks Function()
+    >;
 
 class $TrainingDatabaseManager {
   final _$TrainingDatabase _db;
@@ -8175,4 +9378,8 @@ class $TrainingDatabaseManager {
       $BootstrapStageTableManager(_db, _db.bootstrapStage);
   $BootstrapPagesTableManager get bootstrapPages =>
       $BootstrapPagesTableManager(_db, _db.bootstrapPages);
+  $RecoveryStateTableManager get recoveryState =>
+      $RecoveryStateTableManager(_db, _db.recoveryState);
+  $HistoricalReceiptsTableManager get historicalReceipts =>
+      $HistoricalReceiptsTableManager(_db, _db.historicalReceipts);
 }

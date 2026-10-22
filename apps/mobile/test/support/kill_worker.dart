@@ -30,6 +30,15 @@ Map<String, dynamic> entry(Json root, int index) {
 Future<void> main(List<String> args) async {
   final file = File(args[0]);
   final stage = args[1];
+  if (![
+    'before_commit',
+    'during_commit',
+    'after_commit',
+    'during_freeze',
+    'after_freeze',
+  ].contains(stage)) {
+    throw ArgumentError('Unknown controlled kill boundary');
+  }
   final db = TrainingDatabase(
     NativeDatabase.createInBackground(
       file,
@@ -52,15 +61,47 @@ Future<void> main(List<String> args) async {
   );
   final repo = WorkoutRepository(db, owner);
   await repo.initialize();
+  if (args.length > 2 && args[2] == 'v2') {
+    // Local provenance fixture only; no provider or cloud calls participate.
+    await repo.installRecoveryContext(
+      RecoveryContext(
+        ownerId: owner,
+        environmentId: '30000000-0000-4000-8000-000000000001',
+        incarnation: '30000000-0000-4000-8000-000000000002',
+        generation: '30000000-0000-4000-8000-000000000003',
+        activationSerial: 1,
+        evidenceOrder: 2,
+        evidenceDigest: 'a' * 64,
+        erasureEpoch: 0,
+        position: 0,
+      ),
+    );
+  }
   final id = await repo.startFoundationWorkout();
   await repo.commit(id, 'record_set', entry((await repo.workout(id))!, 0));
   final set =
       allSets((await repo.workout(id))!).elementAt(1)['set_id'] as String;
   await repo.saveDraft(set, {'reps': '7'});
-  final frozen = await repo.prepareHead(id);
-  stdout.writeln(
+  void seeded(String frozen) => stdout.writeln(
     'SEEDED ${jsonEncode({'id': id, 'set': set, 'frozen': frozen, 'process_id': pid})}',
   );
+  if (stage == 'during_freeze') {
+    final original =
+        (await db
+                .customSelect(
+                  'SELECT operation FROM outbox ORDER BY local_seq LIMIT 1',
+                )
+                .getSingle())
+            .read<String>('operation');
+    seeded(original);
+    await db.customStatement(
+      'CREATE TRIGGER qualification_stop BEFORE UPDATE OF frozen_body ON outbox BEGIN SELECT qualification_pause(); END',
+    );
+    await repo.prepareHead(id);
+    throw StateError('Freeze worker unexpectedly resumed');
+  }
+  final frozen = await repo.prepareHead(id);
+  seeded(frozen!);
   if (stage == 'during_commit') {
     await db.customStatement(
       'CREATE TRIGGER qualification_stop BEFORE INSERT ON outbox BEGIN SELECT qualification_pause(); END',

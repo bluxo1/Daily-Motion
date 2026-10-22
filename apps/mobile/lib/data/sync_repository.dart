@@ -33,12 +33,17 @@ extension SynchronizationRepository on WorkoutRepository {
 
   Future<int> attentionCount() => db.transaction(() async {
     await _guard();
-    return (await db
-            .customSelect(
-              "SELECT count(*) AS count FROM sessions WHERE has_conflict=1",
-            )
-            .getSingle())
-        .read<int>('count');
+    // Historical evidence itself is durable attention. Deriving this from the
+    // committed receipt avoids a second flag or a later upload attempt, while
+    // leaving the pending command, working branch and acknowledgement untouched.
+    return (await db.customSelect(
+      '''SELECT (SELECT count(*) FROM sessions WHERE has_conflict=1) +
+                (SELECT count(DISTINCT o.session_id) FROM outbox o
+                 WHERE o.state='pending' AND
+                   (o.last_error IN ('timeline_reconciliation_required','recovery_metadata_unverified')
+                    OR EXISTS(SELECT 1 FROM historical_receipts h
+                              WHERE h.mutation_id=o.mutation_id))) AS count''',
+    ).getSingle()).read<int>('count');
   });
 
   Future<bool> remoteDisabled() async {
@@ -65,8 +70,12 @@ extension SynchronizationRepository on WorkoutRepository {
           )
           .getSingle();
       final frozen = row.read<String>('frozen_body');
-      validateTransport('Operation', jsonDecode(frozen) as Json);
-      validateEnvelope(jsonDecode(frozen) as Json);
+      final operation = jsonDecode(frozen) as Json;
+      validateTransport(
+        operation['schema_version'] == 2 ? 'OperationV2' : 'Operation',
+        operation,
+      );
+      validateEnvelope(_withoutRecoveryFields(operation));
       await db.customStatement(
         'UPDATE outbox SET attempt_count=attempt_count+1,request_digest=? WHERE mutation_id=?',
         [sha256.convert(utf8.encode(frozen)).toString(), id],
@@ -137,6 +146,7 @@ extension SynchronizationRepository on WorkoutRepository {
   });
 
   Future<void> _installAck(Json result) async {
+    await _requireLegacySync();
     final row = await db
         .customSelect(
           'SELECT * FROM outbox WHERE mutation_id=?',
@@ -287,6 +297,7 @@ extension SynchronizationRepository on WorkoutRepository {
       'outbox',
       'bootstrap_pages',
       'bootstrap_stage',
+      'historical_receipts',
     ]) {
       await db.customStatement('DELETE FROM $table');
     }
@@ -294,6 +305,7 @@ extension SynchronizationRepository on WorkoutRepository {
       "UPDATE sync_metadata SET remote_disabled=1,last_error='account_inactive',next_attempt=NULL",
     );
     await db.customStatement('UPDATE local_identity SET locked=1,cursor=NULL');
+    await db.customStatement('UPDATE recovery_state SET current_context=NULL');
   });
 
   Future<void> installPull(
@@ -301,6 +313,7 @@ extension SynchronizationRepository on WorkoutRepository {
     required String? requestedCursor,
   }) => db.transaction(() async {
     await _guard();
+    await _requireLegacySync();
     _ownerContext(page.json);
     final meta = await syncMetadata();
     if (meta['cursor'] != requestedCursor) {
@@ -636,6 +649,7 @@ extension SynchronizationRepository on WorkoutRepository {
   Future<void> stageBootstrap(BootstrapManifestDto manifest) =>
       db.transaction(() async {
         await _guard();
+        await _requireLegacySync();
         _ownerContext(manifest.json);
         final meta = await syncMetadata();
         if (manifest.installationId != meta['installation_id'] ||
@@ -661,6 +675,7 @@ extension SynchronizationRepository on WorkoutRepository {
   Future<void> stageBootstrapPage(int index, SnapshotPageDto page) =>
       db.transaction(() async {
         await _guard();
+        await _requireLegacySync();
         final manifest = await stagedBootstrap();
         if (manifest == null || index < 0 || index >= manifest.pageCount) {
           throw const ContractViolation();
@@ -691,6 +706,7 @@ extension SynchronizationRepository on WorkoutRepository {
     MeResponseDto current,
   ) => db.transaction(() async {
     await _guard();
+    await _requireLegacySync();
     _ownerContext(current.json);
     final manifest = await stagedBootstrap();
     final meta = await syncMetadata();

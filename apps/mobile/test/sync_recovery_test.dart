@@ -14,6 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'repository_test.dart' show recordPayload, fixture;
 import 'support/sync_server.dart';
+import 'support/legacy_schema.dart';
 
 void main() {
   late TrainingDatabase db;
@@ -531,6 +532,7 @@ void main() {
     await repo.saveDraft(setId, {'reps': '7'});
     final frozen = await repo.prepareHead(id);
     final timer = await repo.timerDeadline(id);
+    await reconstructSchemaThree(db);
     // Reconstruct the exact previous SQL schema; no prior released schema exists.
     for (final table in [
       'sync_metadata',
