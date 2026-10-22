@@ -1960,3 +1960,83 @@ internals and unknown advisories are outside this result. Final repository check
   managed recovery/processor and named operator/reviewer gates remain open.
   Phase 0 is **in progress** and Phase 1 **unstarted**.
   [Machine-readable results](evidence/phase0-integration-recovery-2026-10-20.json).
+
+## Recovery Protocol V2 local implementation in progress — 2026-10-22
+
+The uncommitted work in `restore-timeline-investigation-20261021` implements
+components of the [V2 specification](RECOVERY_PROTOCOL_V2_SPEC.md). The
+[proposed ADR](ADR_RECOVERY_PROTOCOL_V2_PROPOSED.md) and specification are
+preserved unchanged. The [autonomous work log](../RECOVERY_PROTOCOL_V2_AUTONOMOUS_WORKLOG.md)
+records requirements, exact commands, failures, corrections and remaining work.
+This is incomplete local implementation, not protocol activation, accepted
+security review, provider qualification or release readiness.
+
+The current changes provide generated schema-2 command provenance and a shared
+Python/Dart digest fixture; internal evidence rules and a file-backed test-only
+authority emulator; additive PostgreSQL 0004 private control/attempt/publication
+metadata with forced owner RLS; and shared/exclusive transaction fencing.
+An internal B1 primitive now atomically reserves a stable attempt/frozen command
+and owner publication hold for existing owners, with fresh under-lock binding,
+exact retry and retained-receipt replay guards. Internal B3 now commits one private
+domain/feed outcome, pending receipt, affected-ID/result marker and evidence
+anchor atomically, retaining the hold and leaving V/certified high-water unchanged.
+Database guards prevent rewriting the original binding or committed marker/result.
+Only local tests invoke these primitives; authenticated authority/actual-target
+adapters, B4/B5 certification/publication and public V2 admission remain unfinished.
+No target is activated or reopened. Before any recovery control is installed,
+the capability release retains v1 admission. Any installed recovery state,
+including a copied uncertified OPEN row, denies ordinary cloud access. Denial
+precedes account-state responses and never fabricates account erasure. Runtime
+control grants are read-only; unsafe downgrade requires compatible forward repair.
+The full independent certification/publication pipeline remains unfinished.
+Drift schema 4 now preserves old blobs and captures known/unknown command origin
+atomically; failed migrations roll back both DDL and schema version. Newer local
+schemas are refused. Internal historical-result persistence stores original
+evidence separately without acknowledging/rebasing a divergent working branch.
+The client still lacks the reviewed certified V2 transport/current-result and
+bootstrap installation paths; these internal boundaries do not activate V2.
+
+Actual disposable Windows PostgreSQL and file-backed SQLite checks cover lock
+ordering through `pg_locks`, lost-response/checkpoint retries, unresolved attempts,
+historical evidence, bounds, owner isolation, populated 0003→0004 preservation,
+single active attempts and recovery-denial local availability. A full local
+regression passes **398 Python tests, zero skips/failures**, including existing
+restore tests and the wrapper executing **nine connected Flutter HTTP cases**.
+It uses newly created loopback clusters, restricted runtime roles and synthetic
+data. An earlier run had four failures; the log records the corrected downgrade
+expectation, table-owner fixture and actual SCRAM password-denial setup. The
+evidence-reducer checks cover attempt identity uniqueness and minimal terminal
+outcomes, which survive
+authority-emulator restart without primary payloads; altered result bindings
+fail closed. Ruff formatting/lint and strict mypy pass. Full ordinary Flutter
+completed with **211 passes, 12 explicit skips**. The eleven-case local recovery
+run includes named SQ01/SQ02/SQ06/SQ08/SQ10: actual OS-kill/freeze atomicity,
+historical branch preservation, migration across schemas 1/2/3, blocked-network
+local saves and grant-loss/account isolation. Flutter analysis has zero issues.
+Generated OpenAPI, transport schemas/
+limits and Drift outputs reproduce byte-for-byte and remain unchanged in the
+latest source review. Historical evidence now immediately requires attention
+after restart without another upload attempt or changes to the pending branch.
+Three fault/restart regressions first reproduced the missing attention state.
+The current full suite also verifies a Windows OS lock around native kill-test
+workers after a concurrent Dart native-asset DLL replacement failure was found
+and fixed; the failed report is preserved separately.
+
+The new exact-name/JUnit/Flutter completion guard explicitly rejects partial,
+omitted, skipped or incomplete qualification. Current component passes do not
+satisfy the complete PG/SQ/RC matrix. RC10/RC11 remain **NOT EXECUTED**; ordinary
+local reports cannot qualify provider consistency, encryption or custody.
+The current named-case assessment credits PG01/PG02/PG04/PG05/PG10/PG21 and those
+five SQ cases, leaving 31 local named cases missing. PG21 executes the actual
+baseline readiness module against the additive schema and verifies unsafe
+downgrade refusal; it does not deploy an old service or qualify source containment.
+[Machine-readable local evidence](evidence/recovery-protocol-v2-local-2026-10-22-iteration18.json)
+records exact report hashes and changed source fingerprints; it explicitly marks
+the full protocol, provider and physical-device qualification incomplete.
+
+No existing project database, hosted provider, production system, credential,
+specification, ADR or historical characterization receipt was modified. No commit,
+push, deployment, activation or hosted drill occurred. Independent authority,
+actual target/containment proof, committed-marker/abort proof acceptance,
+lifecycle/RPO policy and provider/custody qualification remain open. Phase 0
+remains in progress; no Phase 1 or physical-device gate is closed.
