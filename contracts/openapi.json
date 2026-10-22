@@ -839,6 +839,118 @@
         "title": "OperationError",
         "type": "object"
       },
+      "OperationV2": {
+        "additionalProperties": false,
+        "description": "Immutable DRP/2 command identity, captured when creating the local branch.\n\nActivation serial is admission evidence, not mutable command provenance.\nInherited validation counts these fields in the canonical command bound.\nDefining the contract does not activate a v2 endpoint or permit v1 restamping.",
+        "properties": {
+          "aggregate_id": {
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "title": "Aggregate Id",
+            "type": "string"
+          },
+          "aggregate_type": {
+            "const": "workout_session",
+            "title": "Aggregate Type",
+            "type": "string"
+          },
+          "command": {
+            "enum": [
+              "create_session",
+              "record_set",
+              "correct_set",
+              "complete_session",
+              "abandon_session",
+              "delete_session"
+            ],
+            "title": "Command",
+            "type": "string"
+          },
+          "environment_id": {
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "title": "Environment Id",
+            "type": "string"
+          },
+          "expected_revision": {
+            "maximum": 9223372036854775807,
+            "minimum": 0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "installation_id": {
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "title": "Installation Id",
+            "type": "string"
+          },
+          "mutation_id": {
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "title": "Mutation Id",
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "origin_generation": {
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "title": "Origin Generation",
+            "type": "string"
+          },
+          "origin_incarnation": {
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "title": "Origin Incarnation",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object",
+            "x-command-schemas": {
+              "abandon_session": "EmptyPayload",
+              "complete_session": "EmptyPayload",
+              "correct_set": "RecordSet",
+              "create_session": "CreateSession",
+              "delete_session": "EmptyPayload",
+              "record_set": "RecordSet"
+            }
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$",
+            "title": "Recorded At",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": 2,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "mutation_id",
+          "installation_id",
+          "aggregate_type",
+          "aggregate_id",
+          "expected_revision",
+          "command",
+          "occurred_at",
+          "recorded_at",
+          "payload",
+          "schema_version",
+          "environment_id",
+          "origin_incarnation",
+          "origin_generation"
+        ],
+        "title": "OperationV2",
+        "type": "object"
+      },
       "PlannedSet": {
         "additionalProperties": false,
         "properties": {
@@ -1124,6 +1236,31 @@
           "operations"
         ],
         "title": "PushRequest",
+        "type": "object"
+      },
+      "PushRequestV2": {
+        "additionalProperties": false,
+        "properties": {
+          "operations": {
+            "items": {
+              "$ref": "#/components/schemas/OperationV2"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Operations",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": 2,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "schema_version",
+          "operations"
+        ],
+        "title": "PushRequestV2",
         "type": "object"
       },
       "PushResponse": {
