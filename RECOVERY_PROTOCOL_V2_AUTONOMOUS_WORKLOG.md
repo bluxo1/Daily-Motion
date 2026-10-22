@@ -1368,3 +1368,87 @@ stopped and was restarted; a waiting-read confirmed healthy on 127.0.0.1:25432.
 
 Not claimed: physical-device durability, provider-dependent connected-hosted
 outcomes of the skipped external gates, or any release readiness.
+
+## 2026-10-22 — continuation after PR #10 squash merge
+
+The user requested current status and continued implementation. The merged
+baseline is signed main `3e0213151433bf3044d6bfb47d128d6b93e66ae6`, with the
+same tree as reviewed `78267c1`. Main CI run `39723025027` passes API, Linux
+mobile and macOS mobile; its API reports 490 passed and zero skips. Phase 0
+remains in progress, and Phase 1 has not started. Work continues on local branch
+`feat/recovery-v2-observation` from that baseline, in the existing clean worktree.
+
+Implemented an internal known-marker database observation component. It opens
+its own bounded READ COMMITTED session, takes the shared fence and ordered owner
+locks, and verifies the persisted B3 marker/request/result, pending receipt,
+original activation/owner/head, private feed, visible/pruned positions and
+erasure/retirement scope. It rejects borrowed transactions and privileged roles.
+No application rows change, no authority is called, and all locks close before
+return. The existing local launcher runs the new cases and requires their module
+in successful reports.
+
+This does not implement O3's authenticated certifier, approved certificate
+format or original-target continuity proof. It does not append certificates,
+advance V/H, clear a hold, publish a result, enable public V2 admission or settle
+uncertainty. CLOSED-target reconciliation and lost-marker resumption remain
+unavailable. The specification, proposed ADR and characterization are unchanged.
+
+Validation and corrections:
+
+- First focused Linux run: 22 passed, one new fixture failed because its account
+  retirement insert omitted `retired_at`; remaining cases were not executed.
+  Corrected the arrangement and preserved the first JUnit report.
+- Initial combined admission/effect/observation run: 107 passed, zero skips.
+  Review then added malformed deletion-feed shape and unsafe pruning-position
+  guards and regressions.
+- Final Linux/Docker PostgreSQL run: **109 passed / zero skips**, including
+  **46 new observation cases**, actual commit/rollback waits, exclusive-close
+  ordering, deletion suppression and lock-release checks.
+- Full owned native PostgreSQL/restore/connected run
+  `5914b372a0cd49afaef94a05f9226cff`: **536 passed / zero skips**, terminal
+  exit 0, component checks true, including the wrapper verifying nine connected
+  Flutter HTTP cases. CI's JUnit acceptance checker also passes.
+- Ruff: 65 formatted files, lint clean. Strict mypy: 18 source/script files.
+  Tooling: 24 passing tests. Generated OpenAPI/transport comparisons, docs,
+  credential, native configuration and archived receipt checks pass.
+
+[Machine-readable evidence](docs/evidence/recovery-observation-local-2026-10-22.json)
+records the source/report hashes and retained failure scope. New local component
+tests do not close additional named PG/SQ/RC qualification cases. RC10/RC11 remain
+NOT EXECUTED; provider/custody, physical hardware and O1–O12 acceptance remain
+open. At this local checkpoint, no feature commit, push, provider access,
+deployment or activation was performed. The next production boundary still needs the
+accepted O3 trust/certificate decision and independent review before B4/B5.
+
+## 2026-10-22 — observation review and authorized PR preparation
+
+The user explicitly authorized complete local review, concrete fixes, validation,
+signed commit/push and a feature PR, followed by CI fixes until green. Merging,
+deployment, provider changes and hosted drills remain excluded. The original
+checkout and unrelated worktrees/files are preserved.
+
+The standards and protocol reviews find no concrete defect within the declared
+known-marker component. They check fresh-session/fence/owner-lock ordering,
+actual commit/rollback observation, restricted roles, owner/lifecycle isolation,
+canonical persisted evidence and deletion suppression. Nondelete checks do not
+independently audit every normalized child or observation value; this limitation
+is now explicit in the implementation record and the separate
+[O3 proposal](docs/RECOVERY_O3_VERIFIER_PROPOSAL.md). The proposal covers trust,
+permissions, target continuity, certificate contents, append/publication ordering,
+failure cases and required reviewer decisions. It remains unapproved, grants no
+production B4/B5 authorization and does not replace independent security review.
+No behavior change or speculative refactoring is introduced by the review.
+The proposed specification/ADR, historical characterization and original local
+receipt are preserved. New review validation is recorded separately.
+
+Review validation: Linux/Docker PostgreSQL **109 passed / zero skips, failures or
+errors**, including 46 observation cases (284.22 seconds). Source/protected-doc
+hashes and all referenced original JUnit/log/launcher hashes match. The previous
+full native **536 passed / zero skips** remains valid retained evidence; it was
+not rerun during this review. Its JUnit acceptance guard passes again. Frozen
+dependencies check 46 packages; Ruff checks 65 files and lint passes; strict mypy
+checks 18 source/script files; all 24 tooling tests pass. Documentation links,
+credential, native static and archived mobile receipt checks pass, with zero new
+physical samples. [Review receipt](docs/evidence/recovery-observation-review-2026-10-22.json)
+keeps the fresh and retained runs distinct. Exact-head remote CI remains a later
+PR check, never implied by this local evidence.

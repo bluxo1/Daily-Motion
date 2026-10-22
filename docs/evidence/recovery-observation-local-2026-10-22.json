@@ -1,0 +1,119 @@
+{
+  "recorded_at_utc": "2026-10-22T05:01:28.498337+00:00",
+  "scope": "Local known-marker database observation component only",
+  "baseline_main_commit": "3e0213151433bf3044d6bfb47d128d6b93e66ae6",
+  "branch": "feat/recovery-v2-observation",
+  "source_state": "uncommitted local development",
+  "source_sha256": {
+    "services/api/src/daily_motion/recovery_observation.py": "0a2bc952131daec8e2cc4dc11bd1b51554e1704e16b0b532af3d3e3e81838d9b",
+    "services/api/tests/test_recovery_observation.py": "860412bda6520d52f6946f3dbeeb9652602fd675450526ae32c2c63e4609e891",
+    "tools/run_recovery_v2_local.py": "525533f73409e91f4d58ffce3acf49c7217a6caecf0a3588946b716626d4685d"
+  },
+  "protected_document_sha256": {
+    "docs/RECOVERY_PROTOCOL_V2_SPEC.md": "61ee2b5f4f035ce066c6719b0a1783f5427c08a5db438fe6d4c234d9bd4a54ac",
+    "docs/ADR_RECOVERY_PROTOCOL_V2_PROPOSED.md": "08bd8809dec6981de7ab657c55e682d32bd12e65e3f41af62ac5d873a39439a7",
+    "docs/RESTORE_TIMELINE_INVESTIGATION.md": "a38051ecb48bb2c6888b8150766a5fb87a652e16888ae1dd8a0a24db3e02f0f2"
+  },
+  "baseline_main_ci": {
+    "run": "https://github.com/bluxo1/Daily-Motion/actions/runs/39723025027",
+    "jobs": {
+      "api": "success",
+      "mobile (ubuntu-24.04)": "success",
+      "mobile (macos-15-intel)": "success"
+    },
+    "python_passed": 490,
+    "python_skipped": 0,
+    "scope": "Merged baseline only; does not test these uncommitted additions"
+  },
+  "linux_docker_regression": {
+    "path": ".tools/ci-recovery-verification/results/linux-recovery-observation-final.xml",
+    "sha256": "d632c75dbc56b791ffe12e8d63228bafbbe4ce6a7e3de44f20afb4d7a0ec69f8",
+    "cases": 109,
+    "passed": 109,
+    "skipped": 0,
+    "failed": 0,
+    "errors": 0,
+    "modules": {
+      "tests.test_recovery_effect": 23,
+      "tests.test_recovery_observation": 46,
+      "tests.test_recovery_protocol_v2": 40
+    }
+  },
+  "full_native_python_regression": {
+    "path": ".tools/recovery-v2-attempts/5914b372a0cd49afaef94a05f9226cff/pytest.xml",
+    "sha256": "41f141e170ee15eebf75d5156e3a88041b86ec9f80e83185b2b9e043096c2697",
+    "cases": 536,
+    "passed": 536,
+    "skipped": 0,
+    "failed": 0,
+    "errors": 0,
+    "modules": {
+      "tests.test_accounts": 21,
+      "tests.test_auth": 8,
+      "tests.test_auth_qualification_bridge": 32,
+      "tests.test_auth_rotation": 7,
+      "tests.test_connected_protocol": 5,
+      "tests.test_contracts": 22,
+      "tests.test_credential_guard": 9,
+      "tests.test_database_target": 21,
+      "tests.test_development_identity": 20,
+      "tests.test_flutter_connected": 7,
+      "tests.test_races": 4,
+      "tests.test_recovery": 14,
+      "tests.test_recovery_authority": 25,
+      "tests.test_recovery_contracts": 32,
+      "tests.test_recovery_effect": 23,
+      "tests.test_recovery_evidence": 128,
+      "tests.test_recovery_observation": 46,
+      "tests.test_recovery_protocol_v2": 40,
+      "tests.test_recovery_target": 18,
+      "tests.test_runtime_guard": 4,
+      "tests.test_staging": 41,
+      "tests.test_sync": 9
+    }
+  },
+  "full_native_launcher_receipt_sha256": "2074bcaf1e484c1ed47f1fba193e24687195add1dcd9570f17b907fae8c9c480",
+  "full_native_log_sha256": "4c6f05b8070132bce412f007c00ca02697f72249b4d8e9ebbe064a8357c13bd4",
+  "connected_flutter_cases_verified_by_existing_wrapper": 9,
+  "first_focused_failure": {
+    "path": ".tools/ci-recovery-verification/results/linux-recovery-observation.xml",
+    "sha256": "aceaa44dc5ddfe66b1e5d5a890bdbdb661342d3e658ee73d0736f5951675d79c",
+    "cases": 23,
+    "passed": 22,
+    "skipped": 0,
+    "failed": 1,
+    "errors": 0,
+    "modules": {
+      "tests.test_recovery_observation": 23
+    },
+    "reason": "New retirement test arrangement omitted required retired_at; fixture corrected",
+    "scope": "Stopped after first failure; remaining cases were not executed"
+  },
+  "static_checks": {
+    "ruff_format_files": 65,
+    "ruff_lint": "pass",
+    "strict_mypy_source_and_script_files": 18,
+    "tooling_unit_tests_passed": 24,
+    "credential_guard": "zero findings",
+    "documentation_links": "pass",
+    "native_configuration_and_archived_mobile_receipts": "pass"
+  },
+  "limits": {
+    "trusted_certifier_implemented": false,
+    "certificate_format_approved": false,
+    "target_continuity_proof_implemented": false,
+    "authority_provider_selected": false,
+    "publication_enabled": false,
+    "public_v2_admission_enabled": false,
+    "closed_target_reconciliation_implemented": false,
+    "lost_marker_resumption_implemented": false,
+    "new_named_pg_sq_rc_cases_qualified": false,
+    "complete_protocol_qualification": false,
+    "RC10": "NOT EXECUTED",
+    "RC11": "NOT EXECUTED",
+    "physical_device_samples_added": 0,
+    "hosted_provider_operations_performed": false,
+    "phase0": "in progress",
+    "phase1": "not started"
+  }
+}

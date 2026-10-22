@@ -1,0 +1,83 @@
+{
+  "recorded_at_utc": "2026-10-22T09:31:26.283435+00:00",
+  "scope": "Pre-publication implementation review; no behavior changes after local snapshot",
+  "baseline_main_commit": "3e0213151433bf3044d6bfb47d128d6b93e66ae6",
+  "branch": "feat/recovery-v2-observation",
+  "prior_local_evidence": {
+    "path": "docs/evidence/recovery-observation-local-2026-10-22.json",
+    "sha256": "12503450da3ba98c0d1a76561bdb07cb470c2ff03b68a248d60611d3d809502e",
+    "all_referenced_hashes_verified": true
+  },
+  "unchanged_source_sha256": {
+    "services/api/src/daily_motion/recovery_observation.py": "0a2bc952131daec8e2cc4dc11bd1b51554e1704e16b0b532af3d3e3e81838d9b",
+    "services/api/tests/test_recovery_observation.py": "860412bda6520d52f6946f3dbeeb9652602fd675450526ae32c2c63e4609e891",
+    "tools/run_recovery_v2_local.py": "525533f73409e91f4d58ffce3acf49c7217a6caecf0a3588946b716626d4685d"
+  },
+  "unchanged_protected_document_sha256": {
+    "docs/RECOVERY_PROTOCOL_V2_SPEC.md": "61ee2b5f4f035ce066c6719b0a1783f5427c08a5db438fe6d4c234d9bd4a54ac",
+    "docs/ADR_RECOVERY_PROTOCOL_V2_PROPOSED.md": "08bd8809dec6981de7ab657c55e682d32bd12e65e3f41af62ac5d873a39439a7",
+    "docs/RESTORE_TIMELINE_INVESTIGATION.md": "a38051ecb48bb2c6888b8150766a5fb87a652e16888ae1dd8a0a24db3e02f0f2"
+  },
+  "review": {
+    "standards": "No concrete in-scope defect found",
+    "protocol": "No concrete in-scope defect found",
+    "scope_limit": "Nondelete observation does not independently audit every normalized child/observation value",
+    "O3_approval": false,
+    "independent_security_qualification": false
+  },
+  "fresh_linux_docker_regression": {
+    "path": ".tools/ci-recovery-verification/results/linux-recovery-observation-review.xml",
+    "sha256": "08cf4f0e70bfa607d4fe08001c216110bf3e57727f0a43552a37819ef1e2e4cf",
+    "cases": 109,
+    "passed": 109,
+    "skipped": 0,
+    "failure": 0,
+    "error": 0
+  },
+  "retained_full_native_regression": {
+    "cases": 536,
+    "passed": 536,
+    "skipped": 0,
+    "failure": 0,
+    "error": 0,
+    "rerun_during_this_review": false,
+    "basis": "Unchanged source hashes plus revalidated original JUnit, log and successful launcher receipt",
+    "connected_flutter_cases_verified_by_existing_wrapper": 9
+  },
+  "static_validation": {
+    "frozen_dependencies": "46 packages checked; no lockfile change",
+    "ruff_format_files": 65,
+    "ruff_lint": "pass",
+    "strict_mypy_files": 18,
+    "tooling_tests_passed": 24
+  },
+  "next_step_proposal": {
+    "path": "docs/RECOVERY_O3_VERIFIER_PROPOSAL.md",
+    "sha256": "624e8b808b659389fecf234716029ef507216f09f3159fc89a7da1e22f0ccbb0",
+    "status": "PROPOSED / UNAPPROVED; backend/security review required"
+  },
+  "publication": {
+    "authorized_by_user": true,
+    "CI_for_this_change_recorded_here": false,
+    "exact_head_CI_to_be_verified_on_PR": true,
+    "merge_authorized": false
+  },
+  "limits": {
+    "trusted_certifier_implemented": false,
+    "certificate_format_approved": false,
+    "target_continuity_proof_implemented": false,
+    "authority_provider_selected": false,
+    "publication_enabled": false,
+    "public_v2_admission_enabled": false,
+    "closed_target_reconciliation_implemented": false,
+    "lost_marker_resumption_implemented": false,
+    "new_named_pg_sq_rc_cases_qualified": false,
+    "complete_protocol_qualification": false,
+    "RC10": "NOT EXECUTED",
+    "RC11": "NOT EXECUTED",
+    "physical_device_samples_added": 0,
+    "hosted_provider_operations_performed": false,
+    "phase0": "in progress",
+    "phase1": "not started"
+  }
+}

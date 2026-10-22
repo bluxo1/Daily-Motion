@@ -79,6 +79,7 @@ def main() -> int:
         "--tb=short",
         "tests/test_recovery_protocol_v2.py",
         "tests/test_recovery_effect.py",
+        "tests/test_recovery_observation.py",
         "tests/test_recovery_evidence.py",
         "tests/test_recovery_authority.py",
         "tests/test_recovery_contracts.py",
@@ -160,6 +161,7 @@ def main() -> int:
             and {
                 "tests.test_recovery_protocol_v2",
                 "tests.test_recovery_effect",
+                "tests.test_recovery_observation",
                 "tests.test_recovery_evidence",
                 "tests.test_recovery_authority",
                 "tests.test_recovery_contracts",
