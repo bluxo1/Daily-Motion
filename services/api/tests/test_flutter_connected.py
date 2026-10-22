@@ -22,44 +22,319 @@ from daily_motion import accounts
 from daily_motion.config import settings
 from daily_motion.main import app
 
+CONNECTED_CASES = {
+    "real signed JWT, restricted PostgreSQL upload, own echo and second-device bootstrap",
+    "contract defaults and arbitrary supported IANA timezone survive real feed and snapshot",
+    "real receipt after dropped committed response is exact and replay-safe",
+    "real digest mismatch and exact duplicate results",
+    "two real devices conflict without losing either branch",
+    "real deletion retires pending branch, redacts feed and invalidates snapshot",
+    "expired signed credentials pause cloud synchronization while logging continues",
+    "real SQLite restart after delivered request recovers through real HTTP receipt/echo",
+    (
+        "account initialization and A to B to A recovery use real authenticated HTTP "
+        "and separate SQLite stores"
+    ),
+}
+
 
 def connected_passed(output: str) -> bool:
     events = []
     for line in output.splitlines():
+        if not line.strip():
+            continue
         try:
             event = json.loads(line)
         except json.JSONDecodeError:
+            # Flutter can print dependency progress before its machine stream.
+            # Once events begin, malformed/trailing output cannot imply success.
+            if events or line.lstrip().startswith(("{", "[")):
+                return False
             continue
-        if isinstance(event, dict):
-            events.append(event)
-    cases = [
-        event
-        for event in events
-        if event.get("type") == "testDone" and event.get("hidden") is False
-    ]
-    return (
-        len(cases) == 9
-        and all(case.get("skipped") is False and case.get("result") == "success" for case in cases)
-        and any(event.get("type") == "done" and event.get("success") is True for event in events)
-    )
+        if events and events[-1].get("type") == "done":
+            return False
+        if (
+            isinstance(event, list)
+            and event
+            and all(
+                isinstance(item, dict)
+                and set(item) == {"event", "params"}
+                and item["event"] == "test.startedProcess"
+                and isinstance(item["params"], dict)
+                and set(item["params"]) == {"vmServiceUri"}
+                and (
+                    item["params"]["vmServiceUri"] is None
+                    or isinstance(item["params"]["vmServiceUri"], str)
+                )
+                for item in event
+            )
+        ):
+            continue
+        if not isinstance(event, dict):
+            return False
+        events.append(event)
+    if (
+        not events
+        or events[0].get("type") != "start"
+        or sum(event.get("type") == "start" for event in events) != 1
+        or events[-1].get("type") != "done"
+        or events[-1].get("success") is not True
+        or sum(event.get("type") == "done" for event in events) != 1
+    ):
+        return False
+    suites: dict[int, str] = {}
+    started: dict[int, str] = {}
+    completed: set[int] = set()
+    passed: set[str] = set()
+    try:
+        for event in events:
+            kind = event["type"]
+            if kind == "suite":
+                suite = event["suite"]
+                identity = suite["id"]
+                if type(identity) is not int or identity in suites:
+                    return False
+                filename = suite["path"].replace("\\", "/")
+                if not filename.endswith("/apps/mobile/test/connected_http_test.dart"):
+                    return False
+                suites[identity] = filename
+            elif kind == "testStart":
+                test = event["test"]
+                identity, suite_id, name = test["id"], test["suiteID"], test["name"]
+                if (
+                    type(identity) is not int
+                    or identity in started
+                    or type(suite_id) is not int
+                    or suite_id not in suites
+                    or not isinstance(name, str)
+                    or not name
+                ):
+                    return False
+                started[identity] = name
+            elif kind == "testDone":
+                identity = event["testID"]
+                if (
+                    type(identity) is not int
+                    or identity not in started
+                    or identity in completed
+                    or event["skipped"] is not False
+                    or event["result"] != "success"
+                    or type(event["hidden"]) is not bool
+                ):
+                    return False
+                completed.add(identity)
+                if not event["hidden"]:
+                    name = started[identity]
+                    if name not in CONNECTED_CASES or name in passed:
+                        return False
+                    passed.add(name)
+            elif kind not in {"start", "group", "print", "debug", "allSuites", "done"}:
+                return False
+    except (KeyError, TypeError, AttributeError):
+        return False
+    return len(suites) == 1 and completed == set(started) and passed == CONNECTED_CASES
 
 
-@pytest.mark.parametrize("fault", [None, "skip", "failure", "empty", "incomplete", "hidden"])
-def test_connected_report_cannot_claim_skipped_or_incomplete_success(fault: str | None) -> None:
-    cases = [
-        {"type": "testDone", "hidden": False, "skipped": False, "result": "success"}
-        for _ in range(9)
+@pytest.fixture
+def connected_events() -> list[dict]:
+    names = [
+        "real signed JWT, restricted PostgreSQL upload, own echo and second-device bootstrap",
+        "contract defaults and arbitrary supported IANA timezone survive real feed and snapshot",
+        "real receipt after dropped committed response is exact and replay-safe",
+        "real digest mismatch and exact duplicate results",
+        "two real devices conflict without losing either branch",
+        "real deletion retires pending branch, redacts feed and invalidates snapshot",
+        "expired signed credentials pause cloud synchronization while logging continues",
+        "real SQLite restart after delivered request recovers through real HTTP receipt/echo",
+        (
+            "account initialization and A to B to A recovery use real authenticated HTTP "
+            "and separate SQLite stores"
+        ),
     ]
+    events: list[dict] = [
+        {"type": "start", "protocolVersion": "0.1.1"},
+        {
+            "type": "suite",
+            "suite": {"id": 0, "path": "/owned/apps/mobile/test/connected_http_test.dart"},
+        },
+    ]
+    # Real machine output includes a hidden loader completion as well as tests.
+    for identity, name in enumerate(
+        ["loading /owned/apps/mobile/test/connected_http_test.dart", *names]
+    ):
+        events.extend(
+            [
+                {"type": "testStart", "test": {"id": identity, "name": name, "suiteID": 0}},
+                {
+                    "type": "testDone",
+                    "testID": identity,
+                    "hidden": identity == 0,
+                    "skipped": False,
+                    "result": "success",
+                },
+            ]
+        )
+    events.append({"type": "done", "success": True})
+    return events
+
+
+@pytest.mark.parametrize(
+    "fault",
+    [
+        None,
+        "skip",
+        "failure",
+        "empty",
+        "incomplete",
+        "hidden",
+        "wrong_name",
+        "wrong_suite",
+        "duplicate_completion",
+        "duplicate_start",
+        "duplicate_name",
+        "missing_start",
+        "unfinished_start",
+        "unknown_completion",
+        "hidden_failure",
+        "hidden_skip",
+        "error_event",
+        "duplicate_done",
+        "early_done",
+        "trailing_error",
+        "malformed_json",
+        "unexpected_array",
+        "missing_suite",
+        "duplicate_suite",
+        "bool_suite_id",
+        "bool_test_id",
+        "bool_completion_id",
+        "bool_test_suite_id",
+        "missing_hidden",
+        "nonboolean_hidden",
+        "missing_start_event",
+        "duplicate_start_event",
+        "non_event",
+        "unknown_event",
+        "malformed_daemon",
+        "trailing_text",
+    ],
+)
+def test_connected_report_cannot_claim_skipped_or_incomplete_success(
+    fault: str | None, connected_events: list[dict]
+) -> None:
+    events = connected_events
     if fault == "skip":
-        cases[0]["skipped"] = True
+        events[5]["skipped"] = True
     elif fault == "failure":
-        cases[0]["result"] = "error"
+        events[5]["result"] = "error"
     elif fault == "empty":
-        cases.clear()
+        events = []
+    elif fault == "incomplete":
+        events.pop()
     elif fault == "hidden":
-        cases[0]["hidden"] = True
-    events = cases + ([] if fault == "incomplete" else [{"type": "done", "success": True}])
-    assert connected_passed("\n".join(json.dumps(event) for event in events)) is (fault is None)
+        events[5]["hidden"] = True
+    elif fault == "wrong_name":
+        events[4]["test"]["name"] = "unrelated passing case"
+    elif fault == "wrong_suite":
+        events[1]["suite"]["path"] = "/owned/apps/mobile/test/unrelated_test.dart"
+    elif fault == "duplicate_completion":
+        events[7] = events[5].copy()
+    elif fault == "duplicate_start":
+        events[6] = events[4].copy()
+    elif fault == "duplicate_name":
+        events[6]["test"]["name"] = events[4]["test"]["name"]
+    elif fault == "missing_start":
+        events.pop(4)
+    elif fault == "unfinished_start":
+        events.insert(
+            -1, {"type": "testStart", "test": {"id": 50, "name": "unfinished", "suiteID": 0}}
+        )
+    elif fault == "unknown_completion":
+        events[5]["testID"] = 50
+    elif fault == "hidden_failure":
+        events[3]["result"] = "error"
+    elif fault == "hidden_skip":
+        events[3]["skipped"] = True
+    elif fault == "error_event":
+        events.insert(-1, {"type": "error", "error": "synthetic error"})
+    elif fault == "duplicate_done":
+        events.insert(-1, {"type": "done", "success": True})
+    elif fault == "early_done":
+        events.insert(4, events.pop())
+    elif fault == "trailing_error":
+        events.append({"type": "error", "error": "synthetic error"})
+    elif fault == "unexpected_array":
+        events.insert(4, [{"type": "testDone", "result": "error"}])
+    elif fault == "missing_suite":
+        events.pop(1)
+    elif fault == "duplicate_suite":
+        events.insert(2, events[1].copy())
+    elif fault == "bool_suite_id":
+        events[1]["suite"]["id"] = False
+    elif fault == "bool_test_id":
+        events[4]["test"]["id"] = True
+    elif fault == "bool_completion_id":
+        events[5]["testID"] = True
+    elif fault == "bool_test_suite_id":
+        events[4]["test"]["suiteID"] = False
+    elif fault == "missing_hidden":
+        del events[3]["hidden"]
+    elif fault == "nonboolean_hidden":
+        events[3]["hidden"] = "true"
+    elif fault == "missing_start_event":
+        events.pop(0)
+    elif fault == "duplicate_start_event":
+        events.insert(1, events[0].copy())
+    elif fault == "non_event":
+        events.insert(4, {})
+    elif fault == "unknown_event":
+        events.insert(4, {"type": "testOmitted"})
+    elif fault == "malformed_daemon":
+        events.insert(4, [{"event": "test.startedProcess", "params": {"vmServiceUri": 17}}])
+    output = "Resolving dependencies...\n" + "\n".join(json.dumps(event) for event in events)
+    if fault == "malformed_json":
+        output = output.replace('"type": "testStart"', '"type": ', 1)
+    elif fault == "trailing_text":
+        output += "\nUnhandled test failure"
+    else:
+        # Supported Flutter daemon messages are auxiliary, not test results.
+        output = output.replace(
+            '\n{"type": "suite"',
+            '\n[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]\n{"type": "suite"',
+            1,
+        )
+    assert connected_passed(output) is (fault is None)
+
+
+@pytest.mark.parametrize("variant", ["windows_path", "interleaved", "auxiliary", "daemon_uri"])
+def test_connected_report_accepts_supported_machine_shapes(
+    variant: str, connected_events: list[dict]
+) -> None:
+    events = connected_events
+    if variant == "windows_path":
+        events[1]["suite"]["path"] = r"E:\owned\apps\mobile\test\connected_http_test.dart"
+    elif variant == "interleaved":
+        # Parallel completion order need not match registration order.
+        events = (
+            events[:2]
+            + [event for event in events[2:-1] if event["type"] == "testStart"]
+            + [event for event in reversed(events[2:-1]) if event["type"] == "testDone"]
+            + events[-1:]
+        )
+    elif variant == "auxiliary":
+        events.insert(4, {"type": "print", "testID": 0, "message": "synthetic diagnostic"})
+        events.insert(4, {"type": "group", "group": {"id": 0, "suiteID": 0}})
+        events.insert(4, {"type": "allSuites", "count": 1})
+        events.insert(4, {"type": "debug", "suiteID": 0})
+    output = "\n".join(json.dumps(event) for event in events)
+    if variant == "daemon_uri":
+        output = output.replace(
+            '\n{"type": "suite"',
+            '\n[{"event":"test.startedProcess",'
+            '"params":{"vmServiceUri":"http://127.0.0.1:1234/"}}]\n{"type": "suite"',
+            1,
+        )
+    assert connected_passed(output)
 
 
 def test_flutter_http_with_real_postgres(
