@@ -113,9 +113,15 @@ def backup(lab: RecoveryLab) -> dict[str, Any]:
             snapshot = bootstrap(owner_a)
             bootstrap(owner_b)
             baseline = fingerprint(admin)
-            assert baseline["revision"] == "0003"
-            assert len(baseline["rows"]) == 11
-            assert all(table["count"] > 0 for table in baseline["rows"].values())
+            assert baseline["revision"] == "0004"
+            assert len(baseline["rows"]) == 13
+            # Legacy recovery still covers all 11 original tables nonempty.
+            # V2 attempts/holds have separate explicit admission tests.
+            assert all(
+                table["count"] > 0
+                for name, table in baseline["rows"].items()
+                if name not in {"recovery_owners", "recovery_attempts"}
+            )
             archive = lab.dump()
             assert fingerprint(admin) == baseline
             with admin.connect() as connection:
@@ -198,14 +204,14 @@ def test_missing_acl_role_restore_rolls_back(lab: RecoveryLab, backup: dict[str,
         source.dispose()
 
 
-def test_retirement_migration_rollback_is_refused_without_data_loss(
+def test_recovery_and_retirement_downgrade_is_refused_without_data_loss(
     restored: tuple[Engine, Engine], backup: dict[str, Any]
 ) -> None:
     admin, _ = restored
     root = Path(__file__).parents[1]
     config = Config(str(root / "alembic.ini"))
     config.set_main_option("script_location", str(root / "migrations"))
-    with pytest.raises(RuntimeError, match="Account retirement cannot be rolled back"):
+    with pytest.raises(RuntimeError, match="Recovery provenance and publication holds"):
         with admin.begin() as connection:
             config.attributes["connection"] = connection
             alembic_command.downgrade(config, "0002")

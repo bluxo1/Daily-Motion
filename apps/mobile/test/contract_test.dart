@@ -10,6 +10,82 @@ import 'package:flutter_test/flutter_test.dart';
 import 'repository_test.dart' show fixture;
 
 void main() {
+  test('DRP/2 generated commands bind immutable origin and share the Python fixture', () {
+    final operation = jsonDecode(
+      File('../../contracts/fixtures/recovery_v2_workout.json')
+          .readAsStringSync(),
+    ) as Json;
+    final frozen = canonicalJson(OperationV2Dto.fromJson(operation).json);
+    final checksum = File('../../contracts/fixtures/recovery_v2_workout.sha256')
+        .readAsStringSync()
+        .trim();
+    expect(sha256.convert(utf8.encode(frozen)).toString(), checksum);
+    expect(
+      PushRequestV2Dto.fromJson({
+        'schema_version': 2,
+        'operations': [operation],
+      }).operations.length,
+      1,
+    );
+    for (final field in [
+      'schema_version',
+      'environment_id',
+      'origin_incarnation',
+      'origin_generation',
+    ]) {
+      final missing = copyJson(operation)..remove(field);
+      expect(
+        () => OperationV2Dto.fromJson(missing),
+        throwsA(isA<ContractViolation>()),
+      );
+    }
+    expect(
+      () => OperationDto.fromJson(operation),
+      throwsA(isA<ContractViolation>()),
+    );
+    expect(
+      () => OperationV2Dto.fromJson({
+        ...operation,
+        'owner_id': '20000000-0000-4000-8000-000000000001',
+      }),
+      throwsA(isA<ContractViolation>()),
+    );
+    expect(canonicalJson(operation), frozen);
+    for (final field in [
+      'mutation_id',
+      'installation_id',
+      'aggregate_id',
+      'environment_id',
+      'origin_incarnation',
+      'origin_generation',
+    ]) {
+      expect(
+        () => OperationV2Dto.fromJson({
+          ...operation,
+          field: 'ABCDEF00-0000-4000-8000-000000000001',
+        }),
+        throwsA(isA<ContractViolation>()),
+      );
+    }
+    for (final version in [2.0, '2', true]) {
+      expect(
+        () =>
+            OperationV2Dto.fromJson({...operation, 'schema_version': version}),
+        throwsA(isA<ContractViolation>()),
+      );
+    }
+    for (final revision in [-1, true, 2.0, jsonDecode('9223372036854775808')]) {
+      expect(
+        () => OperationV2Dto.fromJson({
+          ...operation,
+          'command': 'complete_session',
+          'payload': <String, dynamic>{},
+          'expected_revision': revision,
+        }),
+        throwsA(isA<ContractViolation>()),
+      );
+    }
+  });
   test(
     'generated contract hash matches the checked authority and shared fixture',
     () {

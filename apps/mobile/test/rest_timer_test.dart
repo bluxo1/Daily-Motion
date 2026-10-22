@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'repository_test.dart' show recordPayload;
 import 'support/sync_server.dart' show testOwner;
+import 'support/legacy_schema.dart';
 
 class ControlledRestClock implements RestClock {
   ClockSample value;
@@ -116,6 +117,7 @@ void main() {
       final set =
           allSets((await repo.workout(id))!).elementAt(1)['set_id'] as String;
       await repo.saveDraft(set, {'reps': '7'});
+      await reconstructSchemaThree(db);
       for (final column in ['monotonic_us', 'continuity_id', 'uncertain']) {
         await db.customStatement('ALTER TABLE rest_timers DROP COLUMN $column');
       }

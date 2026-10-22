@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from daily_motion.config import settings
 from daily_motion.models import Base
+from daily_motion.recovery_db import deny_unverified_recovery, shared_fence
 
 
 @lru_cache
@@ -34,6 +35,16 @@ def assert_runtime_role(session: Session) -> None:
         text("""
         SELECT NOT r.rolsuper AND NOT r.rolbypassrls
           AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
+          AND has_schema_privilege(current_user, 'recovery', 'USAGE')
+          AND NOT has_schema_privilege(current_user, 'recovery', 'CREATE')
+          AND has_table_privilege(current_user, 'recovery.control', 'SELECT')
+          AND NOT has_table_privilege(current_user, 'recovery.control',
+              'INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+          AND NOT EXISTS (
+            SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='recovery' AND c.relname='control'
+              AND pg_has_role(current_user,c.relowner,'MEMBER')
+          )
           AND NOT EXISTS (
             SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
             WHERE n.nspname='training' AND c.relkind IN ('r','p')
@@ -54,10 +65,13 @@ def database_readiness() -> None:
         session.execute(text("SELECT set_config('app.owner_id', '', true)"))
         assert_runtime_role(session)
         if session.scalars(text("SELECT version_num FROM public.alembic_version")).all() != [
-            "0003"
+            "0004"
         ]:
             raise HTTPException(503, detail={"code": "service_not_configured"})
-        expected = {table.name for table in Base.metadata.tables.values()}
+        expected = {table.name for table in Base.metadata.tables.values()} | {
+            "recovery_owners",
+            "recovery_attempts",
+        }
         present = set(
             session.scalars(
                 text("""
@@ -75,12 +89,15 @@ def database_readiness() -> None:
             or session.scalar(text("SELECT count(*) FROM training.owner_state")) != 0
         ):
             raise HTTPException(503, detail={"code": "service_not_configured"})
+        deny_unverified_recovery(session)
 
 
 def tenant_transaction(owner: UUID, isolation: str | None = None) -> Iterator[Session]:
-    bind = engine().execution_options(isolation_level=isolation) if isolation else engine()
+    bind = engine().execution_options(isolation_level=isolation or "READ COMMITTED")
     with Session(bind) as session, session.begin():
+        shared_fence(session)
         assert_runtime_role(session)
+        deny_unverified_recovery(session)
         session.execute(
             text("SELECT set_config('app.owner_id', :owner, true)"), {"owner": str(owner)}
         )

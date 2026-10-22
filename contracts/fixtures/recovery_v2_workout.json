@@ -1,0 +1,72 @@
+{
+  "mutation_id": "10000000-0000-4000-8000-000000000001",
+  "installation_id": "10000000-0000-4000-8000-000000000002",
+  "aggregate_type": "workout_session",
+  "aggregate_id": "10000000-0000-4000-8000-000000000003",
+  "expected_revision": 0,
+  "command": "create_session",
+  "occurred_at": "2026-10-12T13:00:00Z",
+  "recorded_at": "2026-10-12T13:00:00Z",
+  "payload": {
+    "name": "Upper body foundation",
+    "timezone": "Asia/Kolkata",
+    "exercises": [
+      {
+        "session_exercise_id": "10000000-0000-4000-8000-000000000004",
+        "variant_id": "10000000-0000-4000-8000-000000000005",
+        "name": "Barbell bench press",
+        "loading_basis": "total_external",
+        "rep_convention": "bilateral",
+        "side": "both",
+        "sets": [
+          {
+            "set_id": "10000000-0000-4000-8000-000000000006",
+            "set_class": "working",
+            "set_purpose": "regular",
+            "planned": {
+              "reps": 5,
+              "load": {
+                "value": "60",
+                "unit": "kg",
+                "basis": "total_external"
+              },
+              "rest_seconds": 120
+            }
+          },
+          {
+            "set_id": "10000000-0000-4000-8000-000000000007",
+            "set_class": "working",
+            "set_purpose": "regular",
+            "planned": {
+              "reps": 5,
+              "load": {
+                "value": "60",
+                "unit": "kg",
+                "basis": "total_external"
+              },
+              "rest_seconds": 120
+            }
+          },
+          {
+            "set_id": "10000000-0000-4000-8000-000000000008",
+            "set_class": "working",
+            "set_purpose": "regular",
+            "planned": {
+              "reps": 5,
+              "load": {
+                "value": "60",
+                "unit": "kg",
+                "basis": "total_external"
+              },
+              "rest_seconds": 120
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "schema_version": 2,
+  "environment_id": "30000000-0000-4000-8000-000000000001",
+  "origin_incarnation": "30000000-0000-4000-8000-000000000002",
+  "origin_generation": "30000000-0000-4000-8000-000000000003"
+}

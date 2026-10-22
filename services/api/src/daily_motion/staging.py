@@ -17,7 +17,7 @@ from daily_motion.config import validate_database_transport
 from daily_motion.db import assert_runtime_role
 
 ROLE = "dm_staging_runtime"
-HEAD = "0003"
+HEAD = "0004"
 
 
 def validate_admin_url(value: str, project_ref: str) -> None:
@@ -106,6 +106,12 @@ def provision(admin: Engine, runtime_password: str) -> None:
                 sql.SQL("GRANT USAGE ON SCHEMA training TO {}").format(sql.Identifier(ROLE))
             )
             cursor.execute(
+                sql.SQL("GRANT USAGE ON SCHEMA recovery TO {}").format(sql.Identifier(ROLE))
+            )
+            cursor.execute(
+                sql.SQL("GRANT SELECT ON recovery.control TO {}").format(sql.Identifier(ROLE))
+            )
+            cursor.execute(
                 sql.SQL(
                     "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA training TO {}"
                 ).format(sql.Identifier(ROLE))
@@ -186,7 +192,7 @@ def verify_isolation(runtime: Engine) -> dict[str, object]:
                 WHERE n.nspname='training' AND c.relkind IN ('r','p')
             """)
             ).one()
-            if tables[0] != 11 or tables[1] is not True:
+            if tables[0] != 13 or tables[1] is not True:
                 raise ValueError("Expected training schema/forced RLS is missing")
         except HTTPException:
             raise ValueError("Runtime role is unsafe") from None
@@ -200,7 +206,7 @@ def verify_isolation(runtime: Engine) -> dict[str, object]:
             raise ValueError("Pooled owner context leaked")
     return {
         "migration_revision": revisions[0],
-        "training_tables": 11,
+        "training_tables": 13,
         "forced_rls": True,
         "owner_isolation": True,
         "probe_rolled_back": True,

@@ -13,6 +13,7 @@ import '../sync/transport_limits.dart';
 import 'database.dart';
 
 part 'sync_repository.dart';
+part 'recovery_repository.dart';
 
 class WorkoutRepository {
   final TrainingDatabase db;
@@ -60,6 +61,9 @@ class WorkoutRepository {
     }
     await db.customStatement(
       'INSERT OR IGNORE INTO sync_metadata(singleton) VALUES(1)',
+    );
+    await db.customStatement(
+      'INSERT OR IGNORE INTO recovery_state(singleton,required) VALUES(1,1)',
     );
   });
 
@@ -342,7 +346,7 @@ class WorkoutRepository {
           .getSingle();
       final shadow = await db
           .customSelect(
-            'SELECT revision FROM shadows WHERE session_id=?',
+            'SELECT revision,recovery_context FROM shadows WHERE session_id=?',
             variables: [Variable(id)],
           )
           .getSingleOrNull();
@@ -374,21 +378,41 @@ class WorkoutRepository {
         'recorded_at': stamp,
         'payload': copyJson(payload),
       };
+      final recoveryRequired = await _recoveryRequired();
+      Json? origin;
+      if (recoveryRequired) {
+        try {
+          origin = await _captureOrigin(
+            head,
+            shadow,
+            newRoot: previous == null,
+          );
+        } on ContractViolation {
+          // Unverifiable cloud provenance cannot block an otherwise valid local
+          // save. Retain its predecessor and quarantine this new unknown origin.
+          origin = null;
+        }
+      }
+      if (origin != null) operation.addAll({'schema_version': 2, ...origin});
       // Reserve enough room for the largest supported integer revision before accepting locally.
       final bounded = {...operation, 'expected_revision': 9223372036854775807};
       require(
         utf8.encode(canonicalJson(bounded)).length <= commandByteLimit,
         'This edit exceeds the command size limit. Your draft is retained.',
       );
-      validateEnvelope(operation);
+      final domainOperation = _withoutRecoveryFields(operation);
+      validateEnvelope(domainOperation);
       try {
-        validateTransport('Operation', operation);
+        validateTransport(
+          origin == null ? 'Operation' : 'OperationV2',
+          operation,
+        );
       } on ContractViolation {
         throw const WorkoutValidation(
           'This edit does not match the supported workout contract. Your draft is retained.',
         );
       }
-      final next = applyOperation(previous, operation)!;
+      final next = applyOperation(previous, domainOperation)!;
       final sequence = (previous?['local_seq'] as int? ?? 0) + 1;
       await _write(next, sequence);
       await db.customStatement('UPDATE sessions SET branch_base=? WHERE id=?', [
@@ -396,7 +420,7 @@ class WorkoutRepository {
         id,
       ]);
       await db.customStatement(
-        'INSERT INTO outbox(mutation_id,session_id,local_seq,predecessor_id,origin_base,operation,state) VALUES(?,?,?,?,?,?,?)',
+        'INSERT INTO outbox(mutation_id,session_id,local_seq,predecessor_id,origin_base,operation,state,wire_version,origin_context) VALUES(?,?,?,?,?,?,?,?,?)',
         [
           operation['mutation_id'],
           id,
@@ -405,6 +429,8 @@ class WorkoutRepository {
           branchBase,
           canonicalJson(operation),
           'pending',
+          recoveryRequired ? 2 : 1,
+          origin == null ? null : canonicalJson(origin),
         ],
       );
       if (command == 'record_set' || command == 'correct_set') {
@@ -565,6 +591,9 @@ class WorkoutRepository {
         )
         .getSingleOrNull();
     if (row == null || row.read<String>('state') != 'pending') return null;
+    if (await _recoveryRequired() && !await _eligibleRecoveryHead(row)) {
+      return null;
+    }
     if (row.readNullable<String>('frozen_body') != null) {
       return row.read<String>('frozen_body');
     }
@@ -573,11 +602,23 @@ class WorkoutRepository {
     if (predecessor != null) {
       final receipt = await db
           .customSelect(
-            'SELECT accepted_revision FROM outbox WHERE mutation_id=?',
+            'SELECT accepted_revision,accepted_context FROM outbox WHERE mutation_id=?',
             variables: [Variable(predecessor)],
           )
           .getSingle();
       if (receipt.readNullable<int>('accepted_revision') == null) return null;
+      if (await _recoveryRequired()) {
+        final encoded = receipt.readNullable<String>('accepted_context');
+        if (encoded == null) return null;
+        final accepted = RecoveryContext._decode(encoded);
+        if (accepted.ownerId != ownerId) {
+          throw const ContractViolation('wrong_owner');
+        }
+        if (canonicalJson(accepted.origin) !=
+            row.readNullable<String>('origin_context')) {
+          return null;
+        }
+      }
       revision = receipt.read<int>('accepted_revision');
     }
     final op = jsonDecode(row.read<String>('operation')) as Json;
@@ -597,6 +638,7 @@ class WorkoutRepository {
 
   Future<void> installRemote(Json projection) => db.transaction(() async {
     await _guard();
+    await _requireLegacySync();
     await _installRemote(projection);
   });
 
@@ -625,6 +667,7 @@ class WorkoutRepository {
     require(size <= transportSnapshotLimit, 'Snapshot capacity exceeded.');
     await db.transaction(() async {
       await _guard();
+      await _requireLegacySync();
       final seen = <String>{};
       for (final page in pages) {
         for (final raw in page['roots'] as List) {

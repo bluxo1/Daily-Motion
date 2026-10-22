@@ -1,0 +1,162 @@
+{
+  "date": "2026-10-22",
+  "status": "incomplete; active local implementation",
+  "baseline_commit": "2781f5c101e87e1a9351cb3e7bbf53453625e025",
+  "uncommitted_worktree": "restore-timeline-investigation-20261021",
+  "scope": "new disposable loopback PostgreSQL clusters and file-backed SQLite; synthetic data",
+  "python": {
+    "passed": 341,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 135.678,
+    "includes_existing_restore_and_connected_flutter_http": true
+  },
+  "flutter_ordinary": {
+    "passed": 205,
+    "skipped": 12,
+    "failures": 0,
+    "final_completion": true,
+    "seconds": 101.721
+  },
+  "tooling_unittest_passes": 24,
+  "named_case_assessment": {
+    "scope": "named local cases only; report validation is not oracle review",
+    "local_named_cases_passed": false,
+    "passed": [
+      "SQ08",
+      "SQ10"
+    ],
+    "missing": [
+      "PG01",
+      "PG02",
+      "PG03",
+      "PG04",
+      "PG05",
+      "PG06",
+      "PG07",
+      "PG08",
+      "PG09",
+      "PG10",
+      "PG11",
+      "PG12",
+      "PG13",
+      "PG14",
+      "PG15",
+      "PG16",
+      "PG17",
+      "PG18",
+      "PG19",
+      "PG20",
+      "PG21",
+      "PG22",
+      "RC01",
+      "RC02",
+      "RC03",
+      "RC04",
+      "RC05",
+      "RC06",
+      "RC07",
+      "RC08",
+      "RC09",
+      "RC12",
+      "SQ01",
+      "SQ02",
+      "SQ03",
+      "SQ04",
+      "SQ05",
+      "SQ06",
+      "SQ07",
+      "SQ09"
+    ],
+    "RC10": "NOT EXECUTED",
+    "RC11": "NOT EXECUTED",
+    "complete_protocol_qualification": false
+  },
+  "complete_protocol_qualification": false,
+  "activated": false,
+  "physical_device_qualified": false,
+  "independent_security_review": "unavailable; not retried or bypassed",
+  "open_work": [
+    "server B0-B6 and trusted certificate/observer",
+    "reviewed certified V2 transport/current acknowledgement/bootstrap",
+    "complete retirement/lifecycle/high-water replay and cutover",
+    "remaining exact named PG/SQ/RC tests",
+    "O1-O12 decisions and separately authorized provider/custody qualification"
+  ],
+  "protected_document_sha256": {
+    "docs/RECOVERY_PROTOCOL_V2_SPEC.md": "61ee2b5f4f035ce066c6719b0a1783f5427c08a5db438fe6d4c234d9bd4a54ac",
+    "docs/ADR_RECOVERY_PROTOCOL_V2_PROPOSED.md": "08bd8809dec6981de7ab657c55e682d32bd12e65e3f41af62ac5d873a39439a7"
+  },
+  "artifacts": {
+    "pytest.xml": {
+      "path": ".tools/recovery-v2-attempts/2aa4fe38266f48259ae3f6df6f80d18b/pytest.xml",
+      "sha256": "40e5d459e391bec08a6eebbc288b809ef2797ed7af8755e2d46e1abdd05d5ef6"
+    },
+    "python.log": {
+      "path": ".tools/recovery-v2-attempts/2aa4fe38266f48259ae3f6df6f80d18b/python.log",
+      "sha256": "591ecd8376f423da73acc8ce249107535b852d513e9479181abbf2bf240905f0"
+    },
+    "receipt.json": {
+      "path": ".tools/recovery-v2-attempts/2aa4fe38266f48259ae3f6df6f80d18b/receipt.json",
+      "sha256": "ee563134d48c6c02b07e8d4517e95449fa4a2fd4accb86f769ef436a59a8ecc6"
+    },
+    "flutter-ordinary.jsonl": {
+      "path": ".tools/recovery-v2-attempts/2aa4fe38266f48259ae3f6df6f80d18b/flutter-ordinary.jsonl",
+      "sha256": "6c854f616a407c402e243206f96c00979a85d53ff09327cd235309ba8d02ecf6"
+    },
+    "flutter-named-local.jsonl": {
+      "path": ".tools/recovery-v2-attempts/2aa4fe38266f48259ae3f6df6f80d18b/flutter-named-local.jsonl",
+      "sha256": "fd753bfacb9349edec47e1065763432c556838e3b4c7c43ed32809b69fe8d258"
+    },
+    "named-case-assessment.json": {
+      "path": ".tools/recovery-v2-attempts/2aa4fe38266f48259ae3f6df6f80d18b/named-case-assessment.json",
+      "sha256": "1dbee68171333829adc187de149a464fb7c2ac214f416d81b1280e12e9e55ea2"
+    }
+  },
+  "changed_source_sha256": {
+    "apps/mobile/lib/data/database.dart": "c956d324937b806319593e76c4558c5896f705501fe87d0c7eada6255c1c61c4",
+    "apps/mobile/lib/data/database.g.dart": "ac87db1179a652859806be4554331c8fa50c579922775557622047ec94b24eca",
+    "apps/mobile/lib/data/recovery_repository.dart": "d55ecdf783aa29aaf3f099878080123ea17ebfba0b13d8911fb551de7e007d93",
+    "apps/mobile/lib/data/schema.drift": "3bb7dfbfcfbea69bbaa0290452eb22be03df727a42e76e28229bdcab312e013d",
+    "apps/mobile/lib/data/sync_repository.dart": "f861c15b1376d1fc1e402c10d2ac7d978631540661062611a86c12eb8f6f98f2",
+    "apps/mobile/lib/data/workout_repository.dart": "fdc25b219478184ce27d63c95442a5e62eb7ca4c115d7e7f7389e773317d6ebb",
+    "apps/mobile/lib/sync/coordinator.dart": "a04993d411f64569c7fbe4a9b041e30d9af06e253ad745aca8158b713a03c9b0",
+    "apps/mobile/lib/sync/transport.dart": "76627ab3932ac8c058be5a6dbc40a9371e524054cc55c0becb55dda8a0b89274",
+    "apps/mobile/lib/sync/transport_contract.dart": "04c5b91430c6bd12603c4950aef5e7e923b93dbf6c0dadc4b7450fb1f11bfd46",
+    "apps/mobile/test/contract_test.dart": "d25b67b6ea72539a3e2a698fd528fb06875ba37a832d11b0f24a1dc5040f5378",
+    "apps/mobile/test/investigation/restore_timeline_probe.dart": "4f9361768b2548aa8b7ee706d12b0983bb6ac0f4cfe312c8be5648b3436d60b5",
+    "apps/mobile/test/process_kill_test.dart": "1c62d9adbc383bad3965d4be4332c2427d96497a74e6dbbddd98752c4f6a29bf",
+    "apps/mobile/test/recovery_persistence_test.dart": "6ce4956976f81737999c3ac7c1bd2b0caef22b0c3fb58c1346dfea776b5209f7",
+    "apps/mobile/test/recovery_protocol_v2_test.dart": "c6d44a82f52ca12fd3ac68e900f2c10027401ea7cbbc214d5b0c1f6389c8f2f3",
+    "apps/mobile/test/rest_timer_test.dart": "cbf009a736aeb0566551671ee28736e3040ddd465b2b24973d453f01a65cd4bc",
+    "apps/mobile/test/support/kill_worker.dart": "71278de341d48db9b5885513f59acda69b41895db5277e2689e4d4f37cf6521d",
+    "apps/mobile/test/support/legacy_schema.dart": "f74a605af1c4ce511db2299ae0b5e7f16dabc9edf2d0f70b6d90eba5d56bd12e",
+    "apps/mobile/test/sync_recovery_test.dart": "11aebbd9eed802dce2052ff49c0987a7507568a6c26d47c66063f3f843350eeb",
+    "contracts/fixtures/recovery_v2_workout.json": "bf61386f4dea15551dec4775198552c4908e77a5c554f00835ae5ee035a8db9a",
+    "contracts/fixtures/recovery_v2_workout.sha256": "945adeccb21e50f87c4218aa251b604a227776fd7446cf1cf03eaa9d571e1f7e",
+    "contracts/openapi.json": "fe39532a9541a29d99b90ac08e4cb89c8cb80170262ccfa84a3758ad4a97d74e",
+    "services/api/migrations/versions/0004_recovery_protocol.py": "1f796abbf4573057371545651cb7ee5097583f3149f414c354aefe4408df5209",
+    "services/api/src/daily_motion/contracts.py": "025db8f5da6dbb3099635443708896413c1c6890749bd21518aecc3bbd1db8b1",
+    "services/api/src/daily_motion/db.py": "e1180c85aa60bda5149e4765d1d14b8a7cbde974a88fcda8c4582b8c9d37a4f7",
+    "services/api/src/daily_motion/main.py": "e7a5be891a7de33b78e3562b99ac0a98443caa2c2e39d8647250202603adc0c0",
+    "services/api/src/daily_motion/recovery.py": "66af3ac0853f26ecb44c14d32f317b49cdce0d5cba37efdebae52e1cb4dd8426",
+    "services/api/src/daily_motion/recovery_db.py": "46e79cb0fdd025325c0ab573c69ae5fd7fa43bb52afbcb4e9d7fc7be586f7a7b",
+    "services/api/src/daily_motion/staging.py": "cd6c73a1ffc447eb6807ef4c805127bfa28dacd36b7915091311bad172e1fa72",
+    "services/api/tests/conftest.py": "f1d840a29564b475895f5bd83de65fd8ab4b82f63528cd86ee397576c0aae912",
+    "services/api/tests/investigations/restore_timeline_probe.py": "ae50665b95d26bbc3ea33f0659dd563bd8f653a85e56523ccff38e001e66b114",
+    "services/api/tests/recovery_authority.py": "a337c2f90f59c012f5b4463a8096ff38a9b401a3ab9fcb50d4ce40122bf3ec5f",
+    "services/api/tests/recovery_lab.py": "6aa8bd762194c13fce9bfce8b3ee9cde81039771ca7464f6b295d095d2f7e836",
+    "services/api/tests/test_recovery.py": "c5935349ab8c770fdd3271b95f93391e4cce9cd635e40cb454190305a8eca358",
+    "services/api/tests/test_recovery_authority.py": "d1c0c63235a17debc9461e927630c593624187409911eb34a720284d5764feac",
+    "services/api/tests/test_recovery_contracts.py": "400c40200d9cf49eb7546db08301169452fd8cbe80ac8c6b406c0409e23d6ede",
+    "services/api/tests/test_recovery_evidence.py": "85410e7ae30dca97b8333d345758e9403581baf82808d5598586b6d58a699593",
+    "services/api/tests/test_recovery_protocol_v2.py": "3c8cb2659a924c9538e2554e48ef07d70035c2ac51e3bbf95adee9545226a421",
+    "services/api/tests/test_runtime_guard.py": "7ee86ca74bec694dd8af5165005a3e27f4302c2220fa4577a22da9ac98131ac7",
+    "services/api/tests/test_staging.py": "94ed3430d25aab7091f9e28e46bb3b600f1ddaf289770c3ddf9a35d080174ebe",
+    "tools/check_recovery_v2_results.py": "e3459a93e3f3738be7245758e79810d234dbeaa6ea7a0a352da45d87082504c5",
+    "tools/run_recovery_v2_local.py": "50321a64f75efe78742d92ed7903c3048db756c1477d4a3cd1420de1b566f988",
+    "tools/tests/test_recovery_v2_launcher.py": "9b85c23043e11f60fb5383d995a0668c47b54a10be880c4a47f3df4faad596d2",
+    "tools/tests/test_recovery_v2_results.py": "36d85b61dc2cc41a3e03ed004c4119b02d55cf2cabd7870f1ea07a756fc6e10e"
+  }
+}
