@@ -93,6 +93,62 @@ void main() {
     return manifest;
   }
 
+  test('bootstrap preserves a completed workout corrected to skipped after file restart', () async {
+    final id = await repo.startFoundationWorkout();
+    await expectLater(
+      repo.commit(id, 'complete_session', {}),
+      throwsA(isA<WorkoutValidation>()),
+    );
+    final recorded = recordPayload((await repo.workout(id))!);
+    await repo.commit(id, 'record_set', recorded);
+    await repo.commit(id, 'complete_session', {});
+    await repo.commit(id, 'correct_set', {
+      ...recorded,
+      'execution_status': 'skipped',
+      'actual': null,
+      'correction_reason': 'The set was recorded by mistake.',
+    });
+    await sync.synchronize(force: true);
+    expect(sync.status.phase, SyncPhase.synchronized, reason: sync.status.code);
+    expect(await repo.pendingCount(), 0);
+
+    // A clean installation sees only the corrected snapshot, not its earlier
+    // performed observation. Completion was valid when the user finished.
+    await sync.close();
+    repo.dispose();
+    await db.close();
+    fixtureDatabase = File('${fixtureDirectory.path}/import.sqlite');
+    db = TrainingDatabase.open(fixtureDatabase);
+    repo = WorkoutRepository(db, testOwner);
+    await repo.initialize();
+    sync = SyncCoordinator(repo, server);
+    await baseline();
+    await reopen();
+
+    final restored = (await repo.workout(id))!;
+    expect(restored['status'], 'completed');
+    expect(restored['ended_at'], isNotNull);
+    expect(restored['revision'], 4);
+    final observation = allSets(restored).first['observation'] as Json;
+    expect(observation['execution_status'], 'skipped');
+    expect(observation['actual'], isNull);
+    expect(observation['completion_seq'], 1);
+    expect(
+      observation['correction_reason'],
+      'The set was recorded by mistake.',
+    );
+    expect(
+      allSets(restored).where(
+        (s) =>
+            s['observation'] != null &&
+            s['observation']['execution_status'] != 'skipped',
+      ),
+      isEmpty,
+    );
+    expect(await repo.pendingCount(), 0);
+    expect((await repo.syncMetadata())['position'], server.position);
+  });
+
   test('acknowledgement failure rolls back metadata and recovers the committed receipt', () async {
     final id = await repo.startFoundationWorkout();
     await baseline();

@@ -464,12 +464,11 @@ extension SynchronizationRepository on WorkoutRepository {
         }
       }
     }
+    // Finishing requires attempted work, but a later historical correction may
+    // mark every recorded set skipped without reopening the completed workout.
+    // Corrections retain observations, so a truly empty completed root is invalid.
     if (projection['status'] == 'completed' &&
-        !allSets(projection).any(
-          (s) =>
-              s['observation'] != null &&
-              s['observation']['execution_status'] != 'skipped',
-        )) {
+        !allSets(projection).any((s) => s['observation'] != null)) {
       throw const ContractViolation('invalid_remote_state');
     }
     final id = projection['aggregate_id'] as String;
