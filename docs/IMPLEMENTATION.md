@@ -1963,8 +1963,8 @@ internals and unknown advisories are outside this result. Final repository check
 
 ## Recovery Protocol V2 local implementation in progress — 2026-10-22
 
-The uncommitted work in `restore-timeline-investigation-20261021` implements
-components of the [V2 specification](RECOVERY_PROTOCOL_V2_SPEC.md). The
+The initial component work was squash merged through PR #10 as `3e02131`.
+It implements components of the [V2 specification](RECOVERY_PROTOCOL_V2_SPEC.md). The
 [proposed ADR](ADR_RECOVERY_PROTOCOL_V2_PROPOSED.md) and specification are
 preserved unchanged. The [autonomous work log](../RECOVERY_PROTOCOL_V2_AUTONOMOUS_WORKLOG.md)
 records requirements, exact commands, failures, corrections and remaining work.
@@ -2034,9 +2034,10 @@ downgrade refusal; it does not deploy an old service or qualify source containme
 records exact report hashes and changed source fingerprints; it explicitly marks
 the full protocol, provider and physical-device qualification incomplete.
 
-No existing project database, hosted provider, production system, credential,
-specification, ADR or historical characterization receipt was modified. No commit,
-push, deployment, activation or hosted drill occurred. Independent authority,
+At the original local checkpoint, no existing project database, hosted provider,
+production system, credential, specification, ADR or historical characterization
+receipt was modified; no commit, push, deployment, activation or hosted drill
+occurred. Independent authority,
 actual target/containment proof, committed-marker/abort proof acceptance,
 lifecycle/RPO policy and provider/custody qualification remain open. Phase 0
 remains in progress; no Phase 1 or physical-device gate is closed.
@@ -2063,3 +2064,121 @@ Ruff formatting/lint, strict source/script mypy, generated contract comparisons,
 documentation, credential, native configuration and archived receipt checks pass.
 These are local results; a new remote CI outcome and further Phase 0 qualification
 are not claimed.
+
+### Merged baseline and continued observation component — 2026-10-22
+
+The user squash merged PR #10 into signed main commit `3e02131`, whose tree
+matches the reviewed `78267c1` source. All three
+[main CI jobs](https://github.com/bluxo1/Daily-Motion/actions/runs/39723025027)
+pass, including **490 Python tests / zero skips** and Android/iOS build variants
+and harness compilation. These results qualify the merged development baseline;
+they do not activate Recovery V2 or close physical/provider gates.
+
+Continued work is isolated on local branch `feat/recovery-v2-observation`.
+`recovery_observation.py` checks a known B3 marker in a fresh, bounded READ
+COMMITTED transaction under the shared recovery fence and owner locks. It
+requires the original activation/target/owner/head, persisted request/result,
+private feed position, pending receipt, erasure epoch and retirement scope to
+agree. It rejects borrowed transactions, privileged roles, divergent/pruned
+evidence, restored deletion payloads and account/recovery denials. All database
+locks close before a caller could perform a later external operation.
+
+This is a database observation component, not O3's authenticated certifier,
+certificate format or proof of target continuity. It returns existing minimal
+marker metadata, keeps V/high-water/receipt/hold unchanged and performs no
+authority append. Public V2 routes, CLOSED-target reconciliation, lost-marker
+resumption, trusted certification and B5 publication remain unavailable. The
+local launcher now includes the observation cases and rejects their omission.
+
+Final local verification passes **536 Python tests / zero skips**, including
+**46 observation cases**, the existing restore suite and the wrapper verifying
+**nine connected Flutter HTTP cases**. The CI JUnit acceptance checker accepts
+the report. A separate Linux/Docker run passes **109 recovery cases / zero
+skips**, including all 46 observation cases. They exercise accepted, conflicted,
+rejected and deleted results; marker/receipt/feed/epoch corruption; owner/target/
+freshness/role/isolation denial; actual commit versus rollback; fresh reads after
+waiting behind an exclusive close; and lock release before returning. The first
+focused run stopped at **22 passes / one fixture failure** because its retirement
+arrangement omitted a required timestamp; that report is preserved, and the
+corrected arrangement passes both final runs.
+
+Ruff checks **65 formatted files** and passes lint; strict mypy passes **18
+source/script files**; **24 tooling unit tests** pass. Generated OpenAPI/mobile
+transport artifacts reproduce unchanged. Documentation links, credential scan,
+native static configuration and archived mobile receipt checks pass. The
+[local evidence receipt](evidence/recovery-observation-local-2026-10-22.json)
+records source/report hashes, exact scope and remaining limits. These additions
+were uncommitted local development at that recorded checkpoint; the green main
+CI above tests the merged baseline. The named PG/SQ/RC qualification matrix and O1–O12 acceptance remain
+open; this component does not supply independent certification or Phase 0 exit.
+
+### Observation implementation review and O3 proposal — 2026-10-22
+
+The subsequent review covers the complete local change against repository
+standards and the proposed protocol, including isolation, lifecycle checks,
+deletion suppression, commit/rollback races and fresh reads after lock waits.
+Neither review identifies a concrete in-scope correctness defect. The component
+checks marker/feed/root-revision consistency for nondelete outcomes; it does not
+independently audit every normalized child or observation value. Trusted B3
+atomicity and independently verified target continuity remain assumptions for a
+future trusted verifier, not capabilities supplied by this helper.
+
+The [O3 verifier/certificate proposal](RECOVERY_O3_VERIFIER_PROPOSAL.md) makes the
+next boundary reviewable: separate verifier permissions, original-target and
+continuity evidence, exact PREPARED/commit bindings, authenticated authority
+records, post-transaction append, and fresh B5 publication checks. It lists the
+backend, security, operator and privacy decisions and fault tests still required.
+It is **proposed / unapproved**. No production certifier, certificate format,
+CLOSED reconciliation or B5 implementation is authorized by this proposal, and
+these code reviews do not constitute O3 acceptance or independent security
+qualification. The original proposed specification, ADR and characterization
+remain unchanged.
+
+A fresh Linux/Docker PostgreSQL regression passes **109 cases / zero skips,
+failures or errors**, including all **46 observation cases**. Source and protected
+document hashes still match the earlier receipt; its original 536-pass native
+JUnit, successful launcher receipt and log hashes are revalidated. That full
+native run is retained evidence, not a second execution during review. Frozen
+dependencies, formatting/lint, strict mypy and 24 tooling tests pass again, as do
+documentation, credential and native/archive receipt checks. The
+[review evidence](evidence/recovery-observation-review-2026-10-22.json) records
+the fresh run separately from the retained full run and the original fixture
+failure. No failures or skips are hidden or promoted to passes.
+
+The user subsequently authorized signed feature-branch publication and a PR after
+review and validation, with CI required green and merging excluded. Publication
+and exact-head CI results belong to that PR; the earlier local receipt remains
+a dated uncommitted-source snapshot and is not rewritten as CI evidence.
+
+### Observation PR CI follow-up — 2026-10-22
+
+Signed commit `aa04e4d` was published on `feat/recovery-v2-observation` in
+[PR #11](https://github.com/bluxo1/Daily-Motion/pull/11), with a server tree exactly
+matching the reviewed Git index. Both API jobs pass **536 tests / zero skips**.
+The first PR macOS job reports **214 passed / one failed / 12 skipped**: the
+`test_origin_projection_outbox_atomic_restart` worker exits inside Dart's native
+asset bundling (`parseOtoolArchitectureSections`) before its kill boundary.
+The other process-kill suite continues successfully. The
+[failed job](https://github.com/bluxo1/Daily-Motion/actions/runs/39756559635/job/119749910172)
+remains part of the evidence; it is not relabeled as a pass.
+
+Inspection finds that two concurrent test-file processes can invoke `dart run`
+against the same `.dart_tool/lib`, but the existing helper lock was Windows-only.
+The failure is consistent with competing asset copy/inspection; its exact
+toolchain interleaving is not proven by the log. The follow-up applies that same
+lock to every desktop platform, through worker exit and reopened-database close.
+It retains all real OS kills, fault boundaries, timeouts and recovery assertions;
+no test is skipped or retried inside the helper. This changes test infrastructure,
+with no observation/domain/API behavior change. The proposed specification and
+ADR remain unchanged; native-asset stability is not physical-device qualification.
+
+The full local Windows Flutter suite then passes **215 tests / zero failures /
+12 explicit skips**, terminal success and process exit 0. All seven process-kill
+tests pass, covering eleven actual kill boundaries across v1/v2 and freeze/restart.
+The skips remain nine separately invoked connected cases and three external
+hosted/provider cases; none is counted as a pass. Flutter analysis has no issues,
+and the changed helper passes Dart formatting. The
+[CI follow-up receipt](evidence/recovery-observation-ci-followup-2026-10-22.json)
+preserves the original failure and new machine-log hashes separately. Fresh
+Linux/macOS CI on the signed follow-up head is required before review readiness;
+the older head's successful jobs do not substitute for it.

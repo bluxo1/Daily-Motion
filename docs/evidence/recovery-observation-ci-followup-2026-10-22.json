@@ -1,0 +1,126 @@
+{
+  "recorded_at_utc": "2026-10-22T09:52:52.841299+00:00",
+  "scope": "Test-only cross-platform process-kill worker serialization CI follow-up",
+  "branch": "feat/recovery-v2-observation",
+  "parent_commit": "aa04e4d10ee3524ecd1c2d978a011c97a6fca471",
+  "first_pr_macos_failure": {
+    "job": "https://github.com/bluxo1/Daily-Motion/actions/runs/39756559635/job/119749910172",
+    "passed": 214,
+    "failed": 1,
+    "skipped": 12,
+    "case": "test_origin_projection_outbox_atomic_restart",
+    "boundary": "Worker exited in Dart native-asset bundling before KILL_BOUNDARY",
+    "error": "Null check in parseOtoolArchitectureSections",
+    "excerpt": {
+      "path": ".tools/ci-recovery-verification/results/macos-observation-first-failure.log",
+      "sha256": "33074224caa39133bc5425de98c2879563a8aa98a1807006a7c91fe6105ea3e5"
+    },
+    "inference": "Concurrent dart run launchers shared native assets without the Windows-only lock; exact SDK interleaving not proven"
+  },
+  "fix": {
+    "source": {
+      "path": "apps/mobile/test/support/process_kill_harness.dart",
+      "sha256": "feb92a3358e107c8b2739f215ecc93dfd8ba2c18b47fb07031367a346210f6d7"
+    },
+    "behavior": "Apply existing shared file lock on every platform through worker exit and database close",
+    "kill_boundaries_assertions_timeouts_skips_changed": false,
+    "standards_and_protocol_review": "No blocking issue; SQ01 oracle preserved"
+  },
+  "local_windows_validation": {
+    "flutter_analysis": "No issues found",
+    "dart_format_files": 1,
+    "dart_format_changes": 0,
+    "machine_log": {
+      "path": ".tools/ci-recovery-verification/results/windows-flutter-observation-ci-fix.jsonl",
+      "sha256": "1b3605275c60ee60590a2a7a221d253cce961c7bb34dcb3559b72b7722e697f7"
+    },
+    "stderr": {
+      "path": ".tools/ci-recovery-verification/results/windows-flutter-observation-ci-fix.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "passed": 215,
+    "failed": 0,
+    "skipped": 12,
+    "terminal_success": true,
+    "process_kill_tests_passed": [
+      "v1 hard OS process kill before_commit restores atomic acknowledgement/outbox/draft",
+      "v1 hard OS process kill during_commit restores atomic acknowledgement/outbox/draft",
+      "v1 hard OS process kill after_commit restores atomic acknowledgement/outbox/draft",
+      "v2 hard OS process kill before_commit restores atomic acknowledgement/outbox/draft",
+      "v2 hard OS process kill during_commit restores atomic acknowledgement/outbox/draft",
+      "v2 hard OS process kill after_commit restores atomic acknowledgement/outbox/draft",
+      "test_origin_projection_outbox_atomic_restart"
+    ],
+    "actual_kill_boundaries_covered": 11,
+    "explicit_skips": [
+      {
+        "name": "real signed JWT, restricted PostgreSQL upload, own echo and second-device bootstrap",
+        "reason": null
+      },
+      {
+        "name": "contract defaults and arbitrary supported IANA timezone survive real feed and snapshot",
+        "reason": null
+      },
+      {
+        "name": "real receipt after dropped committed response is exact and replay-safe",
+        "reason": null
+      },
+      {
+        "name": "real digest mismatch and exact duplicate results",
+        "reason": null
+      },
+      {
+        "name": "two real devices conflict without losing either branch",
+        "reason": null
+      },
+      {
+        "name": "real deletion retires pending branch, redacts feed and invalidates snapshot",
+        "reason": null
+      },
+      {
+        "name": "expired signed credentials pause cloud synchronization while logging continues",
+        "reason": null
+      },
+      {
+        "name": "real SQLite restart after delivered request recovers through real HTTP receipt/echo",
+        "reason": null
+      },
+      {
+        "name": "account initialization and A to B to A recovery use real authenticated HTTP and separate SQLite stores",
+        "reason": null
+      },
+      {
+        "name": "hosted SDK OTP, refresh, restart, remote sign-out and owner isolation",
+        "reason": null
+      },
+      {
+        "name": "hosted delivered OTP expires and a fresh code succeeds",
+        "reason": null
+      },
+      {
+        "name": "real staging receipt, RLS namespace and file-backed A to B to A recovery",
+        "reason": null
+      }
+    ]
+  },
+  "prior_evidence_preserved": [
+    {
+      "path": "docs/evidence/recovery-observation-local-2026-10-22.json",
+      "sha256": "12503450da3ba98c0d1a76561bdb07cb470c2ff03b68a248d60611d3d809502e"
+    },
+    {
+      "path": "docs/evidence/recovery-observation-review-2026-10-22.json",
+      "sha256": "a0bfdfdeb939dd19a3bea704c6c31ad0426dbe2e9a4f02648d96706472a5d179"
+    }
+  ],
+  "new_head_CI": "Required after publication; no result claimed by this pre-publication receipt",
+  "limits": {
+    "trusted_certifier": false,
+    "O3_approval": false,
+    "independent_security_qualification": false,
+    "hosted_drills": false,
+    "physical_device_samples_added": 0,
+    "phase0": "in progress",
+    "phase1": "not started"
+  }
+}
