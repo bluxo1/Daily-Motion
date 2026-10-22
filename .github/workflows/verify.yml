@@ -23,6 +23,7 @@ jobs:
       DM_TEST_ADMIN_URL: postgresql+psycopg://dm_admin:synthetic-ci-only@127.0.0.1:5432/daily_motion_test
       DM_RUN_CONNECTED: "1"
       DM_RUN_RECOVERY: "1"
+      DM_RUN_RECOVERY_V2: "1"
     defaults:
       run:
         working-directory: services/api

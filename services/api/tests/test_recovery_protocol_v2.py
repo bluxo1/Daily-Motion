@@ -1,6 +1,7 @@
 """Disposable PostgreSQL admission components; full protocol qualification pending.
 
-Use tools/run_recovery_v2_local.py. Never accepts an existing database URL.
+Use tools/run_recovery_v2_local.py for native binaries, or DM_RUN_RECOVERY_V2=1
+for a fresh local Docker cluster. Never accepts an existing database URL.
 These cases do not certify a provider or a complete B0-B6 implementation.
 """
 
@@ -40,17 +41,15 @@ from daily_motion.recovery_db import (
     require_read_committed,
 )
 from tests.recovery_authority import ConformanceAuthority
-from tests.recovery_lab import NativeRecoveryLab, fingerprint, migrate
+from tests.recovery_lab import NativeRecoveryLab, RecoveryLab, fingerprint, migrate
 
 
 @pytest.fixture(scope="module")
-def recovery_lab() -> Iterator[NativeRecoveryLab]:
+def recovery_lab() -> Iterator[RecoveryLab]:
     if os.environ.get("DM_RUN_RECOVERY_V2") != "1":
-        pytest.skip("DRP/2 PostgreSQL components require the explicit owned-resource launcher")
+        pytest.skip("DRP/2 PostgreSQL components require explicit DM_RUN_RECOVERY_V2=1")
     binary = os.environ.get("DM_RECOVERY_PG_BIN")
-    if not binary:
-        pytest.fail("DRP/2 explicitly requested but isolated PostgreSQL binaries are missing")
-    lab = NativeRecoveryLab(Path(binary))
+    lab = NativeRecoveryLab(Path(binary)) if binary else RecoveryLab()
     try:
         lab.start()
         admin = lab.engine("daily_motion_test")
@@ -71,7 +70,7 @@ class Target:
 
 
 @pytest.fixture
-def target(recovery_lab: NativeRecoveryLab, monkeypatch: pytest.MonkeyPatch) -> Iterator[Target]:
+def target(recovery_lab: RecoveryLab, monkeypatch: pytest.MonkeyPatch) -> Iterator[Target]:
     admin = recovery_lab.engine("daily_motion_test")
     runtime = recovery_lab.engine("daily_motion_test", runtime=True)
     with admin.begin() as connection:
@@ -294,7 +293,7 @@ def test_new_private_metadata_has_forced_owner_rls_and_legacy_receipts_are_uncha
 
 @pytest.mark.parametrize("populated", [False, True])
 def test_additive_migration_and_old_binary_denial(
-    recovery_lab: NativeRecoveryLab,
+    recovery_lab: RecoveryLab,
     create_body: dict[str, Any],
     monkeypatch: pytest.MonkeyPatch,
     populated: bool,

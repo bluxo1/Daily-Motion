@@ -2040,3 +2040,26 @@ push, deployment, activation or hosted drill occurred. Independent authority,
 actual target/containment proof, committed-marker/abort proof acceptance,
 lifecycle/RPO policy and provider/custody qualification remain open. Phase 0
 remains in progress; no Phase 1 or physical-device gate is closed.
+
+### Recovery V2 CI harness correction — 2026-10-22
+
+PR #10's [PR run](https://github.com/bluxo1/Daily-Motion/actions/runs/39715816403)
+and [push run](https://github.com/bluxo1/Daily-Motion/actions/runs/39715751759)
+each reported **427 Python passes and 63 skips**, then failed the zero-skip
+acceptance check. The workflow omitted `DM_RUN_RECOVERY_V2=1`, and the new
+component fixture required Windows PostgreSQL binaries. CI now opts in, and the
+fixture uses the existing disposable local Docker lab when no native binary path
+is configured. The explicit native launcher and zero-skip acceptance rule remain
+available unchanged.
+
+Local validation passes **490 Python tests, zero skips**, with the native owned
+PostgreSQL launcher, including the existing recovery and nine connected Flutter
+HTTP cases. The CI report checker accepts that report. A separate Linux container
+with Python 3.13.14 and frozen dependencies passes all **63 Recovery V2 PostgreSQL
+component cases, zero skips**, through the Docker fixture. Two direct Windows
+Docker attempts encountered disposable-cluster readiness timeouts; the successful
+Docker validation ran inside Linux with host networking. All **24 tooling tests**,
+Ruff formatting/lint, strict source/script mypy, generated contract comparisons,
+documentation, credential, native configuration and archived receipt checks pass.
+These are local results; a new remote CI outcome and further Phase 0 qualification
+are not claimed.
