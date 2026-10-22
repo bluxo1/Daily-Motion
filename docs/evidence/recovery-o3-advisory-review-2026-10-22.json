@@ -1,0 +1,1241 @@
+{
+  "recorded_at_utc": "2026-10-22T12:08:28.348659+00:00",
+  "status": "ADVISORY_TECHNICAL_REVIEW_COMPLETE_NOT_APPROVED",
+  "phase": {
+    "phase_0": "in_progress",
+    "phase_1": "not_started"
+  },
+  "scope": "Local design/evidence review and existing component probes only; no executable B4/B5 behavior added",
+  "baseline": {
+    "head": "3935d5186a8797693413379271b97df614666102",
+    "tree": "f5fe7067535b14fe2df04e5f80982a9bb9129085",
+    "github_signature_verified": true,
+    "reviewed_feature": "266e164e80efa793df3efcf031e255a3de80ae14",
+    "trees_match": true,
+    "remote_verification": {
+      "main": {
+        "sha": "3935d5186a8797693413379271b97df614666102",
+        "protected": true
+      },
+      "signature": {
+        "sha": "3935d5186a8797693413379271b97df614666102",
+        "tree": "f5fe7067535b14fe2df04e5f80982a9bb9129085",
+        "verified": true,
+        "reason": "valid"
+      },
+      "run": {
+        "head": "3935d5186a8797693413379271b97df614666102",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "jobs": [
+        {
+          "name": "api",
+          "id": 119773722993,
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "mobile (macos-15-intel)",
+          "id": 119773723565,
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "mobile (ubuntu-24.04)",
+          "id": 119773723667,
+          "conclusion": "success",
+          "status": "completed"
+        }
+      ]
+    },
+    "main_ci": {
+      "run": 39763668555,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": 3,
+      "scope": "Merged main only, not this uncommitted package"
+    }
+  },
+  "checkpoint": {
+    "manifest": ".tools/o3-advisory/before/checkpoint.json",
+    "sha256": "051e718a74a3f7ac5ed20629f3f193a76acb1caeb4b0bc1565d5b04a96439a0e",
+    "package_files": 8,
+    "all_matched_prior_receipt_before_review": true,
+    "prior_receipt": "docs/evidence/recovery-o3-design-review-2026-10-22.json",
+    "prior_receipt_unchanged": true
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "High",
+      "title": "Missing exact UNRESOLVED-head observation proof",
+      "before_locations": [
+        "docs/RECOVERY_O3_RECORDS_PROPOSED.md:116",
+        "docs/RECOVERY_O3_RECORDS_PROPOSED.md:169",
+        "docs/RECOVERY_O3_ACCEPTANCE_PLAN.md:P02"
+      ],
+      "support": [
+        "existing_observer_denies_unresolved_head",
+        "recovery_observation.py:235",
+        "SPEC section 4.2"
+      ],
+      "local_disposition": "Design matrix/purpose proof and P02 corrected; new observer remains unimplemented/unapproved"
+    },
+    {
+      "id": "F2",
+      "severity": "Medium",
+      "title": "Independent deletion-completeness assurance needed qualification",
+      "before_locations": [
+        "docs/RECOVERY_O3_VERIFIER_PROPOSAL.md:61",
+        "docs/RECOVERY_O3_VERIFIER_PROPOSAL.md:315",
+        "docs/RECOVERY_O3_ACCEPTANCE_PLAN.md:L03"
+      ],
+      "support": [
+        "inconsistent_omitted_scope_denied",
+        "consistent_omitted_scope_not_independently_detected",
+        "sync.py:225",
+        "SPEC I6/trusted domain assumptions"
+      ],
+      "local_disposition": "Trusted B3 completeness explicit; future pre-delete inventory oracle; excluded coherent administrator corruption, not a restricted-reader exploit"
+    },
+    {
+      "id": "F3",
+      "severity": "Medium",
+      "title": "Absent exact certificate lookup was not representable",
+      "before_locations": [
+        "docs/RECOVERY_O3_RECORDS_PROPOSED.md:234",
+        "docs/RECOVERY_O3_ACCEPTANCE_PLAN.md:R04"
+      ],
+      "support": [
+        "prepared_lookup_has_no_certificate",
+        "tests/recovery_authority.py:207",
+        "SPEC response-loss/idempotency semantics"
+      ],
+      "local_disposition": "Null/absent/unknown/not_requested cases and three loss windows specified; no replay/abort inferred"
+    },
+    {
+      "id": "F4",
+      "severity": "Medium",
+      "title": "Probe success accepted incomplete inventories",
+      "before_locations": [
+        "docs/experiments/recovery_o3_local_probe.py:419"
+      ],
+      "support": [
+        "old_aggregate_gate_accepts_empty",
+        "seven exact inventory controls",
+        "SPEC machine evidence guards"
+      ],
+      "local_disposition": "Explicit 25-name exact-boolean/cardinality guard; 25-check fresh real rerun; original actual report remains valid historical execution"
+    },
+    {
+      "id": "F5",
+      "severity": "Medium",
+      "title": "Oversize oracle conflated existing preparation with new certification",
+      "before_locations": [
+        "docs/RECOVERY_O3_ACCEPTANCE_PLAN.md:98"
+      ],
+      "support": [
+        "SPEC B2-before-B3-before-B4",
+        "5051-ID three-shape sizing measurement"
+      ],
+      "local_disposition": "Pre-append baseline and complete-body/depth bounds specified; S01 not executed; bounds need D10 review"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "advisory_disposition": "Retain with explicit trust/revocation conditions",
+      "evidence": "Admission is an untrusted internal dataclass; owner/assertion binding precedes private reads. Existing auth.py validates mobile identity, not verifier workload identity. F2 and the unsafe scope control bound what B3 trust means",
+      "unresolved_dependency": "Workload federation, current principal/deployment policy, revocation ordering, trusted B3 completeness; no IAM experiment",
+      "required_reviewer_and_precise_decision": "Backend + security: accept that TCB and distinct verifier audience/subject/manifest policy, deny API impersonation, define append-versus-revocation ordering and enforcement bound; or request a stronger witness",
+      "acceptance": "NOT_APPROVED",
+      "named_reviewer": null,
+      "approval_reference": null
+    },
+    {
+      "id": "D2",
+      "advisory_disposition": "Retain candidate grants, not role acceptance",
+      "evidence": "db.py:35 checks runtime metadata, not an exact verifier grant/policy allowlist. Old 20 SQL checks; new five existing observer outcome branches work with 12 training-table/column reads plus control; six denied reads/DML",
+      "unresolved_dependency": "Dedicated readiness, role/policy/function/membership drift, hosted pooler behavior, successor-schema grants",
+      "required_reviewer_and_precise_decision": "Backend + security: approve exact SELECT/lock grants, restrictive policy and callable-function/membership allowlist; require readiness to reject removal/escape, without reusing CRUD readiness",
+      "acceptance": "NOT_APPROVED",
+      "named_reviewer": null,
+      "approval_reference": null
+    },
+    {
+      "id": "D3",
+      "advisory_disposition": "Blocked on platform proof",
+      "evidence": "Activation/Admission compare supplied digests; Engine ownership only separates transactions. Neither current code nor either probe binds a physical connection to unchanged ancestry",
+      "unresolved_dependency": "Independent immutable resource registry, actual-connection proof covering whole transaction, restore/failover revocation/drain and containment",
+      "required_reviewer_and_precise_decision": "Platform/operator + security: supply an enforceable connection/lifecycle contract and its failure evidence, including mid-transaction changes and pool reconnection, or keep this path unavailable",
+      "acceptance": "NOT_APPROVED",
+      "named_reviewer": null,
+      "approval_reference": null
+    },
+    {
+      "id": "D4",
+      "advisory_disposition": "Retain online authenticated record; amend absent lookup",
+      "evidence": "OwnerEvidence/ConformanceAuthority supply pure/local state semantics only. F3 fixes null/absence. Existing marker/envelope digests are content references, not authentication",
+      "unresolved_dependency": "Authenticated authority transport/authorization, rooted complete inventory and scoped lookup; no real authority",
+      "required_reviewer_and_precise_decision": "Backend + security + storage: accept online retrieval/fail-closed availability and exact absence/unknown/inclusion semantics; define authenticated adapter construction and authorization policy",
+      "acceptance": "NOT_APPROVED",
+      "named_reviewer": null,
+      "approval_reference": null
+    },
+    {
+      "id": "D5",
+      "advisory_disposition": "Amend settlement/publication contracts; preserve core bytes",
+      "evidence": "F1, ordinary equality denial, direct and UNRESOLVED reducer paths, existing canonical_json, source/existing example hash checks",
+      "unresolved_dependency": "Strict new parser and purpose validators; prior/prepared anchor retention; additive certificate-present/immutable binding",
+      "required_reviewer_and_precise_decision": "Backend + security: approve each exact head/state proof and golden encoding/counter rules. Do not weaken validate_admission or insert nonce/provenance into current event hashes",
+      "acceptance": "NOT_APPROVED",
+      "named_reviewer": null,
+      "approval_reference": null
+    },
+    {
+      "id": "D6",
+      "advisory_disposition": "Candidate architecture, blocked on O1",
+      "evidence": "No production authority adapter exists; tests/recovery_authority.py is local SQLite only. Root/anchor CAS ordering is a proposed contract, not evidence. R07 remains future",
+      "unresolved_dependency": "Atomic complete-inventory schema, independently administered nonrollbackable anchor, root-publisher custody, one-pending-root backpressure/cost",
+      "required_reviewer_and_precise_decision": "Storage + security + operator: accept or replace this concrete ordering; prove both crash windows and new-worker stale-prefix denial. Approve global pause/throughput tradeoff and separately authorize any RC10 work",
+      "acceptance": "NOT_APPROVED",
+      "named_reviewer": null,
+      "approval_reference": null
+    },
+    {
+      "id": "D7",
+      "advisory_disposition": "Conditional concurrency interpretation, not approval",
+      "evidence": "recovery_db.py:13 shared fence; close_admission takes exclusive lock; separate fresh READ COMMITTED statements. Current observer is not B5",
+      "unresolved_dependency": "Authority ACTIVE read can precede CLOSING while SQL publication precedes CLOSED; no cross-store instantaneous ACTIVE proof",
+      "required_reviewer_and_precise_decision": "Backend + security + recovery operator: explicitly accept fresh-read/shared-fence cutoff, or require redesigned coordination. State permitted two race outcomes before implementing P06",
+      "acceptance": "NOT_APPROVED",
+      "named_reviewer": null,
+      "approval_reference": null
+    },
+    {
+      "id": "D8",
+      "advisory_disposition": "Retain safe closure; amend known-commit resumption",
+      "evidence": "Stable reservations/frozen digest; no missing-row replay; current observer refuses unknown/closed and Qu head. F1 adds design for known-marker settlement",
+      "unresolved_dependency": "Source-unavailable abort/commit proof remains O4; no NOT_COMMITTED resolver, no timeout proof; O5 retention conflict",
+      "required_reviewer_and_precise_decision": "Recovery owner + backend/security: accept closed availability default, specify exact original-source proof and in-flight exclusion for cancellation; authorize no replay/abort from absence",
+      "acceptance": "NOT_APPROVED",
+      "named_reviewer": null,
+      "approval_reference": null
+    },
+    {
+      "id": "D9",
+      "advisory_disposition": "Blocked lifecycle/privacy; clarify completeness/cleanup",
+      "evidence": "accounts.py uses real retirement/initialization barriers; installed recovery control denies v1. Observer supports active known owners only. 0004 allows terminal body null but lacks CERTIFIED_HELD and certificate-required PUBLISHED",
+      "unresolved_dependency": "Lifecycle variants without dummy root; retained minimal prior anchor; erasure obligations for uncertain body; account/offline/key horizons",
+      "required_reviewer_and_precise_decision": "Privacy/security + product + backend: accept B3 retirement enumeration or require independent scope evidence; define lifecycle records, cleanup states and deadlines/backups separately, before schema/GC implementation",
+      "acceptance": "NOT_APPROVED",
+      "named_reviewer": null,
+      "approval_reference": null
+    },
+    {
+      "id": "D10",
+      "advisory_disposition": "Retain candidate bound with local sizing evidence",
+      "evidence": "CreateSession max 50; ExerciseSnapshot max 100; _erase includes root/children. Three compact shape measurements below 1 MiB; F5 corrects oracle. No decoder or paging implemented",
+      "unresolved_dependency": "Complete-body/depth/parser limits; legal admitted variants, future lifecycle growth and untrusted whitespace/depth. No new workout-size policy",
+      "required_reviewer_and_precise_decision": "Backend + security + product: approve 1 MiB complete-body/depth-16/Reference bounds and current coverage calculation; require new variant sizing and no-truncation handling before expanded scope",
+      "acceptance": "NOT_APPROVED",
+      "named_reviewer": null,
+      "approval_reference": null
+    },
+    {
+      "id": "D11",
+      "advisory_disposition": "Retain custody direction, blocked operation",
+      "evidence": "Online records avoid new client authority-signing secrets; code/probes establish no KMS, encryption, expiry or loss recovery",
+      "unresolved_dependency": "Identity/root-publisher and anchor custody, key/version retention, availability, independent recovery and current pricing",
+      "required_reviewer_and_precise_decision": "Operator/custodian + privacy/security + billing: name owners/alternates, revocation/recovery and separation of restore/reset powers, approve retention/region/cost and exact later RC11 scope; no provider selected",
+      "acceptance": "NOT_APPROVED",
+      "named_reviewer": null,
+      "approval_reference": null
+    }
+  ],
+  "new_executions": {
+    "hardened_original_probe": {
+      "report": ".tools/o3-review/4a209b0e706f4059b24ea0d7528e8b02/probe.json",
+      "report_sha256": "3862e355784b9c2269c4acdd8c42aba11a7f25163397ee3a1af6b82f26d705e9",
+      "source_sha256": "cd9e405977a37bcb4d0051375a2a36efb073faff696e0cf958a45d0be6e6d1ce",
+      "matches_final_source": true,
+      "exit_code": 0,
+      "checks_matching_expectations": 25,
+      "skipped": 0,
+      "failed_expectations": 0,
+      "cleanup_completed": true,
+      "postgres_version": "postgres (PostgreSQL) 17.11",
+      "categories": {
+        "original_probe": 25
+      },
+      "checks": [
+        {
+          "name": "core_certification_paths",
+          "passed": true
+        },
+        {
+          "name": "sealed_exact_lookup_is_idempotent",
+          "passed": true
+        },
+        {
+          "name": "sealed_new_certification_denied",
+          "passed": true
+        },
+        {
+          "name": "ordinary_admission_rejects_prepared_to_certified_gap",
+          "passed": true
+        },
+        {
+          "name": "adding_envelope_fields_changes_existing_core_hash",
+          "passed": true
+        },
+        {
+          "name": "select_only_cannot_lock",
+          "passed": true,
+          "sqlstate": "42501",
+          "rows": null
+        },
+        {
+          "name": "permissive_false_check_does_not_override_owner_policy",
+          "passed": true,
+          "sqlstate": null,
+          "rows": 1
+        },
+        {
+          "name": "restrictive_verifier_locks_owner_state",
+          "passed": true,
+          "sqlstate": null,
+          "rows": 1
+        },
+        {
+          "name": "restrictive_verifier_cannot_update_owner_state",
+          "passed": true,
+          "sqlstate": "42501",
+          "rows": null
+        },
+        {
+          "name": "restrictive_verifier_locks_recovery_owners",
+          "passed": true,
+          "sqlstate": null,
+          "rows": 1
+        },
+        {
+          "name": "restrictive_verifier_cannot_update_recovery_owners",
+          "passed": true,
+          "sqlstate": "42501",
+          "rows": null
+        },
+        {
+          "name": "restrictive_verifier_locks_recovery_attempts",
+          "passed": true,
+          "sqlstate": null,
+          "rows": 1
+        },
+        {
+          "name": "restrictive_verifier_cannot_update_recovery_attempts",
+          "passed": true,
+          "sqlstate": "42501",
+          "rows": null
+        },
+        {
+          "name": "verifier_denied_delete",
+          "passed": true,
+          "sqlstate": "42501",
+          "rows": null
+        },
+        {
+          "name": "verifier_denied_insert",
+          "passed": true,
+          "sqlstate": "42501",
+          "rows": null
+        },
+        {
+          "name": "verifier_denied_truncate",
+          "passed": true,
+          "sqlstate": "42501",
+          "rows": null
+        },
+        {
+          "name": "verifier_denied_change_state",
+          "passed": true,
+          "sqlstate": "42501",
+          "rows": null
+        },
+        {
+          "name": "verifier_denied_create",
+          "passed": true,
+          "sqlstate": "42501",
+          "rows": null
+        },
+        {
+          "name": "owner_filter_and_transaction_local_reset",
+          "passed": true
+        },
+        {
+          "name": "guc_is_context_not_authenticated_owner_proof",
+          "passed": true,
+          "sqlstate": null,
+          "rows": 1
+        },
+        {
+          "name": "existing_runtime_metadata_guard_accepts_restricted_verifier",
+          "passed": true
+        },
+        {
+          "name": "read_only_transaction_cannot_lock",
+          "passed": true,
+          "sqlstate": "25006"
+        },
+        {
+          "name": "verifier_lock_blocks_competing_owner_writer",
+          "passed": true,
+          "sqlstate": "55P03"
+        },
+        {
+          "name": "verifier_lock_released_after_transaction",
+          "passed": true
+        },
+        {
+          "name": "xid_and_wal_position_do_not_prove_commit",
+          "passed": true
+        }
+      ]
+    },
+    "advisory_first_intermediate_source": {
+      "report": ".tools/o3-advisory/04ae4b268bcf4d61a53536cca6b6b56e/probe.json",
+      "report_sha256": "77c7f8d8ddab3255d179e6726c88222fe4b91bc3a0232cc5a3ae9647fbd27873",
+      "source_sha256": "5a59dfe6535f7fc96d4215f6b7472a7e75db85a2ca3374debd96be3dae33d812",
+      "matches_final_source": false,
+      "exit_code": 0,
+      "checks_matching_expectations": 23,
+      "skipped": 0,
+      "failed_expectations": 0,
+      "cleanup_completed": true,
+      "postgres_version": "postgres (PostgreSQL) 17.11",
+      "categories": {
+        "runner_control": 7,
+        "unsafe_runner_control": 1,
+        "postgres_component": 5,
+        "existing_test_authority": 1,
+        "postgres_component_expected_denial": 2,
+        "postgres_permission": 6,
+        "unsafe_admin_corruption_control": 1
+      },
+      "checks": [
+        {
+          "name": "inventory_complete",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_empty",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_missing",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_duplicate",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_unknown",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_failed",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_truthy",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "old_aggregate_gate_accepts_empty",
+          "matched_expectation": true,
+          "category": "unsafe_runner_control"
+        },
+        {
+          "name": "reader_observes_create",
+          "matched_expectation": true,
+          "category": "postgres_component"
+        },
+        {
+          "name": "prepared_lookup_has_no_certificate",
+          "matched_expectation": true,
+          "category": "existing_test_authority"
+        },
+        {
+          "name": "existing_observer_denies_unresolved_head",
+          "matched_expectation": true,
+          "category": "postgres_component_expected_denial"
+        },
+        {
+          "name": "reader_denies_profiles",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_denies_observation_payload",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_denies_exercise_definition",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_denies_set_observation",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_denies_snapshot_pages",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_denies_owner_update",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_observes_record",
+          "matched_expectation": true,
+          "category": "postgres_component"
+        },
+        {
+          "name": "reader_observes_conflict",
+          "matched_expectation": true,
+          "category": "postgres_component"
+        },
+        {
+          "name": "reader_observes_rejected",
+          "matched_expectation": true,
+          "category": "postgres_component"
+        },
+        {
+          "name": "reader_observes_delete",
+          "matched_expectation": true,
+          "category": "postgres_component"
+        },
+        {
+          "name": "inconsistent_omitted_scope_denied",
+          "matched_expectation": true,
+          "category": "postgres_component_expected_denial"
+        },
+        {
+          "name": "consistent_omitted_scope_not_independently_detected",
+          "matched_expectation": true,
+          "category": "unsafe_admin_corruption_control",
+          "limitation": "Excluded administrator/whole-binding corruption: B3 completeness is trusted, not independently recovered from post-delete rows"
+        }
+      ]
+    },
+    "advisory_final_source": {
+      "report": ".tools/o3-advisory/53524029bea048038a8d60a8963757e9/probe.json",
+      "report_sha256": "f95a59a026036a237386892e4241cebdacbdef340a3bf8307947e8ddd98c2896",
+      "source_sha256": "75397497862f94ae54c21f5fa0a6cd61ed73f6ce6cab3e24358a6242403b4545",
+      "matches_final_source": true,
+      "exit_code": 0,
+      "checks_matching_expectations": 23,
+      "skipped": 0,
+      "failed_expectations": 0,
+      "cleanup_completed": true,
+      "postgres_version": "postgres (PostgreSQL) 17.11",
+      "categories": {
+        "runner_control": 7,
+        "unsafe_runner_control": 1,
+        "postgres_component": 5,
+        "existing_test_authority": 1,
+        "postgres_component_expected_denial": 2,
+        "postgres_permission": 6,
+        "unsafe_admin_corruption_control": 1
+      },
+      "checks": [
+        {
+          "name": "inventory_complete",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_empty",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_missing",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_duplicate",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_unknown",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_failed",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "inventory_truthy",
+          "matched_expectation": true,
+          "category": "runner_control"
+        },
+        {
+          "name": "old_aggregate_gate_accepts_empty",
+          "matched_expectation": true,
+          "category": "unsafe_runner_control"
+        },
+        {
+          "name": "reader_observes_create",
+          "matched_expectation": true,
+          "category": "postgres_component"
+        },
+        {
+          "name": "prepared_lookup_has_no_certificate",
+          "matched_expectation": true,
+          "category": "existing_test_authority"
+        },
+        {
+          "name": "existing_observer_denies_unresolved_head",
+          "matched_expectation": true,
+          "category": "postgres_component_expected_denial"
+        },
+        {
+          "name": "reader_denies_profiles",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_denies_observation_payload",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_denies_exercise_definition",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_denies_set_observation",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_denies_snapshot_pages",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_denies_owner_update",
+          "matched_expectation": true,
+          "category": "postgres_permission",
+          "sqlstate": "42501"
+        },
+        {
+          "name": "reader_observes_record",
+          "matched_expectation": true,
+          "category": "postgres_component"
+        },
+        {
+          "name": "reader_observes_conflict",
+          "matched_expectation": true,
+          "category": "postgres_component"
+        },
+        {
+          "name": "reader_observes_rejected",
+          "matched_expectation": true,
+          "category": "postgres_component"
+        },
+        {
+          "name": "reader_observes_delete",
+          "matched_expectation": true,
+          "category": "postgres_component"
+        },
+        {
+          "name": "inconsistent_omitted_scope_denied",
+          "matched_expectation": true,
+          "category": "postgres_component_expected_denial"
+        },
+        {
+          "name": "consistent_omitted_scope_not_independently_detected",
+          "matched_expectation": true,
+          "category": "unsafe_admin_corruption_control",
+          "limitation": "Excluded administrator/whole-binding corruption: B3 completeness is trusted, not independently recovered from post-delete rows"
+        }
+      ]
+    }
+  },
+  "first_advisory_source_archive": {
+    "path": ".tools/o3-advisory/first-advisory-source.py",
+    "sha256": "5a59dfe6535f7fc96d4215f6b7472a7e75db85a2ca3374debd96be3dae33d812",
+    "change_to_final": "One formatting-only SQL string line wrap; same recorded check inventory"
+  },
+  "sizing": {
+    "path": ".tools/o3-advisory/sizing.json",
+    "sha256": "b598f1d700677126174e4c49941826f0fdb1e55e7506f6b332b11568d0ca1e78",
+    "measurements": {
+      "scope": "Synthetic shape byte counts only; invalidated example hashes, no validation/commit/authentication",
+      "source_sha256": "c3d7c1a9f60447b97c93e2662fa4c7de339643aa91067ac9b9d38e4618298066",
+      "input_example_sha256": "66d217b5c035b35054704a9c05414444d4942c9b13eab059b66ed8fb36df34ef",
+      "dto_exercises": 50,
+      "dto_sets_per_exercise": 100,
+      "conservative_retired_id_count": 5051,
+      "compact_utf8_bytes": {
+        "observation": 396618,
+        "certificate": 396832,
+        "publication_view": 399365
+      },
+      "candidate_body_cap": 1048576,
+      "all_measured_shapes_below_cap": true,
+      "limits": "DTO cardinality ceiling may exceed command byte admission; current workout variant only, not lifecycle/complete inventory or arbitrary future versions."
+    },
+    "qualification": "Shape measurement only; old hashes deliberately invalidated, no parser/authentication/commit test"
+  },
+  "validation_history": {
+    "advisory_probe_initial_ruff": "9 E501 findings, then 1 remaining E501 at the first successful 23-check execution; all corrected before final execution",
+    "sizing_initial_ruff": "2 E501 findings corrected before measurement",
+    "sql_probe_failures": 0,
+    "sql_probe_skips": 0,
+    "scope_note": "Expected denials and intentionally accepted unsafe controls are matched expectations, not failed tests or security acceptance"
+  },
+  "future_acceptance": {
+    "families": [
+      "V01",
+      "V02",
+      "V03",
+      "V04",
+      "V05",
+      "V06",
+      "V07",
+      "V08",
+      "V09",
+      "V10",
+      "R01",
+      "R02",
+      "R03",
+      "R04",
+      "R05",
+      "R06",
+      "R07",
+      "R08",
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08",
+      "L01",
+      "L02",
+      "L03",
+      "L04",
+      "L05",
+      "L06",
+      "K01",
+      "K02",
+      "S01",
+      "S02"
+    ],
+    "count": 36,
+    "audited": true,
+    "implementation_status": "NOT_IMPLEMENTED_BY_THIS_PACKAGE",
+    "execution_status": "NOT_EXECUTED_AS_B4_B5_QUALIFICATION",
+    "rc10_rc11": "NOT_EXECUTED"
+  },
+  "validation": {
+    "status": "PASS",
+    "scope": "Local docs and experiment-source validation; no B4/B5 acceptance or provider qualification",
+    "checks": [
+      {
+        "name": "docs",
+        "command": ".\\.venv\\Scripts\\python.exe ../../tools/check_docs.py",
+        "workdir": "E:\\Motion\\Daily-Motion-worktrees\\restore-timeline-investigation-20261021\\services\\api",
+        "exit_code": 0,
+        "output": "Validated 47 Markdown files, 514 local links and 5 JSON examples"
+      },
+      {
+        "name": "format",
+        "command": ".\\.venv\\Scripts\\ruff.exe format --check ../../docs/experiments/recovery_o3_local_probe.py ../../docs/experiments/recovery_o3_advisory_probe.py ../../docs/experiments/recovery_o3_record_sizing.py",
+        "workdir": "E:\\Motion\\Daily-Motion-worktrees\\restore-timeline-investigation-20261021\\services\\api",
+        "exit_code": 0,
+        "output": "3 files already formatted"
+      },
+      {
+        "name": "lint",
+        "command": ".\\.venv\\Scripts\\ruff.exe check ../../docs/experiments/recovery_o3_local_probe.py ../../docs/experiments/recovery_o3_advisory_probe.py ../../docs/experiments/recovery_o3_record_sizing.py",
+        "workdir": "E:\\Motion\\Daily-Motion-worktrees\\restore-timeline-investigation-20261021\\services\\api",
+        "exit_code": 0,
+        "output": "All checks passed!"
+      },
+      {
+        "name": "credentials",
+        "command": ".\\.venv\\Scripts\\python.exe ../../tools/check_secrets.py",
+        "workdir": "E:\\Motion\\Daily-Motion-worktrees\\restore-timeline-investigation-20261021\\services\\api",
+        "exit_code": 0,
+        "output": "Credential guard: 318 source files checked, 0 findings"
+      },
+      {
+        "name": "diff",
+        "command": "git diff --check",
+        "workdir": "E:\\Motion\\Daily-Motion-worktrees\\restore-timeline-investigation-20261021",
+        "exit_code": 0,
+        "output": ""
+      }
+    ],
+    "relative_markdown_links": "Changed relative paths and code/heading anchors reviewed; original before-line references are tied to the preserved checkpoint, not shifted revision-3 lines.",
+    "full_regressions": "Not rerun: runtime, schema, contracts, apps and infrastructure unchanged; merged-main CI is retained baseline evidence."
+  },
+  "artifact_and_preservation_assertions": [
+    {
+      "name": "remote_main_signature_tree_and_ci",
+      "matched_expectation": true
+    },
+    {
+      "name": "original_raw_25_report_and_checkpoint_source_preserved",
+      "matched_expectation": true
+    },
+    {
+      "name": "baseline_head_unchanged",
+      "matched_expectation": true
+    },
+    {
+      "name": "branch_unchanged",
+      "matched_expectation": true
+    },
+    {
+      "name": "other_worktree_heads_preserved",
+      "matched_expectation": true
+    },
+    {
+      "name": "original_checkout_untracked_status_preserved",
+      "matched_expectation": true
+    },
+    {
+      "name": "no_runtime_contract_migration_tool_infra_diff",
+      "matched_expectation": true
+    },
+    {
+      "name": "checkpoint_preserved:docs/IMPLEMENTATION.md",
+      "matched_expectation": true
+    },
+    {
+      "name": "checkpoint_preserved:docs/RECOVERY_O3_ACCEPTANCE_PLAN.md",
+      "matched_expectation": true
+    },
+    {
+      "name": "checkpoint_preserved:docs/RECOVERY_O3_RECORDS_PROPOSED.md",
+      "matched_expectation": true
+    },
+    {
+      "name": "checkpoint_preserved:docs/RECOVERY_O3_VERIFIER_PROPOSAL.md",
+      "matched_expectation": true
+    },
+    {
+      "name": "checkpoint_preserved:docs/evidence/recovery-o3-certificate-v1-example.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "checkpoint_preserved:docs/evidence/recovery-o3-design-review-2026-10-22.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "checkpoint_preserved:docs/experiments/recovery_o3_local_probe.py",
+      "matched_expectation": true
+    },
+    {
+      "name": "checkpoint_preserved:docs/phases.md",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:services/api/src/daily_motion/recovery.py",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:services/api/src/daily_motion/recovery_admission.py",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:services/api/src/daily_motion/recovery_effect.py",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:services/api/src/daily_motion/recovery_observation.py",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:services/api/src/daily_motion/db.py",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:services/api/migrations/versions/0004_recovery_protocol.py",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:docs/RECOVERY_PROTOCOL_V2_SPEC.md",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:docs/ADR_RECOVERY_PROTOCOL_V2_PROPOSED.md",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:docs/RESTORE_TIMELINE_INVESTIGATION.md",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:docs/evidence/recovery-observation-ci-followup-2026-10-22.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:docs/evidence/recovery-observation-local-2026-10-22.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_preserved:docs/evidence/recovery-observation-review-2026-10-22.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-ci-routing-review-2026-10-18.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-database-recovery-2026-10-20.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-development-routing-and-ci-2026-10-18.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-hosted-auth-2026-10-15.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-hosted-auth-2026-10-16.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-hosted-auth-flow-2026-10-18.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-hosted-rotation-2026-10-15.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-hosted-smtp-2026-10-17.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-hosted-smtp-delivery-2026-10-17.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-hosted-staging-2026-10-14.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-integration-recovery-2026-10-20.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-provider-qualification-2026-10-18.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-recovery-and-connection-guards-2026-10-18.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-recovery-docker-ci-2026-10-21.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-recovery-integration-2026-10-21.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-render-hook-investigation-2026-10-18.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-render-support-submission-2026-10-18.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-smtp-authentication-headers-2026-10-18.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-staging-deployment-preflight-2026-10-18.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-staging-security-deployment-2026-10-18.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/phase0-windows-native-2026-10-13.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/recovery-o3-certificate-v1-example.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/recovery-o3-design-review-2026-10-22.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/recovery-observation-ci-followup-2026-10-22.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/recovery-observation-local-2026-10-22.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/recovery-observation-review-2026-10-22.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration13.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration14.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration15.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration16.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration18.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "historical_receipt_preserved:docs/evidence/recovery-protocol-v2-local-2026-10-22.json",
+      "matched_expectation": true
+    },
+    {
+      "name": "25_rerun_complete_success_cleanup",
+      "matched_expectation": true
+    },
+    {
+      "name": "first23:complete_success_cleanup",
+      "matched_expectation": true
+    },
+    {
+      "name": "final23:complete_success_cleanup",
+      "matched_expectation": true
+    },
+    {
+      "name": "25_rerun_source_matches",
+      "matched_expectation": true
+    },
+    {
+      "name": "23_final_source_matches",
+      "matched_expectation": true
+    },
+    {
+      "name": "first23_exact_source_recovered",
+      "matched_expectation": true
+    },
+    {
+      "name": "sizing_source_and_original_example_match",
+      "matched_expectation": true
+    },
+    {
+      "name": "current_dto_size_measurements",
+      "matched_expectation": true
+    },
+    {
+      "name": "all_11_decisions_advisory_only",
+      "matched_expectation": true
+    },
+    {
+      "name": "all_36_planned_families_audited_not_executed",
+      "matched_expectation": true
+    },
+    {
+      "name": "five_documented_findings",
+      "matched_expectation": true
+    },
+    {
+      "name": "final_static_checks_exit_zero",
+      "matched_expectation": true
+    }
+  ],
+  "artifact_validation_method": {
+    "script": ".tools/o3-advisory/build_receipt.py",
+    "sha256": "72d07b2e1184c45edae8b7bbdecdea6ae2c19871e52ce8894154c5239aa3b3a4",
+    "scope": "Local evidence/checkpoint/report/hash/inventory audit only, not a future authenticated record parser or B4/B5 acceptance runner"
+  },
+  "package_before_after_sha256": {
+    "docs/IMPLEMENTATION.md": {
+      "before_sha256": "eb5f43019832d4d9a34a049cccc1204b76c7ca2eeeda8d71389c124c41e9c92a",
+      "after_sha256": "df84cb65cc2e2a0da26a30433faead9c68a2fb199411b78ae0e064eb50659290"
+    },
+    "docs/RECOVERY_O3_ACCEPTANCE_PLAN.md": {
+      "before_sha256": "7a9077d60bb33b15204b63b689034e9b60eb51941bbb9e5fd8a498be79176836",
+      "after_sha256": "2adc9eeb9d2c34cc82b5e1d0670c3116d2a93a3fb17d26036e18790acf518364"
+    },
+    "docs/RECOVERY_O3_RECORDS_PROPOSED.md": {
+      "before_sha256": "f88bdb888c93c2fb779e5ba4788219d58f873299eb9c70deb1e93f34460009c0",
+      "after_sha256": "1108e445c4a099e999dfcc51db55ff09da9721e1f783fc093ea26a300fe6b69c"
+    },
+    "docs/RECOVERY_O3_TECHNICAL_REVIEW.md": {
+      "before_sha256": null,
+      "after_sha256": "0c79a019ef6309a26d1f1898759fe1906b4d6ee7fd56fd6fe57c9c615c79d3be"
+    },
+    "docs/RECOVERY_O3_VERIFIER_PROPOSAL.md": {
+      "before_sha256": "de74e740620bef2e736cfc87e632125f78a6378bde68267859646da3ff33c292",
+      "after_sha256": "5ef5525a1dfb43b09e48b412f09572ecfe9d60e0553d442c3b352732017a9a1c"
+    },
+    "docs/evidence/recovery-o3-certificate-v1-example.json": {
+      "before_sha256": "66d217b5c035b35054704a9c05414444d4942c9b13eab059b66ed8fb36df34ef",
+      "after_sha256": "66d217b5c035b35054704a9c05414444d4942c9b13eab059b66ed8fb36df34ef"
+    },
+    "docs/experiments/recovery_o3_advisory_probe.py": {
+      "before_sha256": null,
+      "after_sha256": "75397497862f94ae54c21f5fa0a6cd61ed73f6ce6cab3e24358a6242403b4545"
+    },
+    "docs/experiments/recovery_o3_local_probe.py": {
+      "before_sha256": "f86bd3f3d8f4c054ab7394a48c7e4f176a27d17fd0734de381b945d787928e95",
+      "after_sha256": "cd9e405977a37bcb4d0051375a2a36efb073faff696e0cf958a45d0be6e6d1ce"
+    },
+    "docs/experiments/recovery_o3_record_sizing.py": {
+      "before_sha256": null,
+      "after_sha256": "c3d7c1a9f60447b97c93e2662fa4c7de339643aa91067ac9b9d38e4618298066"
+    },
+    "docs/phases.md": {
+      "before_sha256": "6c2c9b2b5244e8eb1f713185f6d75f9a0aa27658436b55970f29abef1dcde631",
+      "after_sha256": "6bc970b7826e5f4294a28c344e0368918a678ac28eb210b5b56049676a27a2b8"
+    }
+  },
+  "runtime_source_sha256": {
+    "services/api/src/daily_motion/recovery.py": "75d92296fc90032780c68cc94dbf8feca8cfbd795ae4cd5c508361bfda90e3aa",
+    "services/api/src/daily_motion/recovery_admission.py": "52e2a666b9f49e5add9bb3f3fe0107516706359782526e9dec2eb98d4e87c1f9",
+    "services/api/src/daily_motion/recovery_effect.py": "4ff714d9745ce346ea5270a690d560d58dc1e48ca090d70e5493715cb5375e2f",
+    "services/api/src/daily_motion/recovery_observation.py": "0a2bc952131daec8e2cc4dc11bd1b51554e1704e16b0b532af3d3e3e81838d9b",
+    "services/api/src/daily_motion/recovery_db.py": "46e79cb0fdd025325c0ab573c69ae5fd7fa43bb52afbcb4e9d7fc7be586f7a7b",
+    "services/api/src/daily_motion/db.py": "e1180c85aa60bda5149e4765d1d14b8a7cbde974a88fcda8c4582b8c9d37a4f7",
+    "services/api/src/daily_motion/auth.py": "70d328159036a4acab7744bae90f273f791f9cf90a85380c77a597cbffbeaed6",
+    "services/api/src/daily_motion/accounts.py": "810a85a1bb7da572d725256d7c5a71f39d71ce8427c963378d455c8ae31134ec",
+    "services/api/src/daily_motion/sync.py": "45021ddd701e69cae38ed5ef73c45896a20c5ed5ce1f801ddbd1650cf6fe9777",
+    "services/api/src/daily_motion/models.py": "366d232e4fba07f8c3ce4899fe7c44fa495237df3a437f3d73e8324efe542682",
+    "services/api/src/daily_motion/contracts.py": "025db8f5da6dbb3099635443708896413c1c6890749bd21518aecc3bbd1db8b1"
+  },
+  "historical_receipts_preserved": {
+    "docs/evidence/phase0-ci-routing-review-2026-10-18.json": "0a58f2a8cfee538b7cea3b0735ebc382da00e712000c452666528fe61acca12c",
+    "docs/evidence/phase0-database-recovery-2026-10-20.json": "5e8d4aaeab4ed9e39842561faa5c118551156f6c56bfbbe9e1a1832ce855945c",
+    "docs/evidence/phase0-development-routing-and-ci-2026-10-18.json": "39b18e5c09ec573fbef38d4593be3fc5843804a9efc475bd1b10c4d80a5997e9",
+    "docs/evidence/phase0-hosted-auth-2026-10-15.json": "6ddb0e53f0781fcc4d32824d1997509207c56fca03730f2e8f0d3cf37e69c04d",
+    "docs/evidence/phase0-hosted-auth-2026-10-16.json": "adc935901a32561e442148eb60914bd8c3bd10a9bd440d92cc9303080c99efb7",
+    "docs/evidence/phase0-hosted-auth-flow-2026-10-18.json": "ff68a783ca45f419881fc93e1ead441901e0e209dba42b5f9f6a5df1e864c393",
+    "docs/evidence/phase0-hosted-rotation-2026-10-15.json": "80ccf101bc961d7695a49206a2c017c659558310eee96e4ba4a78bf49e1b343c",
+    "docs/evidence/phase0-hosted-smtp-2026-10-17.json": "3cdb7feff2b1c49532dffa09fac6f9872d8287efb9bac6b5a2b4f21c9ce11232",
+    "docs/evidence/phase0-hosted-smtp-delivery-2026-10-17.json": "d05355053734315b67047fba42b501b8533b7edc272dc240868a320c52d76e5e",
+    "docs/evidence/phase0-hosted-staging-2026-10-14.json": "e5c8cf324eff30d6cb930e187f304c5cf1cc2d69de6035652a6e4b63c17a6ed3",
+    "docs/evidence/phase0-integration-recovery-2026-10-20.json": "15728767f2f549063f39a197d9a260274b0e75fcb6e9c5410cdb62b7d5c82a0f",
+    "docs/evidence/phase0-provider-qualification-2026-10-18.json": "e6b5c244138eae52852d36e84e78ae208e1908c8918ad42d02603ed75910192c",
+    "docs/evidence/phase0-recovery-and-connection-guards-2026-10-18.json": "e2929935c43780eae45d14f13b5dd3e39ef4dbda903c0369cc0bd48f4acdd40c",
+    "docs/evidence/phase0-recovery-docker-ci-2026-10-21.json": "ac65e967be7ec2b0f60578352d79b2d5bb5bd0b39d8e1eb493f6281f263ced1d",
+    "docs/evidence/phase0-recovery-integration-2026-10-21.json": "4b4bf117a63f0f421b22f35d3e3a6606d29bfec6438bb2e617fd5abbaf690189",
+    "docs/evidence/phase0-render-hook-investigation-2026-10-18.json": "762ee618e6461445394edd5150844a1e8fe071f702687d94b7cbe8064cf1a373",
+    "docs/evidence/phase0-render-support-submission-2026-10-18.json": "f6badb6721e16b49ef16c7bc430aba8caaa001007a5672fd30a4ebce9f1109f2",
+    "docs/evidence/phase0-smtp-authentication-headers-2026-10-18.json": "24fb865de3d0875a9af7a8a63824631ffc355945a1567cea5b0815d32e50dad1",
+    "docs/evidence/phase0-staging-deployment-preflight-2026-10-18.json": "22c8e411ae8faf32090834c479f6dcd83d58729439df0c853a832cbb3184e29f",
+    "docs/evidence/phase0-staging-security-deployment-2026-10-18.json": "0685ba20aad44215c62d5d8972fabad7ac99e8779221de441b92771b170b664a",
+    "docs/evidence/phase0-windows-native-2026-10-13.json": "4adc578f5729dfdef790c6079d7f18ed3a5a95f14db39f06968872ea5c9e8181",
+    "docs/evidence/recovery-o3-certificate-v1-example.json": "66d217b5c035b35054704a9c05414444d4942c9b13eab059b66ed8fb36df34ef",
+    "docs/evidence/recovery-o3-design-review-2026-10-22.json": "c5b68658df6683b7e9da07f771cb9549b8d365e8de1006a025bc717dcb87f01b",
+    "docs/evidence/recovery-observation-ci-followup-2026-10-22.json": "89fc124e463a9d0aa95cbde281b6ab3759043cbc1fb1602f5aefe58e091d763e",
+    "docs/evidence/recovery-observation-local-2026-10-22.json": "12503450da3ba98c0d1a76561bdb07cb470c2ff03b68a248d60611d3d809502e",
+    "docs/evidence/recovery-observation-review-2026-10-22.json": "a0bfdfdeb939dd19a3bea704c6c31ad0426dbe2e9a4f02648d96706472a5d179",
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration13.json": "2148df847171c1efcfd139f73287b631a4db5855cc5438e740839effcf37c1fc",
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration14.json": "53ecfb4c4d42f1bbcc7f3e0bfb02ce4f69bec8596b57e65e101f78bc46424192",
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration15.json": "88e0d323f36404cd01a5c63681184141fa09e202103ce3ca1fbd6b7e67eed4a5",
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration16.json": "fddc59880327b3ada72ef8698dd3d457a3c14fcccdf86799ba138b79ccf05858",
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration18.json": "d0a7244f879982a588161ec5c7ba6af80072ff0e85ec745184564b618311067f",
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22.json": "9ec06ae7425565714e54b37c3e673f087e4b258a9ec3128831495e3b05bfb46b"
+  },
+  "protected_files_preserved": {
+    "services/api/src/daily_motion/recovery.py": "75d92296fc90032780c68cc94dbf8feca8cfbd795ae4cd5c508361bfda90e3aa",
+    "services/api/src/daily_motion/recovery_admission.py": "52e2a666b9f49e5add9bb3f3fe0107516706359782526e9dec2eb98d4e87c1f9",
+    "services/api/src/daily_motion/recovery_effect.py": "4ff714d9745ce346ea5270a690d560d58dc1e48ca090d70e5493715cb5375e2f",
+    "services/api/src/daily_motion/recovery_observation.py": "0a2bc952131daec8e2cc4dc11bd1b51554e1704e16b0b532af3d3e3e81838d9b",
+    "services/api/src/daily_motion/db.py": "e1180c85aa60bda5149e4765d1d14b8a7cbde974a88fcda8c4582b8c9d37a4f7",
+    "services/api/migrations/versions/0004_recovery_protocol.py": "d4d594e48f1032911fdf513f30db2148c6a0c2b52b9efac0acd58e38afe4e132",
+    "docs/RECOVERY_PROTOCOL_V2_SPEC.md": "61ee2b5f4f035ce066c6719b0a1783f5427c08a5db438fe6d4c234d9bd4a54ac",
+    "docs/ADR_RECOVERY_PROTOCOL_V2_PROPOSED.md": "08bd8809dec6981de7ab657c55e682d32bd12e65e3f41af62ac5d873a39439a7",
+    "docs/RESTORE_TIMELINE_INVESTIGATION.md": "a38051ecb48bb2c6888b8150766a5fb87a652e16888ae1dd8a0a24db3e02f0f2",
+    "docs/evidence/recovery-observation-ci-followup-2026-10-22.json": "89fc124e463a9d0aa95cbde281b6ab3759043cbc1fb1602f5aefe58e091d763e",
+    "docs/evidence/recovery-observation-local-2026-10-22.json": "12503450da3ba98c0d1a76561bdb07cb470c2ff03b68a248d60611d3d809502e",
+    "docs/evidence/recovery-observation-review-2026-10-22.json": "a0bfdfdeb939dd19a3bea704c6c31ad0426dbe2e9a4f02648d96706472a5d179"
+  },
+  "workspace": {
+    "branch": "docs/o3-verifier-review-20261022",
+    "head_unchanged": true,
+    "uncommitted": true,
+    "other_worktree_heads_unchanged": true,
+    "original_checkout_status_unchanged": true,
+    "signing_configuration": {
+      "commit_gpgsign": "true",
+      "format": "ssh"
+    }
+  },
+  "limitations": [
+    "All D1-D11 acceptance and named reviewers remain absent; advisory review does not satisfy O3/O11",
+    "Local LOGIN uses loopback trust; no workload credential/IAM authentication qualified",
+    "Candidate full reader queries work in existing five outcomes; no dedicated role readiness/drift, lifecycle/settlement or provider/pooler qualification",
+    "Coherent administrator omission control assumes the explicitly excluded trusted-writer failure; it is not an unprivileged exploit",
+    "No actual-target continuity, root/anchor service, inventory schema or authority provider selected/qualified",
+    "O1/O2/O4/O5/D7 and custody/operation decisions remain blocking; no B4/B5 implementation readiness",
+    "Zero physical-device qualification; no hosted drills or RC10/RC11 execution"
+  ],
+  "actions_not_performed": [
+    "commit",
+    "push",
+    "open_PR",
+    "merge",
+    "deploy",
+    "provider_changes",
+    "external_review_messages",
+    "hosted_drill"
+  ]
+}

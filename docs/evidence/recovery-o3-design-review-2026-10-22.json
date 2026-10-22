@@ -1,0 +1,541 @@
+{
+  "recorded_at_utc": "2026-10-22T11:25:24.773300+00:00",
+  "status": "LOCAL_REVIEW_PACKAGE_PROPOSED_UNAPPROVED",
+  "phase": {
+    "phase_0": "in_progress",
+    "phase_1": "not_started"
+  },
+  "scope": "Documentation design, one bounded local SQL/reducer experiment, and computed synthetic examples only; no trusted certificate or B4/B5 implementation.",
+  "baseline": {
+    "main": "3935d5186a8797693413379271b97df614666102",
+    "github_signature_verified": true,
+    "tree": "f5fe7067535b14fe2df04e5f80982a9bb9129085",
+    "pr": 11,
+    "merged": true,
+    "reviewed_feature": "266e164e80efa793df3efcf031e255a3de80ae14",
+    "trees_match": true
+  },
+  "local_state": {
+    "branch": "docs/o3-verifier-review-20261022",
+    "head": "3935d5186a8797693413379271b97df614666102",
+    "package_uncommitted": true,
+    "original_checkout_and_other_worktree_heads_untouched": true
+  },
+  "baseline_ci": {
+    "url": "https://github.com/bluxo1/Daily-Motion/actions/runs/39763668555",
+    "id": 39763668555,
+    "head_sha": "3935d5186a8797693413379271b97df614666102",
+    "status": "completed",
+    "conclusion": "success",
+    "github_updated_at": "2026-10-22T10:49:07Z",
+    "scope": "Merged-main baseline; not CI on this uncommitted design package.",
+    "jobs": [
+      {
+        "id": 119773722993,
+        "name": "api",
+        "conclusion": "success",
+        "python_passed": 536,
+        "python_skipped": 0,
+        "log_summary": "536 passed in 34.00s; Python acceptance: 536 passed, zero skipped; recovery and connected cases present"
+      },
+      {
+        "id": 119773723565,
+        "name": "mobile (macos-15-intel)",
+        "conclusion": "success",
+        "flutter_passed": 215,
+        "flutter_skipped": 12,
+        "unsigned_ios_builds": "success"
+      },
+      {
+        "id": 119773723667,
+        "name": "mobile (ubuntu-24.04)",
+        "conclusion": "success",
+        "flutter_passed": 215,
+        "flutter_skipped": 12,
+        "android_builds": "success"
+      }
+    ]
+  },
+  "bounded_probe": {
+    "command_from_services_api": ".\\.venv\\Scripts\\python.exe ../../docs/experiments/recovery_o3_local_probe.py --run-local --pg-bin E:/Motion/Daily-Motion-worktrees/recovery/.tools/postgres/pgsql/bin",
+    "report": ".tools/o3-review/a7a4d6acb46c4d7d83d6520505e88747/probe.json",
+    "report_sha256": "cc6209924c696af6a85dbcb406caa3211eaf2393fc0ee8dae6e81aec814765c0",
+    "source_sha256": "f86bd3f3d8f4c054ab7394a48c7e4f176a27d17fd0734de381b945d787928e95",
+    "python": "3.13.14",
+    "postgres_version": "postgres (PostgreSQL) 17.11",
+    "exit_code": 0,
+    "checks_matching_expectations": 25,
+    "sql_checks": 20,
+    "existing_pure_reducer_checks": 5,
+    "skipped": 0,
+    "failed_expectations": 0,
+    "cleanup_completed": true,
+    "checks": [
+      {
+        "name": "core_certification_paths",
+        "passed": true,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "sealed_exact_lookup_is_idempotent",
+        "passed": true,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "sealed_new_certification_denied",
+        "passed": true,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "ordinary_admission_rejects_prepared_to_certified_gap",
+        "passed": true,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "adding_envelope_fields_changes_existing_core_hash",
+        "passed": true,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "select_only_cannot_lock",
+        "passed": true,
+        "sqlstate": "42501",
+        "rows": null,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "permissive_false_check_does_not_override_owner_policy",
+        "passed": true,
+        "sqlstate": null,
+        "rows": 1,
+        "expected_unsafe_control": true
+      },
+      {
+        "name": "restrictive_verifier_locks_owner_state",
+        "passed": true,
+        "sqlstate": null,
+        "rows": 1,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "restrictive_verifier_cannot_update_owner_state",
+        "passed": true,
+        "sqlstate": "42501",
+        "rows": null,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "restrictive_verifier_locks_recovery_owners",
+        "passed": true,
+        "sqlstate": null,
+        "rows": 1,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "restrictive_verifier_cannot_update_recovery_owners",
+        "passed": true,
+        "sqlstate": "42501",
+        "rows": null,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "restrictive_verifier_locks_recovery_attempts",
+        "passed": true,
+        "sqlstate": null,
+        "rows": 1,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "restrictive_verifier_cannot_update_recovery_attempts",
+        "passed": true,
+        "sqlstate": "42501",
+        "rows": null,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "verifier_denied_delete",
+        "passed": true,
+        "sqlstate": "42501",
+        "rows": null,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "verifier_denied_insert",
+        "passed": true,
+        "sqlstate": "42501",
+        "rows": null,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "verifier_denied_truncate",
+        "passed": true,
+        "sqlstate": "42501",
+        "rows": null,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "verifier_denied_change_state",
+        "passed": true,
+        "sqlstate": "42501",
+        "rows": null,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "verifier_denied_create",
+        "passed": true,
+        "sqlstate": "42501",
+        "rows": null,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "owner_filter_and_transaction_local_reset",
+        "passed": true,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "guc_is_context_not_authenticated_owner_proof",
+        "passed": true,
+        "sqlstate": null,
+        "rows": 1,
+        "expected_unsafe_control": true
+      },
+      {
+        "name": "existing_runtime_metadata_guard_accepts_restricted_verifier",
+        "passed": true,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "read_only_transaction_cannot_lock",
+        "passed": true,
+        "sqlstate": "25006",
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "verifier_lock_blocks_competing_owner_writer",
+        "passed": true,
+        "sqlstate": "55P03",
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "verifier_lock_released_after_transaction",
+        "passed": true,
+        "expected_unsafe_control": false
+      },
+      {
+        "name": "xid_and_wal_position_do_not_prove_commit",
+        "passed": true,
+        "expected_unsafe_control": true
+      }
+    ],
+    "limits": [
+      "New owned local cluster only; no existing database URL accepted",
+      "Three guard-table lock policies demonstrated; complete observation SELECT allowlist and full deployed role not qualified",
+      "Positive GUC control demonstrates credential possession is not authenticated owner identity",
+      "No full observation run under this role, workload authentication, actual connection continuity, authority adapter or B4/B5 execution",
+      "Matching expected unsafe controls are not security acceptance"
+    ],
+    "validation_history": "Initial Ruff import/unused-name/line-length findings were corrected before the only SQL probe execution; no failed probe run or hidden rerun."
+  },
+  "synthetic_example": {
+    "path": "docs/evidence/recovery-o3-certificate-v1-example.json",
+    "sha256": "66d217b5c035b35054704a9c05414444d4942c9b13eab059b66ed8fb36df34ef",
+    "certificate_id": "bc1aadde47d727d1b6483fc27c215e5978094084eb749e5fe3aee2eb5aa35da0",
+    "attestation_digest": "9a2baeee14510ddfcfba2bba0d963eb8f688a88cf5c36a694691c362c7c91aee",
+    "authenticated": false,
+    "executed_domain_commit": false
+  },
+  "future_acceptance": {
+    "case_ids": [
+      "V01",
+      "V02",
+      "V03",
+      "V04",
+      "V05",
+      "V06",
+      "V07",
+      "V08",
+      "V09",
+      "V10",
+      "R01",
+      "R02",
+      "R03",
+      "R04",
+      "R05",
+      "R06",
+      "R07",
+      "R08",
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08",
+      "L01",
+      "L02",
+      "L03",
+      "L04",
+      "L05",
+      "L06",
+      "K01",
+      "K02",
+      "S01",
+      "S02"
+    ],
+    "count": 36,
+    "status": "NOT_IMPLEMENTED_NOT_EXECUTED_BY_THIS_PACKAGE",
+    "required_reviewers": "unassigned",
+    "decisions": [
+      "D1",
+      "D2",
+      "D3",
+      "D4",
+      "D5",
+      "D6",
+      "D7",
+      "D8",
+      "D9",
+      "D10",
+      "D11"
+    ]
+  },
+  "local_validation": {
+    "status": "PASS",
+    "scope": "Local documentation/experiment-source checks; no B4/B5 runtime or provider qualification.",
+    "checks": [
+      {
+        "command": "python tools/check_docs.py",
+        "exit_code": 0,
+        "output": "Validated 46 Markdown files, 498 local links and 5 JSON examples"
+      },
+      {
+        "command": "ruff format --check docs/experiments/recovery_o3_local_probe.py",
+        "exit_code": 0,
+        "output": "1 file already formatted"
+      },
+      {
+        "command": "ruff check docs/experiments/recovery_o3_local_probe.py",
+        "exit_code": 0,
+        "output": "All checks passed!"
+      },
+      {
+        "command": "python tools/check_secrets.py",
+        "exit_code": 0,
+        "output": "Credential guard: 314 source files checked, 0 findings"
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0,
+        "output": ""
+      }
+    ],
+    "relative_markdown_links": "Reviewed changed relative links and target headings; automated existence checks pass. New records/acceptance/example/evidence paths resolve.",
+    "validation_history": "Ruff findings in the new probe were corrected before the only SQL execution. The final documentation/credential/format/lint/diff commands here pass; future 36-case inventory is not executed."
+  },
+  "artifact_consistency_checks": [
+    {
+      "name": "probe_source_matches_executed_report",
+      "passed": true
+    },
+    {
+      "name": "25_expected_checks_and_cleanup",
+      "passed": true
+    },
+    {
+      "name": "original_marker_and_result_preimages",
+      "passed": true
+    },
+    {
+      "name": "original_prepared_checkpoint",
+      "passed": true
+    },
+    {
+      "name": "original_direct_certified_checkpoint",
+      "passed": true
+    },
+    {
+      "name": "original_unresolved_settlement_checkpoints",
+      "passed": true
+    },
+    {
+      "name": "synthetic_envelope_hash_round_trip",
+      "passed": true
+    },
+    {
+      "name": "36_unique_future_case_ids",
+      "passed": true
+    },
+    {
+      "name": "11_unapproved_decision_ids",
+      "passed": true
+    },
+    {
+      "name": "fresh_docs_branch_from_verified_main",
+      "passed": true
+    },
+    {
+      "name": "no_runtime_migration_contract_tool_changes",
+      "passed": true
+    },
+    {
+      "name": "preserved:services/api/src/daily_motion/recovery.py",
+      "passed": true
+    },
+    {
+      "name": "preserved:services/api/src/daily_motion/recovery_admission.py",
+      "passed": true
+    },
+    {
+      "name": "preserved:services/api/src/daily_motion/recovery_effect.py",
+      "passed": true
+    },
+    {
+      "name": "preserved:services/api/src/daily_motion/recovery_observation.py",
+      "passed": true
+    },
+    {
+      "name": "preserved:services/api/src/daily_motion/db.py",
+      "passed": true
+    },
+    {
+      "name": "preserved:services/api/migrations/versions/0004_recovery_protocol.py",
+      "passed": true
+    },
+    {
+      "name": "preserved:docs/RECOVERY_PROTOCOL_V2_SPEC.md",
+      "passed": true
+    },
+    {
+      "name": "preserved:docs/ADR_RECOVERY_PROTOCOL_V2_PROPOSED.md",
+      "passed": true
+    },
+    {
+      "name": "preserved:docs/RESTORE_TIMELINE_INVESTIGATION.md",
+      "passed": true
+    },
+    {
+      "name": "preserved:docs/evidence/recovery-observation-ci-followup-2026-10-22.json",
+      "passed": true
+    },
+    {
+      "name": "preserved:docs/evidence/recovery-observation-local-2026-10-22.json",
+      "passed": true
+    },
+    {
+      "name": "preserved:docs/evidence/recovery-observation-review-2026-10-22.json",
+      "passed": true
+    }
+  ],
+  "artifact_consistency_method": {
+    "script": ".tools/o3-review/build_review_artifacts.py",
+    "script_sha256": "c290a059b7424c8308f25445cd02ef99baa4da10dbc7d45a9bbc70d444b0efc1",
+    "scope": "Ignored local evidence builder: asserts source/report hashes, recomputes documented marker/event/envelope example hashes, counts decision/case inventory and checks protected files. Not an authenticated record parser or future acceptance-test execution."
+  },
+  "package_sha256": {
+    "docs/RECOVERY_O3_VERIFIER_PROPOSAL.md": "de74e740620bef2e736cfc87e632125f78a6378bde68267859646da3ff33c292",
+    "docs/RECOVERY_O3_RECORDS_PROPOSED.md": "f88bdb888c93c2fb779e5ba4788219d58f873299eb9c70deb1e93f34460009c0",
+    "docs/RECOVERY_O3_ACCEPTANCE_PLAN.md": "7a9077d60bb33b15204b63b689034e9b60eb51941bbb9e5fd8a498be79176836",
+    "docs/experiments/recovery_o3_local_probe.py": "f86bd3f3d8f4c054ab7394a48c7e4f176a27d17fd0734de381b945d787928e95",
+    "docs/evidence/recovery-o3-certificate-v1-example.json": "66d217b5c035b35054704a9c05414444d4942c9b13eab059b66ed8fb36df34ef",
+    "docs/phases.md": "6c2c9b2b5244e8eb1f713185f6d75f9a0aa27658436b55970f29abef1dcde631",
+    "docs/IMPLEMENTATION.md": "eb5f43019832d4d9a34a049cccc1204b76c7ca2eeeda8d71389c124c41e9c92a"
+  },
+  "protected_baseline_files": {
+    "services/api/src/daily_motion/recovery.py": {
+      "working_file_sha256": "75d92296fc90032780c68cc94dbf8feca8cfbd795ae4cd5c508361bfda90e3aa",
+      "git_filtered_blob": "04fc941d4e45e94a552d45c5b1e29984e32f1e4e",
+      "baseline_blob": "04fc941d4e45e94a552d45c5b1e29984e32f1e4e",
+      "unchanged": true
+    },
+    "services/api/src/daily_motion/recovery_admission.py": {
+      "working_file_sha256": "52e2a666b9f49e5add9bb3f3fe0107516706359782526e9dec2eb98d4e87c1f9",
+      "git_filtered_blob": "244002ca73a8ece75be7cbf73ea1689c03eea070",
+      "baseline_blob": "244002ca73a8ece75be7cbf73ea1689c03eea070",
+      "unchanged": true
+    },
+    "services/api/src/daily_motion/recovery_effect.py": {
+      "working_file_sha256": "4ff714d9745ce346ea5270a690d560d58dc1e48ca090d70e5493715cb5375e2f",
+      "git_filtered_blob": "35ab018bc5953743d3c136863b26f5d0f70d11a2",
+      "baseline_blob": "35ab018bc5953743d3c136863b26f5d0f70d11a2",
+      "unchanged": true
+    },
+    "services/api/src/daily_motion/recovery_observation.py": {
+      "working_file_sha256": "0a2bc952131daec8e2cc4dc11bd1b51554e1704e16b0b532af3d3e3e81838d9b",
+      "git_filtered_blob": "f76933c2af102f3c3506e5c48887719ddb2dd24b",
+      "baseline_blob": "f76933c2af102f3c3506e5c48887719ddb2dd24b",
+      "unchanged": true
+    },
+    "services/api/src/daily_motion/db.py": {
+      "working_file_sha256": "e1180c85aa60bda5149e4765d1d14b8a7cbde974a88fcda8c4582b8c9d37a4f7",
+      "git_filtered_blob": "b8902638c40330fa52c8538fe259e690c19c8194",
+      "baseline_blob": "b8902638c40330fa52c8538fe259e690c19c8194",
+      "unchanged": true
+    },
+    "services/api/migrations/versions/0004_recovery_protocol.py": {
+      "working_file_sha256": "d4d594e48f1032911fdf513f30db2148c6a0c2b52b9efac0acd58e38afe4e132",
+      "git_filtered_blob": "c525ce53357deeb19f89798e6b3de5d7a05cf33c",
+      "baseline_blob": "c525ce53357deeb19f89798e6b3de5d7a05cf33c",
+      "unchanged": true
+    },
+    "docs/RECOVERY_PROTOCOL_V2_SPEC.md": {
+      "working_file_sha256": "61ee2b5f4f035ce066c6719b0a1783f5427c08a5db438fe6d4c234d9bd4a54ac",
+      "git_filtered_blob": "2cce2900b5453de9f4492533ec75fe57676cd181",
+      "baseline_blob": "2cce2900b5453de9f4492533ec75fe57676cd181",
+      "unchanged": true
+    },
+    "docs/ADR_RECOVERY_PROTOCOL_V2_PROPOSED.md": {
+      "working_file_sha256": "08bd8809dec6981de7ab657c55e682d32bd12e65e3f41af62ac5d873a39439a7",
+      "git_filtered_blob": "ca1c940c815893009c8444820497eafe64df56ad",
+      "baseline_blob": "ca1c940c815893009c8444820497eafe64df56ad",
+      "unchanged": true
+    },
+    "docs/RESTORE_TIMELINE_INVESTIGATION.md": {
+      "working_file_sha256": "a38051ecb48bb2c6888b8150766a5fb87a652e16888ae1dd8a0a24db3e02f0f2",
+      "git_filtered_blob": "6df0f027903bca8058c82ff5e2af5e835849ff90",
+      "baseline_blob": "6df0f027903bca8058c82ff5e2af5e835849ff90",
+      "unchanged": true
+    },
+    "docs/evidence/recovery-observation-ci-followup-2026-10-22.json": {
+      "working_file_sha256": "89fc124e463a9d0aa95cbde281b6ab3759043cbc1fb1602f5aefe58e091d763e",
+      "git_filtered_blob": "2771fab9b93a7a9ac2eb7ae078640d873045c3f7",
+      "baseline_blob": "2771fab9b93a7a9ac2eb7ae078640d873045c3f7",
+      "unchanged": true
+    },
+    "docs/evidence/recovery-observation-local-2026-10-22.json": {
+      "working_file_sha256": "12503450da3ba98c0d1a76561bdb07cb470c2ff03b68a248d60611d3d809502e",
+      "git_filtered_blob": "1449872ca150b1ed809d0856fe4ccfe9007e3efd",
+      "baseline_blob": "1449872ca150b1ed809d0856fe4ccfe9007e3efd",
+      "unchanged": true
+    },
+    "docs/evidence/recovery-observation-review-2026-10-22.json": {
+      "working_file_sha256": "a0bfdfdeb939dd19a3bea704c6c31ad0426dbe2e9a4f02648d96706472a5d179",
+      "git_filtered_blob": "1787df1b9cbf2ae83cfdc2e130a05df3717e090c",
+      "baseline_blob": "1787df1b9cbf2ae83cfdc2e130a05df3717e090c",
+      "unchanged": true
+    }
+  },
+  "original_o3_sketch": {
+    "ref": "3935d5186a8797693413379271b97df614666102:docs/RECOVERY_O3_VERIFIER_PROPOSAL.md",
+    "git_blob": "f1d1a9d3493f6aca9d0eef60ce2bdd547c85facc",
+    "git_blob_content_sha256": "624e8b808b659389fecf234716029ef507216f09f3159fc89a7da1e22f0ccbb0"
+  },
+  "limits_and_open_gates": [
+    "O3 is proposed and unapproved; automated technical review is advisory",
+    "O1 latest-head/atomicity and O2 actual-target continuity remain unqualified platform questions",
+    "O4 unresolved proof and O5 lifecycle/retention/overflow coverage remain open",
+    "D7 cross-store close interpretation requires explicit backend/security acceptance",
+    "O9/O10 custody/rotation/budget and O11 technical review remain open",
+    "B4/B5 not implemented; full PG/SQ/RC matrix not executed",
+    "RC10/RC11 NOT EXECUTED; physical-device samples zero; no provider qualification"
+  ],
+  "actions_not_performed": [
+    "commit",
+    "push",
+    "open_PR",
+    "merge",
+    "deploy",
+    "provider_change",
+    "hosted_drill"
+  ]
+}

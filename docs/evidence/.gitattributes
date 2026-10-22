@@ -1,0 +1,5 @@
+# Preserve these recorded local artifacts byte for byte for SHA-256 verification.
+# Their CRLF bytes are part of the historical evidence; keep JSON diffs readable.
+recovery-o3-advisory-review-2026-10-22.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+recovery-o3-certificate-v1-example.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+recovery-o3-design-review-2026-10-22.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

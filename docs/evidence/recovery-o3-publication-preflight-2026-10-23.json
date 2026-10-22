@@ -1,0 +1,374 @@
+{
+  "recorded_at_utc": "2026-10-22T22:42:56.822094+00:00",
+  "scope": "Publication preflight of the completed local O3 design and advisory review; not O3 acceptance or B4/B5 implementation authorization",
+  "branch": "docs/o3-verifier-review-20261022",
+  "baseline_main": "3935d5186a8797693413379271b97df614666102",
+  "phase_0": "IN_PROGRESS",
+  "phase_1": "NOT_STARTED",
+  "o3_status": "PROPOSED_UNAPPROVED",
+  "decisions_D1_D11": "ALL_UNAPPROVED",
+  "publication_correction": {
+    "issue": "Default Git normalization changed three new CRLF evidence artifacts, invalidating recorded byte hashes",
+    "fix": "docs/evidence/.gitattributes preserves exactly those three artifacts, with readable JSON diffs and CR recognized as a line ending",
+    "historical_evidence": "Original receipts and protected files were not rewritten. Existing tracked historical artifacts retain their main blobs; local snapshot hashes and Git blob hashes are mapped below. A mismatch in this map is a line-ending representation difference, not a newly executed experiment."
+  },
+  "reviewed_package_and_publication_attributes_git_blob_sha256": {
+    "docs/IMPLEMENTATION.md": "df84cb65cc2e2a0da26a30433faead9c68a2fb199411b78ae0e064eb50659290",
+    "docs/RECOVERY_O3_ACCEPTANCE_PLAN.md": "2adc9eeb9d2c34cc82b5e1d0670c3116d2a93a3fb17d26036e18790acf518364",
+    "docs/RECOVERY_O3_RECORDS_PROPOSED.md": "1108e445c4a099e999dfcc51db55ff09da9721e1f783fc093ea26a300fe6b69c",
+    "docs/RECOVERY_O3_TECHNICAL_REVIEW.md": "0c79a019ef6309a26d1f1898759fe1906b4d6ee7fd56fd6fe57c9c615c79d3be",
+    "docs/RECOVERY_O3_VERIFIER_PROPOSAL.md": "5ef5525a1dfb43b09e48b412f09572ecfe9d60e0553d442c3b352732017a9a1c",
+    "docs/evidence/.gitattributes": "a83432cf721de1315ff5922c2622215aa41f75df5428e42f7d9603cd92181d9f",
+    "docs/evidence/recovery-o3-advisory-review-2026-10-22.json": "d06fd1ce407a6e08176b4053bf0478a011db377121126c21f947e16212a81e00",
+    "docs/evidence/recovery-o3-certificate-v1-example.json": "66d217b5c035b35054704a9c05414444d4942c9b13eab059b66ed8fb36df34ef",
+    "docs/evidence/recovery-o3-design-review-2026-10-22.json": "c5b68658df6683b7e9da07f771cb9549b8d365e8de1006a025bc717dcb87f01b",
+    "docs/experiments/recovery_o3_advisory_probe.py": "75397497862f94ae54c21f5fa0a6cd61ed73f6ce6cab3e24358a6242403b4545",
+    "docs/experiments/recovery_o3_local_probe.py": "cd9e405977a37bcb4d0051375a2a36efb073faff696e0cf958a45d0be6e6d1ce",
+    "docs/experiments/recovery_o3_record_sizing.py": "c3d7c1a9f60447b97c93e2662fa4c7de339643aa91067ac9b9d38e4618298066",
+    "docs/phases.md": "6bc970b7826e5f4294a28c344e0368918a678ac28eb210b5b56049676a27a2b8"
+  },
+  "local_snapshot_and_git_blob_mapping": {
+    "docs/evidence/phase0-ci-routing-review-2026-10-18.json": {
+      "local_sha256": "0a58f2a8cfee538b7cea3b0735ebc382da00e712000c452666528fe61acca12c",
+      "git_blob_sha256": "0a58f2a8cfee538b7cea3b0735ebc382da00e712000c452666528fe61acca12c",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-database-recovery-2026-10-20.json": {
+      "local_sha256": "5e8d4aaeab4ed9e39842561faa5c118551156f6c56bfbbe9e1a1832ce855945c",
+      "git_blob_sha256": "5e8d4aaeab4ed9e39842561faa5c118551156f6c56bfbbe9e1a1832ce855945c",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-development-routing-and-ci-2026-10-18.json": {
+      "local_sha256": "39b18e5c09ec573fbef38d4593be3fc5843804a9efc475bd1b10c4d80a5997e9",
+      "git_blob_sha256": "39b18e5c09ec573fbef38d4593be3fc5843804a9efc475bd1b10c4d80a5997e9",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-hosted-auth-2026-10-15.json": {
+      "local_sha256": "6ddb0e53f0781fcc4d32824d1997509207c56fca03730f2e8f0d3cf37e69c04d",
+      "git_blob_sha256": "6ddb0e53f0781fcc4d32824d1997509207c56fca03730f2e8f0d3cf37e69c04d",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-hosted-auth-2026-10-16.json": {
+      "local_sha256": "adc935901a32561e442148eb60914bd8c3bd10a9bd440d92cc9303080c99efb7",
+      "git_blob_sha256": "adc935901a32561e442148eb60914bd8c3bd10a9bd440d92cc9303080c99efb7",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-hosted-auth-flow-2026-10-18.json": {
+      "local_sha256": "ff68a783ca45f419881fc93e1ead441901e0e209dba42b5f9f6a5df1e864c393",
+      "git_blob_sha256": "ff68a783ca45f419881fc93e1ead441901e0e209dba42b5f9f6a5df1e864c393",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-hosted-rotation-2026-10-15.json": {
+      "local_sha256": "80ccf101bc961d7695a49206a2c017c659558310eee96e4ba4a78bf49e1b343c",
+      "git_blob_sha256": "80ccf101bc961d7695a49206a2c017c659558310eee96e4ba4a78bf49e1b343c",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-hosted-smtp-2026-10-17.json": {
+      "local_sha256": "3cdb7feff2b1c49532dffa09fac6f9872d8287efb9bac6b5a2b4f21c9ce11232",
+      "git_blob_sha256": "3cdb7feff2b1c49532dffa09fac6f9872d8287efb9bac6b5a2b4f21c9ce11232",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-hosted-smtp-delivery-2026-10-17.json": {
+      "local_sha256": "d05355053734315b67047fba42b501b8533b7edc272dc240868a320c52d76e5e",
+      "git_blob_sha256": "d05355053734315b67047fba42b501b8533b7edc272dc240868a320c52d76e5e",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-hosted-staging-2026-10-14.json": {
+      "local_sha256": "e5c8cf324eff30d6cb930e187f304c5cf1cc2d69de6035652a6e4b63c17a6ed3",
+      "git_blob_sha256": "e5c8cf324eff30d6cb930e187f304c5cf1cc2d69de6035652a6e4b63c17a6ed3",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-integration-recovery-2026-10-20.json": {
+      "local_sha256": "15728767f2f549063f39a197d9a260274b0e75fcb6e9c5410cdb62b7d5c82a0f",
+      "git_blob_sha256": "15728767f2f549063f39a197d9a260274b0e75fcb6e9c5410cdb62b7d5c82a0f",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-provider-qualification-2026-10-18.json": {
+      "local_sha256": "e6b5c244138eae52852d36e84e78ae208e1908c8918ad42d02603ed75910192c",
+      "git_blob_sha256": "e6b5c244138eae52852d36e84e78ae208e1908c8918ad42d02603ed75910192c",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-recovery-and-connection-guards-2026-10-18.json": {
+      "local_sha256": "e2929935c43780eae45d14f13b5dd3e39ef4dbda903c0369cc0bd48f4acdd40c",
+      "git_blob_sha256": "e2929935c43780eae45d14f13b5dd3e39ef4dbda903c0369cc0bd48f4acdd40c",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-recovery-docker-ci-2026-10-21.json": {
+      "local_sha256": "ac65e967be7ec2b0f60578352d79b2d5bb5bd0b39d8e1eb493f6281f263ced1d",
+      "git_blob_sha256": "ac65e967be7ec2b0f60578352d79b2d5bb5bd0b39d8e1eb493f6281f263ced1d",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-recovery-integration-2026-10-21.json": {
+      "local_sha256": "4b4bf117a63f0f421b22f35d3e3a6606d29bfec6438bb2e617fd5abbaf690189",
+      "git_blob_sha256": "4b4bf117a63f0f421b22f35d3e3a6606d29bfec6438bb2e617fd5abbaf690189",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-render-hook-investigation-2026-10-18.json": {
+      "local_sha256": "762ee618e6461445394edd5150844a1e8fe071f702687d94b7cbe8064cf1a373",
+      "git_blob_sha256": "762ee618e6461445394edd5150844a1e8fe071f702687d94b7cbe8064cf1a373",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-render-support-submission-2026-10-18.json": {
+      "local_sha256": "f6badb6721e16b49ef16c7bc430aba8caaa001007a5672fd30a4ebce9f1109f2",
+      "git_blob_sha256": "f6badb6721e16b49ef16c7bc430aba8caaa001007a5672fd30a4ebce9f1109f2",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-smtp-authentication-headers-2026-10-18.json": {
+      "local_sha256": "24fb865de3d0875a9af7a8a63824631ffc355945a1567cea5b0815d32e50dad1",
+      "git_blob_sha256": "24fb865de3d0875a9af7a8a63824631ffc355945a1567cea5b0815d32e50dad1",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-staging-deployment-preflight-2026-10-18.json": {
+      "local_sha256": "22c8e411ae8faf32090834c479f6dcd83d58729439df0c853a832cbb3184e29f",
+      "git_blob_sha256": "22c8e411ae8faf32090834c479f6dcd83d58729439df0c853a832cbb3184e29f",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-staging-security-deployment-2026-10-18.json": {
+      "local_sha256": "0685ba20aad44215c62d5d8972fabad7ac99e8779221de441b92771b170b664a",
+      "git_blob_sha256": "0685ba20aad44215c62d5d8972fabad7ac99e8779221de441b92771b170b664a",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/phase0-windows-native-2026-10-13.json": {
+      "local_sha256": "4adc578f5729dfdef790c6079d7f18ed3a5a95f14db39f06968872ea5c9e8181",
+      "git_blob_sha256": "4adc578f5729dfdef790c6079d7f18ed3a5a95f14db39f06968872ea5c9e8181",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/recovery-o3-certificate-v1-example.json": {
+      "local_sha256": "66d217b5c035b35054704a9c05414444d4942c9b13eab059b66ed8fb36df34ef",
+      "git_blob_sha256": "66d217b5c035b35054704a9c05414444d4942c9b13eab059b66ed8fb36df34ef",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": false
+    },
+    "docs/evidence/recovery-o3-design-review-2026-10-22.json": {
+      "local_sha256": "c5b68658df6683b7e9da07f771cb9549b8d365e8de1006a025bc717dcb87f01b",
+      "git_blob_sha256": "c5b68658df6683b7e9da07f771cb9549b8d365e8de1006a025bc717dcb87f01b",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": false
+    },
+    "docs/evidence/recovery-observation-ci-followup-2026-10-22.json": {
+      "local_sha256": "89fc124e463a9d0aa95cbde281b6ab3759043cbc1fb1602f5aefe58e091d763e",
+      "git_blob_sha256": "c5ff4e4cdca6e19339dc03ac7ec67bb4b4d657afef76f128cc27b61e7f714070",
+      "local_and_git_bytes_equal": false,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/recovery-observation-local-2026-10-22.json": {
+      "local_sha256": "12503450da3ba98c0d1a76561bdb07cb470c2ff03b68a248d60611d3d809502e",
+      "git_blob_sha256": "12503450da3ba98c0d1a76561bdb07cb470c2ff03b68a248d60611d3d809502e",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/recovery-observation-review-2026-10-22.json": {
+      "local_sha256": "a0bfdfdeb939dd19a3bea704c6c31ad0426dbe2e9a4f02648d96706472a5d179",
+      "git_blob_sha256": "80bfea403b7b5fc2cca511b76fcdb69fe08dab8d2c68b5bde7a3c68c40702458",
+      "local_and_git_bytes_equal": false,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration13.json": {
+      "local_sha256": "2148df847171c1efcfd139f73287b631a4db5855cc5438e740839effcf37c1fc",
+      "git_blob_sha256": "2148df847171c1efcfd139f73287b631a4db5855cc5438e740839effcf37c1fc",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration14.json": {
+      "local_sha256": "53ecfb4c4d42f1bbcc7f3e0bfb02ce4f69bec8596b57e65e101f78bc46424192",
+      "git_blob_sha256": "53ecfb4c4d42f1bbcc7f3e0bfb02ce4f69bec8596b57e65e101f78bc46424192",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration15.json": {
+      "local_sha256": "88e0d323f36404cd01a5c63681184141fa09e202103ce3ca1fbd6b7e67eed4a5",
+      "git_blob_sha256": "88e0d323f36404cd01a5c63681184141fa09e202103ce3ca1fbd6b7e67eed4a5",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration16.json": {
+      "local_sha256": "fddc59880327b3ada72ef8698dd3d457a3c14fcccdf86799ba138b79ccf05858",
+      "git_blob_sha256": "fddc59880327b3ada72ef8698dd3d457a3c14fcccdf86799ba138b79ccf05858",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22-iteration18.json": {
+      "local_sha256": "d0a7244f879982a588161ec5c7ba6af80072ff0e85ec745184564b618311067f",
+      "git_blob_sha256": "d0a7244f879982a588161ec5c7ba6af80072ff0e85ec745184564b618311067f",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/evidence/recovery-protocol-v2-local-2026-10-22.json": {
+      "local_sha256": "9ec06ae7425565714e54b37c3e673f087e4b258a9ec3128831495e3b05bfb46b",
+      "git_blob_sha256": "f81f69c2ad4f222290aa1308577894aec4322974fc4690bebe3e010b5bf10737",
+      "local_and_git_bytes_equal": false,
+      "unchanged_from_main": true
+    },
+    "services/api/src/daily_motion/recovery.py": {
+      "local_sha256": "75d92296fc90032780c68cc94dbf8feca8cfbd795ae4cd5c508361bfda90e3aa",
+      "git_blob_sha256": "75d92296fc90032780c68cc94dbf8feca8cfbd795ae4cd5c508361bfda90e3aa",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "services/api/src/daily_motion/recovery_admission.py": {
+      "local_sha256": "52e2a666b9f49e5add9bb3f3fe0107516706359782526e9dec2eb98d4e87c1f9",
+      "git_blob_sha256": "52e2a666b9f49e5add9bb3f3fe0107516706359782526e9dec2eb98d4e87c1f9",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "services/api/src/daily_motion/recovery_effect.py": {
+      "local_sha256": "4ff714d9745ce346ea5270a690d560d58dc1e48ca090d70e5493715cb5375e2f",
+      "git_blob_sha256": "4ff714d9745ce346ea5270a690d560d58dc1e48ca090d70e5493715cb5375e2f",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "services/api/src/daily_motion/recovery_observation.py": {
+      "local_sha256": "0a2bc952131daec8e2cc4dc11bd1b51554e1704e16b0b532af3d3e3e81838d9b",
+      "git_blob_sha256": "0a2bc952131daec8e2cc4dc11bd1b51554e1704e16b0b532af3d3e3e81838d9b",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "services/api/src/daily_motion/db.py": {
+      "local_sha256": "e1180c85aa60bda5149e4765d1d14b8a7cbde974a88fcda8c4582b8c9d37a4f7",
+      "git_blob_sha256": "e1180c85aa60bda5149e4765d1d14b8a7cbde974a88fcda8c4582b8c9d37a4f7",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "services/api/migrations/versions/0004_recovery_protocol.py": {
+      "local_sha256": "d4d594e48f1032911fdf513f30db2148c6a0c2b52b9efac0acd58e38afe4e132",
+      "git_blob_sha256": "d4d594e48f1032911fdf513f30db2148c6a0c2b52b9efac0acd58e38afe4e132",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/RECOVERY_PROTOCOL_V2_SPEC.md": {
+      "local_sha256": "61ee2b5f4f035ce066c6719b0a1783f5427c08a5db438fe6d4c234d9bd4a54ac",
+      "git_blob_sha256": "61ee2b5f4f035ce066c6719b0a1783f5427c08a5db438fe6d4c234d9bd4a54ac",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/ADR_RECOVERY_PROTOCOL_V2_PROPOSED.md": {
+      "local_sha256": "08bd8809dec6981de7ab657c55e682d32bd12e65e3f41af62ac5d873a39439a7",
+      "git_blob_sha256": "08bd8809dec6981de7ab657c55e682d32bd12e65e3f41af62ac5d873a39439a7",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "docs/RESTORE_TIMELINE_INVESTIGATION.md": {
+      "local_sha256": "a38051ecb48bb2c6888b8150766a5fb87a652e16888ae1dd8a0a24db3e02f0f2",
+      "git_blob_sha256": "a38051ecb48bb2c6888b8150766a5fb87a652e16888ae1dd8a0a24db3e02f0f2",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "services/api/src/daily_motion/recovery_db.py": {
+      "local_sha256": "46e79cb0fdd025325c0ab573c69ae5fd7fa43bb52afbcb4e9d7fc7be586f7a7b",
+      "git_blob_sha256": "46e79cb0fdd025325c0ab573c69ae5fd7fa43bb52afbcb4e9d7fc7be586f7a7b",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "services/api/src/daily_motion/auth.py": {
+      "local_sha256": "70d328159036a4acab7744bae90f273f791f9cf90a85380c77a597cbffbeaed6",
+      "git_blob_sha256": "70d328159036a4acab7744bae90f273f791f9cf90a85380c77a597cbffbeaed6",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "services/api/src/daily_motion/accounts.py": {
+      "local_sha256": "810a85a1bb7da572d725256d7c5a71f39d71ce8427c963378d455c8ae31134ec",
+      "git_blob_sha256": "810a85a1bb7da572d725256d7c5a71f39d71ce8427c963378d455c8ae31134ec",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "services/api/src/daily_motion/sync.py": {
+      "local_sha256": "45021ddd701e69cae38ed5ef73c45896a20c5ed5ce1f801ddbd1650cf6fe9777",
+      "git_blob_sha256": "45021ddd701e69cae38ed5ef73c45896a20c5ed5ce1f801ddbd1650cf6fe9777",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "services/api/src/daily_motion/models.py": {
+      "local_sha256": "366d232e4fba07f8c3ce4899fe7c44fa495237df3a437f3d73e8324efe542682",
+      "git_blob_sha256": "366d232e4fba07f8c3ce4899fe7c44fa495237df3a437f3d73e8324efe542682",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    },
+    "services/api/src/daily_motion/contracts.py": {
+      "local_sha256": "025db8f5da6dbb3099635443708896413c1c6890749bd21518aecc3bbd1db8b1",
+      "git_blob_sha256": "025db8f5da6dbb3099635443708896413c1c6890749bd21518aecc3bbd1db8b1",
+      "local_and_git_bytes_equal": true,
+      "unchanged_from_main": true
+    }
+  },
+  "previous_executions_revalidated": [
+    {
+      "name": "hardened_original_probe",
+      "report_sha256": "3862e355784b9c2269c4acdd8c42aba11a7f25163397ee3a1af6b82f26d705e9",
+      "checks_matching_expectations": 25,
+      "skipped": 0,
+      "failed_expectations": 0,
+      "execution": "Previously executed; report and source evidence revalidated, SQL not rerun for publication"
+    },
+    {
+      "name": "advisory_first_intermediate_source",
+      "report_sha256": "77c7f8d8ddab3255d179e6726c88222fe4b91bc3a0232cc5a3ae9647fbd27873",
+      "checks_matching_expectations": 23,
+      "skipped": 0,
+      "failed_expectations": 0,
+      "execution": "Previously executed; report and source evidence revalidated, SQL not rerun for publication"
+    },
+    {
+      "name": "advisory_final_source",
+      "report_sha256": "f95a59a026036a237386892e4241cebdacbdef340a3bf8307947e8ddd98c2896",
+      "checks_matching_expectations": 23,
+      "skipped": 0,
+      "failed_expectations": 0,
+      "execution": "Previously executed; report and source evidence revalidated, SQL not rerun for publication"
+    }
+  ],
+  "static_checks_before_manifest": [
+    {
+      "name": "docs",
+      "exit_code": 0,
+      "output": "Validated 47 Markdown files, 514 local links and 5 JSON examples"
+    },
+    {
+      "name": "format",
+      "exit_code": 0,
+      "output": "3 files already formatted"
+    },
+    {
+      "name": "lint",
+      "exit_code": 0,
+      "output": "All checks passed!"
+    },
+    {
+      "name": "credentials",
+      "exit_code": 0,
+      "output": "Credential guard: 318 source files checked, 0 findings"
+    }
+  ],
+  "staged_whitespace_check": "PASS",
+  "future_acceptance": {
+    "families": 36,
+    "execution": "NOT_EXECUTED_AS_B4_B5_QUALIFICATION"
+  },
+  "limits": [
+    "This manifest does not hash itself. Hashes under git_blob_sha256 are SHA-256 of exact Git blob contents, not Git object IDs.",
+    "The dated design/advisory receipts describe their earlier uncommitted local checkpoints. Publishing them does not rewrite those historical observations.",
+    "No runtime, migration, contract, app, infrastructure or protected-specification change.",
+    "Current PR CI and signature verification must be checked separately after publication.",
+    "Backend/security and other named-role decisions remain pending; automated review supplies no required acceptance."
+  ]
+}

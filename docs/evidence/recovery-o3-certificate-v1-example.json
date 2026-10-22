@@ -1,0 +1,128 @@
+{
+  "synthetic_example_only": true,
+  "not_authenticated_or_executed_commit": true,
+  "note": "Fictional root-only deletion and placeholder request/target/manifest digests; hashes are computed examples, not commit, authentication or certification evidence.",
+  "observation": {
+    "record_type": "dm.recovery.observation",
+    "record_version": 1,
+    "purpose": "workout_observe",
+    "request_nonce": "64000000-0000-4000-8000-000000000001",
+    "activation_binding": {
+      "environment": "62000000-0000-4000-8000-000000000001",
+      "activation_serial": 1,
+      "incarnation": "62000000-0000-4000-8000-000000000002",
+      "target_identity_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "manifest_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "continuity_ref": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    "prior_checkpoint": {
+      "order": 0,
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "prepared_checkpoint": {
+      "order": 1,
+      "digest": "2d8b24222ce366c995e4b6e88fea5d7b5b7342695ca9083adb32f1f31b0a539f"
+    },
+    "append_predecessor": {
+      "order": 1,
+      "digest": "2d8b24222ce366c995e4b6e88fea5d7b5b7342695ca9083adb32f1f31b0a539f"
+    },
+    "committed": {
+      "schema_version": 2,
+      "owner": "61000000-0000-4000-8000-000000000001",
+      "mutation": "63000000-0000-4000-8000-000000000002",
+      "attempt": "63000000-0000-4000-8000-000000000003",
+      "root": "63000000-0000-4000-8000-000000000001",
+      "environment": "62000000-0000-4000-8000-000000000001",
+      "incarnation": "62000000-0000-4000-8000-000000000002",
+      "generation": "62000000-0000-4000-8000-000000000003",
+      "activation_serial": 1,
+      "request_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "marker_digest": "b5e8c73c30eee153a2a542d1625342456d3896e1d97b8a198f0a469550c30719",
+      "result_digest": "45942a3703428a341b62aa2add81dfc116a6d5abe1a0b390c7e03aef702c01d6",
+      "outcome": {
+        "mutation_id": "63000000-0000-4000-8000-000000000002",
+        "aggregate_id": "63000000-0000-4000-8000-000000000001",
+        "status": "accepted",
+        "accepted_revision": 2,
+        "accepted_at": "2026-10-22T00:00:00Z"
+      },
+      "private_position": 1,
+      "erasure_epoch": 1,
+      "affected_ids": [
+        "63000000-0000-4000-8000-000000000001"
+      ],
+      "retired_ids": [
+        "63000000-0000-4000-8000-000000000001"
+      ]
+    },
+    "verifier_principal_ref": "workload:dm-commit-verifier",
+    "verifier_manifest_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "observation_method": "postgres_committed_row/v1"
+  },
+  "certificate": {
+    "record_type": "dm.recovery.certificate",
+    "record_version": 1,
+    "event_version": 1,
+    "purpose": "workout",
+    "activation_binding": {
+      "environment": "62000000-0000-4000-8000-000000000001",
+      "activation_serial": 1,
+      "incarnation": "62000000-0000-4000-8000-000000000002",
+      "target_identity_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "manifest_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "continuity_ref": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    "prior_checkpoint": {
+      "order": 0,
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "prepared_checkpoint": {
+      "order": 1,
+      "digest": "2d8b24222ce366c995e4b6e88fea5d7b5b7342695ca9083adb32f1f31b0a539f"
+    },
+    "previous_checkpoint": {
+      "order": 1,
+      "digest": "2d8b24222ce366c995e4b6e88fea5d7b5b7342695ca9083adb32f1f31b0a539f"
+    },
+    "checkpoint": {
+      "order": 2,
+      "digest": "40894f0788c68f2d44f509fd7bc230442f7e2ddd96e9b44b464955ab0250be26"
+    },
+    "committed": {
+      "schema_version": 2,
+      "owner": "61000000-0000-4000-8000-000000000001",
+      "mutation": "63000000-0000-4000-8000-000000000002",
+      "attempt": "63000000-0000-4000-8000-000000000003",
+      "root": "63000000-0000-4000-8000-000000000001",
+      "environment": "62000000-0000-4000-8000-000000000001",
+      "incarnation": "62000000-0000-4000-8000-000000000002",
+      "generation": "62000000-0000-4000-8000-000000000003",
+      "activation_serial": 1,
+      "request_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "marker_digest": "b5e8c73c30eee153a2a542d1625342456d3896e1d97b8a198f0a469550c30719",
+      "result_digest": "45942a3703428a341b62aa2add81dfc116a6d5abe1a0b390c7e03aef702c01d6",
+      "outcome": {
+        "mutation_id": "63000000-0000-4000-8000-000000000002",
+        "aggregate_id": "63000000-0000-4000-8000-000000000001",
+        "status": "accepted",
+        "accepted_revision": 2,
+        "accepted_at": "2026-10-22T00:00:00Z"
+      },
+      "private_position": 1,
+      "erasure_epoch": 1,
+      "affected_ids": [
+        "63000000-0000-4000-8000-000000000001"
+      ],
+      "retired_ids": [
+        "63000000-0000-4000-8000-000000000001"
+      ]
+    },
+    "observation": {
+      "verifier_principal_ref": "workload:dm-commit-verifier",
+      "verifier_manifest_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "attestation_digest": "9a2baeee14510ddfcfba2bba0d963eb8f688a88cf5c36a694691c362c7c91aee"
+    },
+    "certificate_id": "bc1aadde47d727d1b6483fc27c215e5978094084eb749e5fe3aee2eb5aa35da0"
+  }
+}
