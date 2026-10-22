@@ -25,6 +25,7 @@ def admin_engine() -> Iterator[Engine]:
     admin = create_engine(url)
     with admin.begin() as db:
         db.execute(text("DROP SCHEMA IF EXISTS training CASCADE"))
+        db.execute(text("DROP SCHEMA IF EXISTS recovery CASCADE"))
         db.execute(text("DROP TABLE IF EXISTS alembic_version"))
         db.execute(
             text(
@@ -40,6 +41,8 @@ def admin_engine() -> Iterator[Engine]:
     command.upgrade(config, "head")
     with admin.begin() as db:
         db.execute(text("GRANT USAGE ON SCHEMA training TO dm_test_runtime"))
+        db.execute(text("GRANT USAGE ON SCHEMA recovery TO dm_test_runtime"))
+        db.execute(text("GRANT SELECT ON recovery.control TO dm_test_runtime"))
         db.execute(
             text(
                 "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES "

@@ -378,6 +378,8 @@ def migrate(engine: Engine) -> None:
         command.upgrade(config, "head")
         connection.execute(text("CREATE ROLE dm_recovery_runtime LOGIN NOSUPERUSER NOBYPASSRLS"))
         connection.execute(text("GRANT USAGE ON SCHEMA training TO dm_recovery_runtime"))
+        connection.execute(text("GRANT USAGE ON SCHEMA recovery TO dm_recovery_runtime"))
+        connection.execute(text("GRANT SELECT ON recovery.control TO dm_recovery_runtime"))
         connection.execute(
             text(
                 "GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA training "

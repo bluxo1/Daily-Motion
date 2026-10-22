@@ -20,8 +20,10 @@ from daily_motion.contracts import (
     CreateSession,
     EmptyPayload,
     MeResponse,
+    OperationV2,
     PullResponse,
     PushRequest,
+    PushRequestV2,
     PushResponse,
     RecordSet,
     SnapshotPage,
@@ -90,7 +92,7 @@ def sync_openapi() -> dict[str, Any]:
         schema = get_openapi(title=app.title, version=app.version, routes=app.routes)
         components = schema["components"]["schemas"]
         # Describe command-specific payloads while keeping raw receipt/echo bytes.
-        for model in (CreateSession, RecordSet, EmptyPayload):
+        for model in (CreateSession, RecordSet, EmptyPayload, OperationV2, PushRequestV2):
             definition = model.model_json_schema(ref_template="#/components/schemas/{model}")
             components.update(definition.pop("$defs", {}))
             components[model.__name__] = definition

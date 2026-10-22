@@ -8,7 +8,7 @@ from typing import Annotated, Any, Literal
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, field_validator, model_validator
 
 COMMAND_LIMIT = 256 * 1024
 BATCH_LIMIT = 1024 * 1024
@@ -217,6 +217,60 @@ class PushRequest(StrictModel):
 
     @model_validator(mode="after")
     def independent_heads(self) -> "PushRequest":
+        if len({op.aggregate_id for op in self.operations}) != len(self.operations):
+            raise ValueError("Send at most one head per aggregate")
+        if len(canonical_json(self.model_dump(mode="json")).encode()) > BATCH_LIMIT:
+            raise ValueError("Batch exceeds the 1 MiB limit")
+        return self
+
+
+CANONICAL_UUID_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+
+
+def _canonical_v2_uuid(value: object) -> object:
+    if isinstance(value, str) and not re.fullmatch(CANONICAL_UUID_PATTERN, value):
+        raise ValueError("Use a canonical lowercase UUID; frozen identity cannot be normalized")
+    return value
+
+
+def _v2_version(value: object) -> object:
+    if type(value) is not int or value != 2:
+        raise ValueError("Use integer command version 2")
+    return value
+
+
+CanonicalUuidV2 = Annotated[
+    UUID,
+    BeforeValidator(_canonical_v2_uuid),
+    Field(json_schema_extra={"pattern": CANONICAL_UUID_PATTERN}),
+]
+CommandVersionV2 = Annotated[Literal[2], BeforeValidator(_v2_version)]
+
+
+class OperationV2(Operation):
+    """Immutable DRP/2 command identity, captured when creating the local branch.
+
+    Activation serial is admission evidence, not mutable command provenance.
+    Inherited validation counts these fields in the canonical command bound.
+    Defining the contract does not activate a v2 endpoint or permit v1 restamping.
+    """
+
+    mutation_id: CanonicalUuidV2
+    installation_id: CanonicalUuidV2
+    aggregate_id: CanonicalUuidV2
+    expected_revision: Annotated[int, Field(strict=True, ge=0, le=9223372036854775807)]
+    schema_version: CommandVersionV2
+    environment_id: CanonicalUuidV2
+    origin_incarnation: CanonicalUuidV2
+    origin_generation: CanonicalUuidV2
+
+
+class PushRequestV2(StrictModel):
+    schema_version: CommandVersionV2
+    operations: Annotated[list[OperationV2], Field(min_length=1, max_length=50)]
+
+    @model_validator(mode="after")
+    def independent_heads(self) -> "PushRequestV2":
         if len({op.aggregate_id for op in self.operations}) != len(self.operations):
             raise ValueError("Send at most one head per aggregate")
         if len(canonical_json(self.model_dump(mode="json")).encode()) > BATCH_LIMIT:

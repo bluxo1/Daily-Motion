@@ -167,6 +167,7 @@ def test_provision_staging_is_repeatable_and_probe_rolls_back(
     password = "synthetic-staging-runtime-password-'quoted'-32-characters"
     with admin_engine.begin() as connection:
         connection.execute(text("DROP SCHEMA training CASCADE"))
+        connection.execute(text("DROP SCHEMA recovery CASCADE"))
         connection.execute(text("DROP TABLE public.alembic_version"))
     provision(admin_engine, password)
     # Repeated preparation applies no destructive migration or duplicate account.
@@ -174,8 +175,8 @@ def test_provision_staging_is_repeatable_and_probe_rolls_back(
     runtime = create_engine(admin_engine.url.set(username=ROLE, password=password))
     try:
         report = verify_isolation(runtime)
-        assert report["migration_revision"] == "0003"
-        assert report["training_tables"] == 11
+        assert report["migration_revision"] == "0004"
+        assert report["training_tables"] == 13
         assert report["probe_rolled_back"] is True
         with admin_engine.connect() as connection:
             assert connection.scalar(text("SELECT count(*) FROM training.owner_state")) == 0
@@ -186,6 +187,8 @@ def test_provision_staging_is_repeatable_and_probe_rolls_back(
             connection.execute(text("DROP ROLE dm_staging_runtime"))
             # The shared test fixture role's grants were removed with the schema.
             connection.execute(text("GRANT USAGE ON SCHEMA training TO dm_test_runtime"))
+            connection.execute(text("GRANT USAGE ON SCHEMA recovery TO dm_test_runtime"))
+            connection.execute(text("GRANT SELECT ON recovery.control TO dm_test_runtime"))
             connection.execute(
                 text(
                     "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES "
@@ -299,7 +302,7 @@ def test_runtime_probe_checks_actual_migration_metadata(
     finally:
         runtime.dispose()
         with admin_engine.begin() as connection:
-            connection.execute(text("UPDATE public.alembic_version SET version_num='0003'"))
+            connection.execute(text("UPDATE public.alembic_version SET version_num='0004'"))
             connection.execute(text("DROP OWNED BY " + ROLE))
             connection.execute(text("DROP ROLE " + ROLE))
 
@@ -316,7 +319,7 @@ def test_provision_grants_metadata_access_with_restricted_public_schema(
         runtime = create_engine(admin_engine.url.set(username=ROLE, password=password))
         with runtime.connect() as connection:
             assert (
-                connection.scalar(text("SELECT version_num FROM public.alembic_version")) == "0003"
+                connection.scalar(text("SELECT version_num FROM public.alembic_version")) == "0004"
             )
     finally:
         if runtime is not None:
@@ -371,7 +374,7 @@ def test_readiness_rejects_incomplete_or_privileged_deployment(
         assert response.json() == {"detail": {"code": "service_not_configured"}}
     finally:
         with admin_engine.begin() as connection:
-            connection.execute(text("UPDATE public.alembic_version SET version_num='0003'"))
+            connection.execute(text("UPDATE public.alembic_version SET version_num='0004'"))
             connection.execute(text("GRANT UPDATE ON training.workouts TO dm_test_runtime"))
             connection.execute(
                 text("ALTER ROLE dm_test_runtime NOCREATEDB NOCREATEROLE NOREPLICATION")

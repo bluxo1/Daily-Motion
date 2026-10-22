@@ -257,6 +257,48 @@ def _erase(db: Session, owner: UUID, workout: Workout, state: OwnerState) -> lis
     return retired
 
 
+def apply_domain_change(
+    db: Session, owner: UUID, op: Operation, state: OwnerState, workout: Workout | None
+) -> tuple[Workout, list[UUID]]:
+    """Shared normalized mutation rules; caller owns locks, savepoint and feed/result writes."""
+    retired: list[UUID] = []
+    if op.command == "create_session":
+        if workout:
+            raise DomainError("already_exists")
+        workout = _create(db, owner, op)
+    else:
+        if workout is None:
+            raise DomainError("not_found")
+        workout.revision += 1
+        if op.command in {"record_set", "correct_set"}:
+            _record(db, owner, workout, op, state.position + 1, state.generation)
+        elif op.command in {"complete_session", "abandon_session"}:
+            if workout.status != "active":
+                raise DomainError("invalid_transition")
+            if op.command == "complete_session":
+                attempted = db.scalar(
+                    select(WorkoutSet)
+                    .join(
+                        Exercise,
+                        (WorkoutSet.owner_id == Exercise.owner_id)
+                        & (WorkoutSet.exercise_id == Exercise.id),
+                    )
+                    .where(
+                        Exercise.owner_id == owner,
+                        Exercise.session_id == workout.id,
+                        WorkoutSet.observation.is_not(None),
+                        WorkoutSet.observation["execution_status"].astext != "skipped",
+                    )
+                )
+                if attempted is None:
+                    raise DomainError("empty_session")
+            workout.status = "completed" if op.command == "complete_session" else "abandoned"
+            workout.ended_at = op.occurred_at
+        elif op.command == "delete_session":
+            retired = _erase(db, owner, workout, state)
+    return workout, retired
+
+
 def accept(owner: UUID, op: Operation) -> dict[str, Any]:
     body = op.model_dump(mode="json")
     digest = hashlib.sha256(canonical_json(body).encode()).hexdigest()
@@ -286,43 +328,7 @@ def accept(owner: UUID, op: Operation) -> dict[str, Any]:
         try:
             # Validation failures roll back all intermediate projections before returning rejection.
             with db.begin_nested():
-                retired: list[UUID] = []
-                if op.command == "create_session":
-                    if workout:
-                        raise DomainError("already_exists")
-                    workout = _create(db, owner, op)
-                else:
-                    if workout is None:
-                        raise DomainError("not_found")
-                    workout.revision += 1
-                    if op.command in {"record_set", "correct_set"}:
-                        _record(db, owner, workout, op, state.position + 1, state.generation)
-                    elif op.command in {"complete_session", "abandon_session"}:
-                        if workout.status != "active":
-                            raise DomainError("invalid_transition")
-                        if op.command == "complete_session":
-                            attempted = db.scalar(
-                                select(WorkoutSet)
-                                .join(
-                                    Exercise,
-                                    (WorkoutSet.owner_id == Exercise.owner_id)
-                                    & (WorkoutSet.exercise_id == Exercise.id),
-                                )
-                                .where(
-                                    Exercise.owner_id == owner,
-                                    Exercise.session_id == workout.id,
-                                    WorkoutSet.observation.is_not(None),
-                                    WorkoutSet.observation["execution_status"].astext != "skipped",
-                                )
-                            )
-                            if attempted is None:
-                                raise DomainError("empty_session")
-                        workout.status = (
-                            "completed" if op.command == "complete_session" else "abandoned"
-                        )
-                        workout.ended_at = op.occurred_at
-                    elif op.command == "delete_session":
-                        retired = _erase(db, owner, workout, state)
+                workout, retired = apply_domain_change(db, owner, op, state, workout)
                 accepted_revision = workout.revision
                 accepted_at = datetime.now(UTC)
                 state.position += 1

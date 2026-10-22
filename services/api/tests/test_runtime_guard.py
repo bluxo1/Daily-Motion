@@ -38,14 +38,21 @@ def test_runtime_guard_denies_membership_in_table_owner_role(
     database: Engine, admin_engine: Engine, owner: UUID
 ) -> None:
     with admin_engine.begin() as connection:
-        connection.execute(text("GRANT dm_admin TO dm_test_runtime"))
+        table_owner = connection.scalar(
+            text(
+                "SELECT pg_get_userbyid(relowner) FROM pg_class "
+                "WHERE oid='training.workouts'::regclass"
+            )
+        )
+        quoted_owner = connection.dialect.identifier_preparer.quote(table_owner)
+        connection.execute(text(f"GRANT {quoted_owner} TO dm_test_runtime"))
     try:
         with pytest.raises(HTTPException) as error:
             enter(owner)
         assert error.value.status_code == 503
     finally:
         with admin_engine.begin() as connection:
-            connection.execute(text("REVOKE dm_admin FROM dm_test_runtime"))
+            connection.execute(text(f"REVOKE {quoted_owner} FROM dm_test_runtime"))
     enter(owner)
 
 
