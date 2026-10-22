@@ -15,13 +15,11 @@ Future<void> assertHardKillRecovery({
   required String protocol,
   required String stage,
 }) async {
-  if (!Platform.isWindows) {
-    return _assertHardKillRecovery(protocol: protocol, stage: stage);
-  }
   // dart run bundles native assets into the package's shared .dart_tool/lib.
-  // Windows prevents replacement while another worker has its SQLite DLL open.
-  // Keep the lock through the actual kill/exit, across concurrent test files;
-  // closing the handle releases it even when a worker or assertion fails.
+  // Concurrent test-file processes must not copy/rewrite the same asset while
+  // another launcher inspects it (macOS) or a worker has its DLL open (Windows).
+  // Serialize on every platform through the actual kill/exit and database close;
+  // closing the handle releases the lock even when a worker or assertion fails.
   final lock = await File(
     path.join(Directory.current.path, '.dart_tool', 'process-kill-worker.lock'),
   ).open(mode: FileMode.append);

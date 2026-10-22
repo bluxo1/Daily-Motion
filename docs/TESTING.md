@@ -112,6 +112,13 @@ registrant with a dev-only integration-test plugin and failed Java compilation.
 Use serial runs rather than moving test plugins into production dependencies or
 editing generated registrants. Separate CI jobs use independent checkouts.
 
+The process-kill helper also serializes its `dart run` workers across concurrent
+test-file processes on every desktop platform. They share native assets under
+`.dart_tool/lib`: a launcher can rewrite an asset while another inspects it on
+macOS, and Windows prevents replacement of a worker's loaded SQLite DLL. Hold the
+shared file lock through worker exit and reopened-database cleanup. This controls
+test setup; every actual OS-kill boundary and recovery assertion still executes.
+
 Transport timing fakes and loopback fault servers operate around real SQLite
 repositories. Recovery tests use file-backed databases, close/reopen after
 transaction faults and check integrity/foreign keys. They cover pending/frozen

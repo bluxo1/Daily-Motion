@@ -1452,3 +1452,35 @@ credential, native static and archived mobile receipt checks pass, with zero new
 physical samples. [Review receipt](docs/evidence/recovery-observation-review-2026-10-22.json)
 keeps the fresh and retained runs distinct. Exact-head remote CI remains a later
 PR check, never implied by this local evidence.
+
+## 2026-10-22 — authorized publication and macOS CI correction
+
+The GitHub connector lacks branch/PR write permission, so the authorized
+publication uses the authenticated GitHub CLI and established server-signing
+route. Signed `aa04e4d10ee3524ecd1c2d978a011c97a6fca471` has valid GitHub
+verification and tree `04b69a023845bdb07039f559a1fd749896beefbc`, exactly matching
+the reviewed index. Local signing remains enabled. PR #11 is open and unmerged.
+Push/PR API both pass 536 cases with zero skips. Main remains `3e02131`.
+
+First PR macOS job `119749910172` fails the SQ01 process-kill test before the
+worker boundary: Dart native-asset `parseOtoolArchitectureSections` throws a
+null-check error. Its actual result is 214 passed, one failed, 12 skipped. The
+test files concurrently launch `dart run` using shared `.dart_tool/lib`, while
+the helper's existing lock covers only Windows. The stack is consistent with
+asset copy/inspection racing, without proving the exact SDK interleaving.
+The fix removes that platform exception and retains the lock through worker
+exit, restart assertions and database close on every desktop platform. No
+fault boundary, assertion, timeout or skip changes. Standards review finds no
+blocking issue or lock cycle. The first failure is retained and new-head CI is
+required; no blind rerun is used to hide it.
+
+Full Windows Flutter verification after the harness fix: **215 passed / zero
+failures / 12 explicit skips**, terminal success and process exit 0 (167.629
+seconds). All seven process-kill tests pass across eleven actual fault boundaries.
+The nine connected and three external hosted/provider cases remain explicit
+ordinary-suite skips; existing connected API coverage is recorded separately.
+Flutter analysis passes (94.3 seconds); Dart formatting checks one file with no
+changes. Protocol review confirms SQ01's actual kill/reopen/frozen-origin oracle
+is preserved. [Follow-up evidence](docs/evidence/recovery-observation-ci-followup-2026-10-22.json)
+records the failure excerpt and new local log/source hashes. New-head CI remains
+required after signed publication; physical/provider gates stay open.

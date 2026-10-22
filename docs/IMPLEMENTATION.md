@@ -2149,3 +2149,36 @@ The user subsequently authorized signed feature-branch publication and a PR afte
 review and validation, with CI required green and merging excluded. Publication
 and exact-head CI results belong to that PR; the earlier local receipt remains
 a dated uncommitted-source snapshot and is not rewritten as CI evidence.
+
+### Observation PR CI follow-up — 2026-10-22
+
+Signed commit `aa04e4d` was published on `feat/recovery-v2-observation` in
+[PR #11](https://github.com/bluxo1/Daily-Motion/pull/11), with a server tree exactly
+matching the reviewed Git index. Both API jobs pass **536 tests / zero skips**.
+The first PR macOS job reports **214 passed / one failed / 12 skipped**: the
+`test_origin_projection_outbox_atomic_restart` worker exits inside Dart's native
+asset bundling (`parseOtoolArchitectureSections`) before its kill boundary.
+The other process-kill suite continues successfully. The
+[failed job](https://github.com/bluxo1/Daily-Motion/actions/runs/39756559635/job/119749910172)
+remains part of the evidence; it is not relabeled as a pass.
+
+Inspection finds that two concurrent test-file processes can invoke `dart run`
+against the same `.dart_tool/lib`, but the existing helper lock was Windows-only.
+The failure is consistent with competing asset copy/inspection; its exact
+toolchain interleaving is not proven by the log. The follow-up applies that same
+lock to every desktop platform, through worker exit and reopened-database close.
+It retains all real OS kills, fault boundaries, timeouts and recovery assertions;
+no test is skipped or retried inside the helper. This changes test infrastructure,
+with no observation/domain/API behavior change. The proposed specification and
+ADR remain unchanged; native-asset stability is not physical-device qualification.
+
+The full local Windows Flutter suite then passes **215 tests / zero failures /
+12 explicit skips**, terminal success and process exit 0. All seven process-kill
+tests pass, covering eleven actual kill boundaries across v1/v2 and freeze/restart.
+The skips remain nine separately invoked connected cases and three external
+hosted/provider cases; none is counted as a pass. Flutter analysis has no issues,
+and the changed helper passes Dart formatting. The
+[CI follow-up receipt](evidence/recovery-observation-ci-followup-2026-10-22.json)
+preserves the original failure and new machine-log hashes separately. Fresh
+Linux/macOS CI on the signed follow-up head is required before review readiness;
+the older head's successful jobs do not substitute for it.
