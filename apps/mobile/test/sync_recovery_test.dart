@@ -149,6 +149,193 @@ void main() {
     expect((await repo.syncMetadata())['position'], server.position);
   });
 
+  for (final kind in [
+    'no_observations',
+    'missing_reason',
+    'null_reason',
+    'empty_reason',
+    'blank_reason',
+    'unicode_blank_reason',
+    'numeric_reason',
+    'boolean_reason',
+    'object_reason',
+    'list_reason',
+    'overlong_reason',
+    'skipped_actual',
+    'wrong_identity',
+    'duplicate_sequence',
+    'invalid_timestamp',
+    'invalid_order_source',
+  ]) {
+    test(
+      'bootstrap rejects invalid completed skipped snapshot: $kind',
+      () async {
+        final localId = await repo.startFoundationWorkout();
+        final localBefore = canonicalJson(await repo.workout(localId));
+        final metadataBefore = await repo.syncMetadata();
+        final pendingBefore = await repo.pendingCount();
+        final root = applyOperation(null, fixture(), revision: 4)!;
+        root['status'] = 'completed';
+        root['ended_at'] = root['started_at'];
+        final observation = {
+          ...recordPayload(root, status: 'skipped'),
+          'occurred_at': root['started_at'],
+          'recorded_at': root['started_at'],
+        };
+        if (kind != 'no_observations') {
+          allSets(root).first['observation'] = observation;
+        }
+        switch (kind) {
+          case 'null_reason':
+            observation['correction_reason'] = null;
+          case 'empty_reason':
+            observation['correction_reason'] = '';
+          case 'blank_reason':
+            observation['correction_reason'] = ' \t\r\n';
+          case 'unicode_blank_reason':
+            observation['correction_reason'] = '\u00a0\u2007\u202f\ufeff';
+          case 'numeric_reason':
+            observation['correction_reason'] = 1;
+          case 'boolean_reason':
+            observation['correction_reason'] = true;
+          case 'object_reason':
+            observation['correction_reason'] = {'reason': 'Corrected'};
+          case 'list_reason':
+            observation['correction_reason'] = ['Corrected'];
+          case 'overlong_reason':
+            observation['correction_reason'] = List.filled(241, 'x').join();
+          case 'skipped_actual':
+            observation['correction_reason'] = 'Corrected';
+            observation['actual'] = recordPayload(root)['actual'];
+          case 'wrong_identity':
+            observation['correction_reason'] = 'Corrected';
+            observation['set_id'] = allSets(root).last['set_id'];
+          case 'duplicate_sequence':
+            observation['correction_reason'] = 'Corrected';
+            allSets(root).last['observation'] = {
+              ...observation,
+              'set_id': allSets(root).last['set_id'],
+            };
+          case 'invalid_timestamp':
+            observation['correction_reason'] = 'Corrected';
+            observation['recorded_at'] = '2026-02-30T00:00:00Z';
+          case 'invalid_order_source':
+            observation['correction_reason'] = 'Corrected';
+            observation['order_source'] = 'inferred';
+        }
+        await expectLater(() async {
+          await stage([
+            {
+              'roots': [root],
+              'retired_ids': [],
+            },
+          ]);
+          await repo.activateBootstrap(await server.me());
+        }, throwsA(isA<ContractViolation>()));
+        expect(await repo.workout(root['aggregate_id'] as String), isNull);
+        expect(canonicalJson(await repo.workout(localId)), localBefore);
+        expect(await repo.pendingCount(), pendingBefore);
+        expect(await repo.syncMetadata(), metadataBefore);
+        expect(await db.customSelect('SELECT * FROM shadows').get(), isEmpty);
+      },
+    );
+  }
+
+  for (final kind in [
+    'mixed_corrected_skipped',
+    'repeated_correction',
+    'failed',
+    'partial',
+    'active_skipped',
+    'abandoned_skipped',
+  ]) {
+    test(
+      'bootstrap preserves reachable workout after file restart: $kind',
+      () async {
+        final id = await repo.startFoundationWorkout();
+        if (kind == 'mixed_corrected_skipped') {
+          await repo.commit(
+            id,
+            'record_set',
+            recordPayload(
+              (await repo.workout(id))!,
+              index: 1,
+              status: 'skipped',
+            ),
+          );
+          await expectLater(
+            repo.commit(id, 'complete_session', {}),
+            throwsA(isA<WorkoutValidation>()),
+          );
+        }
+        final skipped =
+            kind.endsWith('_skipped') && kind != 'mixed_corrected_skipped';
+        final recorded = recordPayload(
+          (await repo.workout(id))!,
+          status: skipped
+              ? 'skipped'
+              : (kind == 'failed' || kind == 'partial' ? kind : 'completed'),
+          reps: kind == 'failed' ? 0 : 2,
+        );
+        await repo.commit(id, 'record_set', recorded);
+        if (skipped) {
+          await expectLater(
+            repo.commit(id, 'complete_session', {}),
+            throwsA(isA<WorkoutValidation>()),
+          );
+          if (kind == 'abandoned_skipped') {
+            await repo.commit(id, 'abandon_session', {});
+          }
+        } else {
+          await repo.commit(id, 'complete_session', {});
+          if (kind == 'mixed_corrected_skipped' ||
+              kind == 'repeated_correction') {
+            for (var i = 0; i < (kind == 'repeated_correction' ? 2 : 1); i++) {
+              await repo.commit(id, 'correct_set', {
+                ...recorded,
+                'execution_status': 'skipped',
+                'actual': null,
+                'correction_reason': i == 0
+                    ? 'Recorded by mistake.'
+                    : 'Clarified correction.',
+              });
+            }
+          }
+        }
+        await sync.synchronize(force: true);
+        expect(
+          sync.status.phase,
+          SyncPhase.synchronized,
+          reason: sync.status.code,
+        );
+        expect(await repo.pendingCount(), 0);
+        final expected = (await repo.workout(id))!;
+        await sync.close();
+        repo.dispose();
+        await db.close();
+        fixtureDatabase = File('${fixtureDirectory.path}/reachable.sqlite');
+        db = TrainingDatabase.open(fixtureDatabase);
+        repo = WorkoutRepository(db, testOwner);
+        await repo.initialize();
+        sync = SyncCoordinator(repo, server);
+        await baseline();
+        await reopen();
+        final restored = (await repo.workout(id))!;
+        for (final field in [
+          'status',
+          'revision',
+          'started_at',
+          'ended_at',
+          'exercises',
+        ]) {
+          expect(restored[field], expected[field], reason: field);
+        }
+        expect(await repo.pendingCount(), 0);
+        expect((await repo.syncMetadata())['position'], server.position);
+      },
+    );
+  }
+
   test('acknowledgement failure rolls back metadata and recovers the committed receipt', () async {
     final id = await repo.startFoundationWorkout();
     await baseline();

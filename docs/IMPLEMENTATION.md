@@ -2346,3 +2346,19 @@ Flutter skips are nine separately executed connected cases plus three external
 hosted/provider cases; the latter remain unexecuted here. Local results do not
 qualify physical devices or production recovery. Phase 0 remains in progress;
 Phase 1 has not started.
+
+### PR #14 bootstrap integrity remediation (2026-10-24)
+
+Completed snapshots now require attempted work or a skipped observation with
+contract-valid correction metadata. This preserves historical correction without
+accepting original-skipped-only completion; metadata is not historical proof.
+The original restart regression remains, alongside 16 negative bootstrap controls,
+six reachable lifecycle cases and the expanded existing connected HTTP case.
+
+[Additive remediation receipt](evidence/phase0-bootstrap-integrity-remediation-2026-10-24.json)
+records retained local results: 50 focused recovery tests, 238 Flutter / 12 skips,
+609 Python / zero skips, and nine connected cases nested in one Python wrapper.
+These describe the reviewed local snapshot; final committed-tree execution and
+fresh exact-head CI remain publication gates. Focused counts are subsets.
+Three external cases remain unexecuted; no provider or physical qualification.
+D1-D11 remain unapproved, G1/B4/B5 unchanged, Phase 0 in progress, Phase 1 not started.
