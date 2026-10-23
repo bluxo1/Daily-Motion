@@ -2290,3 +2290,18 @@ migrations, historical receipts and all nine Dart case names are unchanged.
 No hosted, physical-device or recovery-provider qualification is claimed; O3
 D1–D11 remain unapproved and B4/B5 unchanged. Exact signed-head CI is checked
 separately in the PR. Phase 0 remains in progress; Phase 1 has not started.
+
+### PR #13 signed integration and parser remediation (2026-10-23)
+
+The signed documentation merge preserves main's complete O3 package and the
+original PR #13 evidence entry. The reviewed parser correction rejects recursive
+duplicate keys, requires pinned protocol `0.1.1` and one consistent suite summary,
+and tests process-exit/report acceptance independently.
+
+[Additive remediation receipt](evidence/phase0-connected-integrity-remediation-2026-10-23.json)
+records retained local results: 79 focused controls, 609 Python / zero skips,
+nine connected cases, and 215 ordinary Flutter / 12 explicit skips. These are
+snapshot results, not new signed-head executions; focused counts are subsets.
+Exact-head targeted checks and fresh push/PR CI remain publication gates.
+The three external cases remain unexecuted; D1-D11 are unapproved, B4/B5 unchanged,
+Phase 0 in progress and Phase 1 not started.

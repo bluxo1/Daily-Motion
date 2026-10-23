@@ -38,19 +38,31 @@ CONNECTED_CASES = {
 }
 
 
+def unique_json_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    value: dict[str, object] = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError("Duplicate JSON object key")
+        value[key] = item
+    return value
+
+
 def connected_passed(output: str) -> bool:
     events = []
     for line in output.splitlines():
         if not line.strip():
             continue
         try:
-            event = json.loads(line)
+            event = json.loads(line, object_pairs_hook=unique_json_object)
         except json.JSONDecodeError:
             # Flutter can print dependency progress before its machine stream.
             # Once events begin, malformed/trailing output cannot imply success.
             if events or line.lstrip().startswith(("{", "[")):
                 return False
             continue
+        except ValueError:
+            # Reject duplicate keys at every depth without exposing their content.
+            return False
         if events and events[-1].get("type") == "done":
             return False
         if (
@@ -76,6 +88,9 @@ def connected_passed(output: str) -> bool:
     if (
         not events
         or events[0].get("type") != "start"
+        # Flutter 3.47.7's pinned test_core reporter emits protocol 0.1.1.
+        # A different protocol requires an explicit compatibility review.
+        or events[0].get("protocolVersion") != "0.1.1"
         or sum(event.get("type") == "start" for event in events) != 1
         or events[-1].get("type") != "done"
         or events[-1].get("success") is not True
@@ -86,6 +101,7 @@ def connected_passed(output: str) -> bool:
     started: dict[int, str] = {}
     completed: set[int] = set()
     passed: set[str] = set()
+    suite_count: int | None = None
     try:
         for event in events:
             kind = event["type"]
@@ -128,11 +144,26 @@ def connected_passed(output: str) -> bool:
                     if name not in CONNECTED_CASES or name in passed:
                         return False
                     passed.add(name)
-            elif kind not in {"start", "group", "print", "debug", "allSuites", "done"}:
+            elif kind == "allSuites":
+                # Scheduling may finish before tests do. Compare only at the end.
+                if suite_count is not None or type(event["count"]) is not int:
+                    return False
+                suite_count = event["count"]
+            elif kind not in {"start", "group", "print", "debug", "done"}:
                 return False
     except (KeyError, TypeError, AttributeError):
         return False
-    return len(suites) == 1 and completed == set(started) and passed == CONNECTED_CASES
+    return (
+        len(suites) == 1
+        and suite_count == len(suites)
+        and completed == set(started)
+        and passed == CONNECTED_CASES
+    )
+
+
+def assert_connected_result(result: subprocess.CompletedProcess[str]) -> None:
+    assert result.returncode == 0, "Connected Flutter HTTP/PostgreSQL process failed"
+    assert connected_passed(result.stdout), "Connected cases were skipped, failed or incomplete"
 
 
 @pytest.fixture
@@ -174,7 +205,7 @@ def connected_events() -> list[dict]:
                 },
             ]
         )
-    events.append({"type": "done", "success": True})
+    events.extend([{"type": "allSuites", "count": 1}, {"type": "done", "success": True}])
     return events
 
 
@@ -306,7 +337,10 @@ def test_connected_report_cannot_claim_skipped_or_incomplete_success(
     assert connected_passed(output) is (fault is None)
 
 
-@pytest.mark.parametrize("variant", ["windows_path", "interleaved", "auxiliary", "daemon_uri"])
+@pytest.mark.parametrize(
+    "variant",
+    ["windows_path", "interleaved", "auxiliary", "daemon_uri", "summary_before_suite"],
+)
 def test_connected_report_accepts_supported_machine_shapes(
     variant: str, connected_events: list[dict]
 ) -> None:
@@ -319,13 +353,15 @@ def test_connected_report_accepts_supported_machine_shapes(
             events[:2]
             + [event for event in events[2:-1] if event["type"] == "testStart"]
             + [event for event in reversed(events[2:-1]) if event["type"] == "testDone"]
-            + events[-1:]
+            + events[-2:]
         )
     elif variant == "auxiliary":
         events.insert(4, {"type": "print", "testID": 0, "message": "synthetic diagnostic"})
         events.insert(4, {"type": "group", "group": {"id": 0, "suiteID": 0}})
-        events.insert(4, {"type": "allSuites", "count": 1})
+        events.insert(4, events.pop(-2))
         events.insert(4, {"type": "debug", "suiteID": 0})
+    elif variant == "summary_before_suite":
+        events.insert(1, events.pop(-2))
     output = "\n".join(json.dumps(event) for event in events)
     if variant == "daemon_uri":
         output = output.replace(
@@ -335,6 +371,130 @@ def test_connected_report_accepts_supported_machine_shapes(
             1,
         )
     assert connected_passed(output)
+
+
+@pytest.mark.parametrize(
+    ("original", "ambiguous"),
+    [
+        ('"success": true', '"success": false, "success": true'),
+        ('"result": "success"', '"result": "error", "result": "success"'),
+        ('"skipped": false', '"skipped": true, "skipped": false'),
+        ('"type": "testDone"', '"type": "error", "type": "testDone"'),
+        (
+            '"path": "/owned/apps/mobile/test/connected_http_test.dart"',
+            '"path": "/unrelated.dart", "path": "/owned/apps/mobile/test/connected_http_test.dart"',
+        ),
+        ('"suiteID": 0', '"suiteID": 50, "suiteID": 0'),
+        ('"success": true', '"success": true, "success": true'),
+        ('"success": true', r'"success": false, "\u0073uccess": true'),
+    ],
+    ids=["success", "result", "skipped", "type", "nested_suite", "nested_test", "same", "escaped"],
+)
+def test_connected_report_rejects_duplicate_keys(
+    original: str, ambiguous: str, connected_events: list[dict]
+) -> None:
+    output = "\n".join(json.dumps(event) for event in connected_events)
+    assert original in output
+    assert not connected_passed(output.replace(original, ambiguous, 1))
+
+
+@pytest.mark.parametrize(
+    "ambiguous",
+    [
+        '{"type":"print","message":{"nested":{"value":1,"value":2}}}',
+        '[{"event":"test.startedProcess","params":{"vmServiceUri":null,"vmServiceUri":null}}]',
+    ],
+    ids=["nested_diagnostic", "nested_daemon"],
+)
+def test_connected_report_rejects_duplicate_keys_in_auxiliary_objects(
+    ambiguous: str, connected_events: list[dict]
+) -> None:
+    lines = [json.dumps(event) for event in connected_events]
+    lines.insert(1, ambiguous)
+    assert not connected_passed("\n".join(lines))
+
+
+@pytest.mark.parametrize(
+    "fault",
+    ["missing", "duplicate", "missing_count", 0, 2, -1, True, False, None, 1.0, "1", [], {}],
+    ids=[
+        "missing",
+        "duplicate",
+        "missing_count",
+        "zero",
+        "two",
+        "negative",
+        "true",
+        "false",
+        "null",
+        "float",
+        "string",
+        "array",
+        "object",
+    ],
+)
+def test_connected_report_requires_consistent_suite_summary(
+    fault: object, connected_events: list[dict]
+) -> None:
+    if fault == "missing":
+        connected_events.pop(-2)
+    elif fault == "duplicate":
+        connected_events.insert(-1, connected_events[-2].copy())
+    elif fault == "missing_count":
+        del connected_events[-2]["count"]
+    else:
+        connected_events[-2]["count"] = fault
+    assert not connected_passed("\n".join(json.dumps(event) for event in connected_events))
+
+
+@pytest.mark.parametrize(
+    "protocol",
+    [None, True, 0.1, [], {}, "", "0.1", "0.1.2", "999.0", " 0.1.1"],
+    ids=[
+        "null",
+        "boolean",
+        "number",
+        "array",
+        "object",
+        "empty",
+        "short",
+        "new_patch",
+        "unsupported",
+        "whitespace",
+    ],
+)
+def test_connected_report_rejects_unsupported_protocol(
+    protocol: object, connected_events: list[dict]
+) -> None:
+    connected_events[0]["protocolVersion"] = protocol
+    assert not connected_passed("\n".join(json.dumps(event) for event in connected_events))
+
+
+def test_connected_report_requires_protocol(connected_events: list[dict]) -> None:
+    del connected_events[0]["protocolVersion"]
+    assert not connected_passed("\n".join(json.dumps(event) for event in connected_events))
+
+
+@pytest.mark.parametrize(
+    ("returncode", "valid_report", "error"),
+    [
+        (1, True, "process failed"),
+        (-9, True, "process failed"),
+        (0, False, "skipped, failed or incomplete"),
+        (0, True, None),
+    ],
+    ids=["nonzero_valid", "signal_valid", "zero_invalid", "zero_valid"],
+)
+def test_connected_process_requires_exit_and_report_success(
+    returncode: int, valid_report: bool, error: str | None, connected_events: list[dict]
+) -> None:
+    output = "\n".join(json.dumps(event) for event in connected_events) if valid_report else ""
+    result = subprocess.CompletedProcess(["synthetic-flutter"], returncode, stdout=output)
+    if error is None:
+        assert_connected_result(result)
+    else:
+        with pytest.raises(AssertionError, match=error):
+            assert_connected_result(result)
 
 
 def test_flutter_http_with_real_postgres(
@@ -437,8 +597,7 @@ def test_flutter_http_with_real_postgres(
             errors="replace",
             timeout=180,
         )
-        assert result.returncode == 0, "Connected Flutter HTTP/PostgreSQL process failed"
-        assert connected_passed(result.stdout), "Connected cases were skipped, failed or incomplete"
+        assert_connected_result(result)
         print("Connected Flutter HTTP/PostgreSQL: 9 passed, zero skipped")
     finally:
         server.should_exit = True
