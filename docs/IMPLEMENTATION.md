@@ -2261,3 +2261,47 @@ retention and D7 fence semantics remain blocking. No decision is accepted by thi
 automated review. The branch remains local/uncommitted, with no publication,
 deployment, provider action, external review message or hosted drill. Phase 0
 remains in progress; Phase 1 has not started.
+
+### Connected Flutter evidence integrity — 2026-10-23
+
+The connected acceptance wrapper previously counted nine visible successes and
+any successful terminal event. New adversarial regressions reproduce false
+success for duplicate/unrelated cases, hidden failures and contradictory or
+incomplete streams: **30 failed expectations / six passes / zero skips** against
+that original predicate. The correction requires the exact nine existing case
+names and suite, unique integer identities, completed starts, no hidden/visible
+failures or skips, and one final successful completion. Supported pinned-Flutter
+daemon messages, hidden loaders, Windows paths and interleaved completion remain
+valid. Process exit zero remains separately required.
+
+All **40 focused parser controls pass**. A new owned Windows PostgreSQL 17.11
+cluster and the pinned Flutter/Python toolchains then pass **570 Python tests /
+zero failures / zero skips**, including the actual **nine connected Flutter
+HTTP/PostgreSQL cases**. Focused cases are included in that Python total; nested
+Flutter cases are not additional Python cases. Ruff formatting/lint, strict
+source/script typing, contract regeneration and native/archive static checks
+pass. Generated contracts reproduce unchanged after their required Dart format
+step. [The local receipt](evidence/phase0-connected-evidence-2026-10-23.json)
+preserves pre-fix failed controls, exact source/report hashes and scope limits;
+raw ignored reports remain local, not downloadable checkout artifacts.
+
+This changes test-evidence validation only. Application behavior, contracts,
+migrations, historical receipts and all nine Dart case names are unchanged.
+No hosted, physical-device or recovery-provider qualification is claimed; O3
+D1–D11 remain unapproved and B4/B5 unchanged. Exact signed-head CI is checked
+separately in the PR. Phase 0 remains in progress; Phase 1 has not started.
+
+### PR #13 signed integration and parser remediation (2026-10-23)
+
+The signed documentation merge preserves main's complete O3 package and the
+original PR #13 evidence entry. The reviewed parser correction rejects recursive
+duplicate keys, requires pinned protocol `0.1.1` and one consistent suite summary,
+and tests process-exit/report acceptance independently.
+
+[Additive remediation receipt](evidence/phase0-connected-integrity-remediation-2026-10-23.json)
+records retained local results: 79 focused controls, 609 Python / zero skips,
+nine connected cases, and 215 ordinary Flutter / 12 explicit skips. These are
+snapshot results, not new signed-head executions; focused counts are subsets.
+Exact-head targeted checks and fresh push/PR CI remain publication gates.
+The three external cases remain unexecuted; D1-D11 are unapproved, B4/B5 unchanged,
+Phase 0 in progress and Phase 1 not started.

@@ -1,0 +1,74 @@
+{
+  "recorded_at_utc": "2026-10-23T13:01:23.218787+00:00",
+  "scope": "Additive PR13 remediation checkpoint; retained local executions, not exact-head CI",
+  "original_pr_head": "0e29f4386b983cfbcf6084f352ff08bd366821bf",
+  "baseline_main": "cf80d6de49d125888b436f0c9a3c32c8317f2b46",
+  "signed_documentation_merge": "d6df38d54d5a46665668126fd70328370c3c143c",
+  "reviewed_patch_sha256": "3c462abd78e6880b8cb3e817f9741759858fe8143a979b1873f01ca2f19010da",
+  "remediated_source": {
+    "path": "services/api/tests/test_flutter_connected.py",
+    "git_blob_content_sha256": "f88128311688bf03d5d68c282bf0c8cc4140fec84d064fbfbf9ea7db39ab63d0",
+    "git_object_id": "4ec2f9e50734efd5a866baa2262ae806fd5db2ef"
+  },
+  "parser_policy": {
+    "duplicate_keys": "Reject decoded duplicate keys recursively, including auxiliary objects and escaped-equivalent keys",
+    "protocol": "Exact string 0.1.1, as emitted by Flutter 3.47.7 / test_core 0.6.18",
+    "suite_summary": "Exactly one integer allSuites.count, compared with observed suites at end; no fixed summary position",
+    "process_exit": "Exit zero and valid machine report are independently required"
+  },
+  "retained_local_executions": {
+    "newly_executed_for_signed_head": false,
+    "original_parser_final_corpus": {
+      "passed": 45,
+      "failed": 34,
+      "errors": 0,
+      "skipped": 0,
+      "report_sha256": "81f404a92548c334d168e01e25ecfecd6ea1bd4a091c97611216836a44a6a56b"
+    },
+    "intermediate_fixture_failure": {
+      "passed": 78,
+      "failed": 1,
+      "errors": 0,
+      "skipped": 0,
+      "correction": "Interleaving fixture retained allSuites after fixture expansion; no parser guard relaxed"
+    },
+    "focused_corrected": {
+      "passed": 79,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "original_40_case_ids_preserved": true,
+      "report_sha256": "80cf93adbeee89f91eea9d2565419cc4a009686ec1d9a1ee6167db8dfdc9d1d5"
+    },
+    "full_python": {
+      "passed": 609,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "report_sha256": "cee5548a8172f63cca669424ebb37944fad1854a9e51886c756be2cd451b98d6"
+    },
+    "connected_flutter": {
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "40298920c66534dd4bd27dc5c7becc89a5dd7f01ed17b97428a3f3d616beecb5",
+      "counting": "Nine Flutter cases nested in one Python wrapper; repeated in full Python, not additional independent cases"
+    },
+    "ordinary_flutter": {
+      "passed": 215,
+      "failed": 0,
+      "skipped": 12,
+      "skip_accounting": "Nine connected cases executed separately; three external hosted/provider cases unexecuted"
+    },
+    "other_checks": "Flutter analysis, Ruff, strict mypy, OpenAPI/Dart/Drift consistency, documentation, credentials, native/archive guards and whitespace passed",
+    "retained_artifact_manifest_sha256": "df59b8abacd78cc98475d4e907fd0adc4b9454c2be986df9ff5a8877da028fcd"
+  },
+  "publication_gate": "Reverify executable/configuration equivalence; rerun focused controls and actual connected harness on final committed tree; require fresh push and PR CI",
+  "limitations": [
+    "Raw ignored reports are retained locally and unavailable from a fresh checkout; digests identify their executions",
+    "SHA-256 hashes refer to exact contents; Git object IDs are separate identifiers",
+    "Focused controls are subsets of full-suite totals",
+    "No provider, physical-device, inbox or production-recovery qualification",
+    "D1-D11 remain unapproved; G1/B4/B5 unchanged; Phase 0 in progress; Phase 1 not started"
+  ]
+}
