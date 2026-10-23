@@ -1,0 +1,60 @@
+{
+  "recorded_at_utc": "2026-10-23T19:51:17.215204+00:00",
+  "scope": "Additive PR14 integration checkpoint; retained local remediation executions, not new signed-head results",
+  "original_pr_head": "dce34ee7332a06da7b02b73e4902c980a10a2a26",
+  "baseline_main": "f6c71c3a34360342906a1326775cccef724b14a7",
+  "signed_older_main_merge": "ba24ec62e846ea7adb0883391308fe71d80e61c8",
+  "signed_latest_main_merge": "7e1cc75e7db64af05c982d6acd58a146a5652222",
+  "approved_patch_sha256": "a9f4f5f20465ea315ebebd1777a067b18ee1c72cae8f28c1b3260b486a087f6b",
+  "source_git_blob_content_sha256": {
+    "apps/mobile/lib/data/sync_repository.dart": "84693793f18c4ff85cf4b344be6fb31c6a34a59d06cf35e1c712ee98669e7555",
+    "apps/mobile/test/sync_recovery_test.dart": "e5e1a394741967589461e0d5fce8787bfc93e113b98cc54d6a978575fb4ba637",
+    "apps/mobile/test/connected_http_test.dart": "f852bd529090b8f402441c2fea4930f98131a1aae6864be1219d14510ba1b7e7"
+  },
+  "invariant": "Completed projection requires an attempted observation or a skipped observation with contract-valid correction metadata. Metadata does not independently prove historical authenticity.",
+  "retained_snapshot_executions": {
+    "new_signed_head_executions": false,
+    "red_negative_controls": {
+      "passed": 14,
+      "failed_expectations": 2,
+      "skipped": 0,
+      "report_sha256": "b2c34775130a69625cce30eb76a4be5b1565d6821357c813ee1d2dcba2dd99a3"
+    },
+    "focused_recovery": {
+      "passed": 50,
+      "failed": 0,
+      "skipped": 0,
+      "subset_of_full_flutter": true
+    },
+    "full_flutter": {
+      "passed": 238,
+      "failed": 0,
+      "skipped": 12
+    },
+    "full_python": {
+      "passed": 609,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "report_sha256": "0c623dfefc13f3ec388398299d7778981a3e1a40e8ee0f6ccb43d14e6e069e35"
+    },
+    "connected_flutter": {
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "child_exit_code": 0,
+      "report_sha256": "c529e565941023ba757759277f9b42ed1b57cadee25130aaed98ecc3c1f03344",
+      "counting": "Nested in one Python wrapper; not added to the Python total"
+    },
+    "other_checks": "Analysis, Ruff, strict mypy, formatting, four generated artifact comparisons, docs, credentials, native/archive and whitespace passed",
+    "artifact_manifest_sha256": "19200589b009e88187d0945c50c617243ef5feb4382a8c35de09074a9e6e776d"
+  },
+  "publication_gate": "Rerun full affected validation on final committed tree; require fresh exact-head push and PR API/Ubuntu/macOS CI",
+  "limits": [
+    "Original historical receipts and O3 artifacts remain unchanged",
+    "Nine ordinary connected skips are executed separately; three external hosted/provider cases remain unexecuted",
+    "Raw ignored reports are local, not available from a fresh checkout; SHA256 values identify exact contents, separately from Git object IDs",
+    "No physical-device, hosted-provider, real-inbox or production-recovery qualification",
+    "D1-D11 all unapproved; G1/B4/B5 unchanged; Phase 0 in progress; Phase 1 not started"
+  ]
+}

@@ -107,6 +107,67 @@ void main() {
         5,
       );
       expect((await other.syncMetadata())['position'], greaterThanOrEqualTo(2));
+
+      await repo.commit(
+        id,
+        'record_set',
+        recordPayload((await repo.workout(id))!, index: 1, status: 'skipped'),
+      );
+      await repo.commit(id, 'complete_session', {});
+      final recorded = recordPayload((await repo.workout(id))!);
+      await repo.commit(id, 'correct_set', {
+        ...recorded,
+        'completion_seq': 1,
+        'execution_status': 'skipped',
+        'actual': null,
+        'correction_reason': 'The set was recorded by mistake.',
+      });
+      await sync.synchronize(force: true);
+      expect(
+        sync.status.phase,
+        SyncPhase.synchronized,
+        reason: sync.status.code,
+      );
+      final corrected = await cloudRoot(id);
+      expect(corrected['revision'], 5);
+      expect(corrected['status'], 'completed');
+      expect(
+        allSets(corrected).first['observation']['execution_status'],
+        'skipped',
+      );
+
+      final manifest = await transport.bootstrap(
+        (await other.syncMetadata())['installation_id'] as String,
+      );
+      await other.stageBootstrap(manifest);
+      for (var index = 0; index < manifest.pageCount; index++) {
+        await other.stageBootstrapPage(
+          index,
+          await transport.page(manifest.token, index),
+        );
+      }
+      await other.activateBootstrap(
+        await transport.validateSnapshot(manifest.token),
+      );
+      final restored = (await other.workout(id))!;
+      expect(restored['status'], 'completed');
+      expect(
+        allSets(restored).first['observation']['execution_status'],
+        'skipped',
+      );
+      expect(allSets(restored).first['observation']['actual'], isNull);
+      expect(
+        allSets(restored).first['observation']['correction_reason'],
+        'The set was recorded by mistake.',
+      );
+      final originalSkip =
+          allSets(restored).elementAt(1)['observation'] as Json;
+      expect(originalSkip['execution_status'], 'skipped');
+      expect(originalSkip['actual'], isNull);
+      expect(originalSkip['correction_reason'], isNull);
+      expect(originalSkip['completion_seq'], 2);
+      expect(restored['revision'], 5);
+      expect((await other.syncMetadata())['position'], greaterThanOrEqualTo(5));
     } finally {
       await otherSync.close();
       other.dispose();

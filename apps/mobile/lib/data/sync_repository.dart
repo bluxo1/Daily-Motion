@@ -464,12 +464,17 @@ extension SynchronizationRepository on WorkoutRepository {
         }
       }
     }
+    // Finishing requires attempted work, but a later historical correction may
+    // mark every recorded set skipped without reopening the completed workout.
+    // The contract above validates correction reasons. Their presence permits
+    // corrected history structurally; it does not prove the earlier transition.
     if (projection['status'] == 'completed' &&
-        !allSets(projection).any(
-          (s) =>
-              s['observation'] != null &&
-              s['observation']['execution_status'] != 'skipped',
-        )) {
+        !allSets(projection).any((s) {
+          final observation = s['observation'] as Json?;
+          return observation != null &&
+              (observation['execution_status'] != 'skipped' ||
+                  observation['correction_reason'] != null);
+        })) {
       throw const ContractViolation('invalid_remote_state');
     }
     final id = projection['aggregate_id'] as String;

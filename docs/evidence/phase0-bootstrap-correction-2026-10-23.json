@@ -1,0 +1,68 @@
+{
+  "recorded_at_utc": "2026-10-22T23:15:45.719915+00:00",
+  "scope": "Phase 0 local validation only",
+  "baseline_main": "3935d5186a8797693413379271b97df614666102",
+  "branch": "fix/phase0-bootstrap-corrections-20261023",
+  "phase_0": "IN_PROGRESS",
+  "phase_1": "NOT_STARTED",
+  "O3_D1_D11": "ALL_UNAPPROVED",
+  "B4_B5": "UNCHANGED",
+  "toolchain": {
+    "flutter": "3.47.7",
+    "dart": "3.13.5",
+    "python": "3.13.14",
+    "local_postgresql": "17.11",
+    "ci_postgresql": "17.7 (separate CI)"
+  },
+  "source_git_blob_content_sha256": {
+    "apps/mobile/lib/data/sync_repository.dart": "9ba51fd26cefe99396da3e4764a516f74a1d12baaef6cb1e6818b6028a3ac84a",
+    "apps/mobile/test/sync_recovery_test.dart": "5f1271f6679562b2f83f050e2c3cac4a55e9eb49c4d3c03f675e6cd368c35dc5",
+    "apps/mobile/test/connected_http_test.dart": "d49599f35c97d439ef47e5daeaf416db445849f5d46d4bc56fe7b974b4f52b99"
+  },
+  "full_python": {
+    "cases": 536,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 536,
+    "local_report": ".tools/recovery-v2-attempts/9ee16362643e421ca0495a00cc04b138/pytest.xml",
+    "report_sha256": "4dc96a69fa4f1dd1144433a677e2b2b975544ae15be6e8f9c8fc5910f9fd2180",
+    "connected_flutter_cases": 9,
+    "connected_case_scope": "Nested in one Python wrapper; not added to Python case total",
+    "runner_receipt_sha256": "632beb60fafb9e1a0d96d77c0cb206d9691839bc63d7e8fe0b7684cc6138d289",
+    "log_sha256": "d8994b43f2345bd65c73cbdb3ebd0ede81f5c6e4780700d70bfc6a02159af735"
+  },
+  "full_python_command": "services/api/.venv/Scripts/python.exe tools/run_recovery_v2_local.py --run-local --pg-bin E:/Motion/Daily-Motion-worktrees/recovery/.tools/postgres/pgsql/bin --full-python --flutter E:/Motion/Daily-Motion/.tools/flutter/bin/flutter.bat --pub-cache E:/Motion/Daily-Motion/.tools/pub-cache",
+  "limits": [
+    "This receipt describes newly executed local checks; it does not attest PR CI or human approval.",
+    "Raw .tools reports are retained locally and are not available from a fresh Git checkout; their digests identify retained executions.",
+    "SHA-256 values are hashes of exact report or Git blob contents, not Git object IDs. This receipt does not hash itself.",
+    "Focused results are subsets of full suites, not additional independent cases.",
+    "No hosted provider, physical-device, production-recovery or O3 B4/B5 qualification; 36 future O3 acceptance families remain unexecuted."
+  ],
+  "regression_before": {
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "error_code": "invalid_remote_state",
+    "boundary": "activateBootstrap -> _installConnectedRemote",
+    "local_report": ".tools/bootstrap-before.log",
+    "report_sha256": "c37b14ae0b68c441ceda2d56c5791ff3c639c5c8e1f3791a520fdd90e984e757"
+  },
+  "focused_after": {
+    "passed": 28,
+    "failed": 0,
+    "skipped": 0,
+    "local_report": ".tools/bootstrap-focused-after.log",
+    "report_sha256": "b086111bdce9556a53d370247b968d0239db4120712ce953bfc6a1790eead3ab"
+  },
+  "full_flutter": {
+    "passed": 216,
+    "failed": 0,
+    "skipped": 12,
+    "local_report": ".tools/flutter-full.log",
+    "report_sha256": "17eebb7919c7ce6ec2396b640fef8f22689b4f92f76947dc8ee618d6effe8a78"
+  },
+  "flutter_analysis": "passed: no issues found",
+  "drift_regeneration": "passed: checked database.g.dart unchanged"
+}

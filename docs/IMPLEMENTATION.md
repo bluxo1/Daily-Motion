@@ -2305,3 +2305,60 @@ snapshot results, not new signed-head executions; focused counts are subsets.
 Exact-head targeted checks and fresh push/PR CI remain publication gates.
 The three external cases remain unexecuted; D1-D11 are unapproved, B4/B5 unchanged,
 Phase 0 in progress and Phase 1 not started.
+
+### Completed-workout correction bootstrap — 2026-10-23
+
+A completed workout whose last attempted set is historically corrected to
+`skipped` is valid current state: the UI, local reducer and API permit that
+reasoned correction without reopening the session. The
+[data-model requirement](DATA_MODEL.md#workout-execution) and
+[finish flow](USER_FLOWS.md) require attempted work when completing. Bootstrap
+incorrectly reapplied that transition-time predicate to the corrected snapshot.
+The new file-backed clean-install regression fails before the fix with
+`invalid_remote_state` in `activateBootstrap` and passes afterward.
+
+The importer now accepts recorded skipped outcomes in a completed snapshot while
+still rejecting a completed root with no observations. The original finish-time
+attempted-set check and all other structural, lifecycle, identity, observation,
+timestamp, checksum and retirement validation remain. No correction metadata is
+treated as independent historical proof. The regression closes/reopens real
+SQLite and checks preserved outcome, reason, logged order, cursor and integrity.
+The existing first connected case additionally completes/corrects through real
+HTTP/PostgreSQL and activates the corrected snapshot on a second device; all
+nine case names and original assertions remain.
+
+New local validation passes **28 focused file-backed recovery tests**, then
+**216 ordinary Flutter tests / 12 explicit skips**, clean Flutter analysis,
+Drift regeneration and Dart formatting. A fresh owned Windows PostgreSQL 17.11
+cluster passes **536 Python tests / zero failures / zero skips**, including
+**nine connected Flutter HTTP cases** with the new correction scenario. Ruff,
+strict source/script typing, native/archive checks and all four generated
+artifacts reproduce successfully. Focused results are subsets; nested Flutter
+cases are not extra Python cases. The
+[local receipt](evidence/phase0-bootstrap-correction-2026-10-23.json) records the
+pre-fix failure and exact source/report hashes. Its ignored raw reports remain
+local rather than downloadable checkout artifacts; signed-head CI is checked
+separately in the PR.
+
+This is a Phase 0 import-consistency fix, with no API behavior, migration,
+transport, provider or O3 B4/B5 change. D1–D11 remain unapproved. The 12 ordinary
+Flutter skips are nine separately executed connected cases plus three external
+hosted/provider cases; the latter remain unexecuted here. Local results do not
+qualify physical devices or production recovery. Phase 0 remains in progress;
+Phase 1 has not started.
+
+### PR #14 bootstrap integrity remediation (2026-10-24)
+
+Completed snapshots now require attempted work or a skipped observation with
+contract-valid correction metadata. This preserves historical correction without
+accepting original-skipped-only completion; metadata is not historical proof.
+The original restart regression remains, alongside 16 negative bootstrap controls,
+six reachable lifecycle cases and the expanded existing connected HTTP case.
+
+[Additive remediation receipt](evidence/phase0-bootstrap-integrity-remediation-2026-10-24.json)
+records retained local results: 50 focused recovery tests, 238 Flutter / 12 skips,
+609 Python / zero skips, and nine connected cases nested in one Python wrapper.
+These describe the reviewed local snapshot; final committed-tree execution and
+fresh exact-head CI remain publication gates. Focused counts are subsets.
+Three external cases remain unexecuted; no provider or physical qualification.
+D1-D11 remain unapproved, G1/B4/B5 unchanged, Phase 0 in progress, Phase 1 not started.
