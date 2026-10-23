@@ -2183,6 +2183,85 @@ preserves the original failure and new machine-log hashes separately. Fresh
 Linux/macOS CI on the signed follow-up head is required before review readiness;
 the older head's successful jobs do not substitute for it.
 
+### Merged observation baseline and local O3 design review package — 2026-10-22
+
+PR #11 is squash merged as signed main
+`3935d5186a8797693413379271b97df614666102`, with tree
+`f5fe7067535b14fe2df04e5f80982a9bb9129085` matching reviewed `266e164`.
+[Main CI](https://github.com/bluxo1/Daily-Motion/actions/runs/39763668555) is now
+complete with all three jobs successful: **536 Python / zero skips**, and
+**215 Flutter passes / 12 explicit skips** on each mobile runner, plus Android
+and unsigned iOS builds. The earlier macOS failure and dated local/PR receipts
+remain historical evidence; none is rewritten or hidden.
+
+The new local `docs/o3-verifier-review-20261022` branch starts from that exact
+main. The [revised O3 proposal](RECOVERY_O3_VERIFIER_PROPOSAL.md) recommends a
+separate verifier workload identity, narrowly lock-capable SQL role with DML
+denied, an online authenticated authority record, unchanged core hashes and an
+exact B5 checkpoint-transition validator. It identifies actual-connection
+continuity, authority completeness/atomicity, the cross-store close cutoff,
+lifecycle/retention and custody as explicit decisions for named reviewers.
+[Record/interface definitions](RECOVERY_O3_RECORDS_PROPOSED.md), a labeled
+synthetic certificate example and the [36-case future acceptance plan](RECOVERY_O3_ACCEPTANCE_PLAN.md)
+make the decision package concrete. All 36 cases remain NOT IMPLEMENTED /
+NOT EXECUTED by this package; no B4/B5 runtime or schema migration is added.
+
+One new owned disposable Windows PostgreSQL 17.11 probe executes **25 checks
+matching expectations / zero skips**, including five existing pure-reducer
+checks and 20 SQL checks; cleanup succeeds. It demonstrates the locking/RLS
+mechanism, a deliberately unsafe permissive-policy control, GUC context limits,
+and why XID/WAL movement alone is not commit proof. It does not qualify the
+complete verifier role, authenticated certificates, B5 or a hosted platform.
+The [design evidence receipt](evidence/recovery-o3-design-review-2026-10-22.json)
+separates this execution from merged-main CI, computed examples and future cases,
+and records hashes and local validation. Runtime source, historical receipts,
+the proposed protocol/ADR and characterization are preserved.
+
+This is an **uncommitted local review package**, not O3 approval or permission
+to implement B4/B5. Required backend/security, platform/storage, privacy/product
+and operator/custodian reviewers remain unassigned. No commit, push, PR, merge,
+deployment, provider change or hosted drill is performed for this package.
+RC10/RC11 remain NOT EXECUTED; physical-device samples remain zero. Phase 0 is
+in progress and Phase 1 has not started.
+
+### O3 advisory backend/security review — 2026-10-22
+
+The [technical review and D1-D11 record](RECOVERY_O3_TECHNICAL_REVIEW.md) covers
+the complete uncommitted package against actual admission/effect/observation,
+pure/test-authority, role, erasure and lifecycle code. It records five concrete
+design/evidence findings: a missing UNRESOLVED-head observation proof, deletion
+scope's dependence on trusted B3 enumeration, an unrepresentable absent lookup,
+an incomplete-inventory false-green probe gate and an oversize oracle that failed
+to distinguish prior PREPARED history from a new CERTIFIED append. Local design/
+oracle corrections and the probe's explicit 25-name success guard address these;
+they do not implement B4/B5 or provide backend/security/O11 acceptance.
+
+The hardened original probe executes **25 checks matching expectations / zero
+skips** on a new owned cluster. A separate advisory probe executes **23 matching
+checks / zero skips**: 14 existing PostgreSQL component/permission checks, one
+test-authority absence lookup and eight runner controls. The 23-check probe runs
+twice, before and after one remaining lint-only line-wrap correction; both reports
+and source hashes are retained, with the final run matching final source. No
+failed SQL run is hidden. Unsafe administrator-corruption/old-gate controls are
+explicitly labeled, not promoted into defensive security qualification.
+
+The [shape measurement](experiments/recovery_o3_record_sizing.py) resolves current
+workout cardinality conservatively: 5,051 IDs and a compact publication-view size
+of 399,365 bytes, below the candidate 1 MiB whole-body bound. It intentionally
+invalidates the synthetic example's hashes to measure field widths; it performs
+no record validation, authentication or domain commit. Lifecycle/decoder coverage
+and the new bounds remain unapproved. All 36 future acceptance families have
+deterministic review notes and remain NOT EXECUTED as B4/B5 qualification.
+
+The [new review receipt](evidence/recovery-o3-advisory-review-2026-10-22.json)
+separates new runs/measurements/validation from historical evidence, preserves the
+revision-2 checkpoint and protected hashes, and records each decision's pending
+reviewer/dependency. O1/O2 platform proofs, O4 source-loss resolution, O5 lifecycle/
+retention and D7 fence semantics remain blocking. No decision is accepted by this
+automated review. The branch remains local/uncommitted, with no publication,
+deployment, provider action, external review message or hosted drill. Phase 0
+remains in progress; Phase 1 has not started.
+
 ### Completed-workout correction bootstrap — 2026-10-23
 
 A completed workout whose last attempted set is historically corrected to
