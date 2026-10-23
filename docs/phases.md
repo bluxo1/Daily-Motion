@@ -2,18 +2,28 @@
 
 Updated: 2026-10-22 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
 
-Protected main `3e02131` includes PR #10's Recovery V2 component foundation and
-Docker CI correction as one signed squash commit. Its
-[main CI](https://github.com/bluxo1/Daily-Motion/actions/runs/39723025027) passes
-all three jobs: **490 Python / zero skips**, Android builds and unsigned iOS
-builds, including the existing native qualification harness compilation.
-Independent certification/publication, provider/operator acceptance and physical
-qualification remain open. No Phase 0 gate is closed by this merge.
+Protected main `3935d51` is PR #11's signed squash merge; its tree matches reviewed
+`266e164`. The observation helper and desktop worker-lock correction are merged.
+[Main CI](https://github.com/bluxo1/Daily-Motion/actions/runs/39763668555) passes
+all three jobs: **536 Python / zero skips**, **215 Flutter / 12 explicit skips**
+on each mobile runner, Android builds and unsigned iOS builds. Earlier main
+`3e02131` and its 490-test CI remain historical evidence in IMPLEMENTATION.md.
+These results do not qualify independent certification/publication, providers,
+operators or physical devices; no additional Phase 0 gate is closed.
 
-The next observation component has a separate
-[O3 verifier/certificate review proposal](RECOVERY_O3_VERIFIER_PROPOSAL.md).
-Its known-marker checks do not provide trusted certification or publication;
-backend/security acceptance is required before the blocked B4/B5 work.
+The local [O3 design review package](RECOVERY_O3_VERIFIER_PROPOSAL.md) now provides
+recommended records/permissions, a decision matrix and 36 future fault cases.
+Its separate bounded probe has **25 checks matching expectations / zero skips**;
+unsafe controls are explicitly labeled. O3 remains **proposed / unapproved**.
+The existing known-marker helper supplies no trusted certification, target-
+continuity proof, authority publication or complete recovery. Required backend/
+security decisions and explicit authorization precede B4/B5 implementation.
+
+The subsequent [advisory technical review](RECOVERY_O3_TECHNICAL_REVIEW.md)
+records concrete corrections and a pending decision for each D1-D11. New evidence
+separates a hardened 25-check run, a 23-check existing-component/runner review
+and synthetic record sizing from the 36 unexecuted future acceptance families.
+No O3/O11 approval or additional Phase 0 acceptance gate is closed.
 
 **Historical Oct 21 checkpoint:** main `5975999` contains merged PR #7 authentication and PR #8 mobile
 qualification. Session 2 recovery integration passes **180 Flutter / 12 explicit
