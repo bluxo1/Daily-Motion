@@ -21,7 +21,7 @@ class TrainingDatabase extends _$TrainingDatabase {
   );
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -84,6 +84,14 @@ class TrainingDatabase extends _$TrainingDatabase {
         await customStatement(
           'INSERT INTO recovery_state(singleton) VALUES(1)',
         );
+      }
+      if (from < 5) {
+        await customStatement(
+          'CREATE UNIQUE INDEX local_identity_owner ON local_identity(owner_id)',
+        );
+        await migrator.createTable(routines);
+        await migrator.createTable(workoutTemplates);
+        await migrator.createTable(routineStarts);
       }
       // Drift updates its version after the callback. Persist it with the DDL
       // too, so process loss after commit cannot retry an already-applied ALTER.
