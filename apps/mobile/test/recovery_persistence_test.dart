@@ -560,7 +560,9 @@ void main() {
     'newer local schema is refused without downgrading or deleting work',
     () async {
       await repo.startFoundationWorkout();
-      await db.customStatement('PRAGMA user_version=5');
+      final futureVersion = db.schemaVersion + 1;
+      final supportedVersion = db.schemaVersion;
+      await db.customStatement('PRAGMA user_version=$futureVersion');
       await close();
       db = TrainingDatabase.open(file);
       repo = WorkoutRepository(db, testOwner);
@@ -577,7 +579,10 @@ void main() {
       await db.close();
       final raw = native.sqlite3.open(file.path);
       try {
-        expect(raw.select('PRAGMA user_version').single.values.single, 5);
+        expect(
+          raw.select('PRAGMA user_version').single.values.single,
+          futureVersion,
+        );
         expect(
           raw.select('SELECT count(*) FROM sessions').single.values.single,
           1,
@@ -587,7 +592,7 @@ void main() {
           1,
         );
         // Restore only this synthetic test's declared version so common teardown can close normally.
-        raw.execute('PRAGMA user_version=4');
+        raw.execute('PRAGMA user_version=$supportedVersion');
       } finally {
         raw.close();
       }

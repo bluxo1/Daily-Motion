@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/workout.dart';
@@ -7,10 +8,17 @@ import 'workout_screen.dart';
 import 'sync_provider.dart';
 import '../sync/coordinator.dart';
 import '../auth/auth_app.dart';
+import 'routine_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   final bool syntheticFixture;
-  const HomeScreen({super.key, this.syntheticFixture = true});
+  final bool localRoutinesEnabled;
+  const HomeScreen({
+    super.key,
+    this.syntheticFixture = true,
+    this.localRoutinesEnabled =
+        !kReleaseMode && const bool.fromEnvironment('DM_LOCAL_ROUTINES'),
+  });
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
@@ -152,6 +160,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SizedBox(height: 24),
               ],
               if (destination == 0) ...[
+                if (widget.localRoutinesEnabled) ...[
+                  OutlinedButton.icon(
+                    onPressed: () => Navigator.of(context).push<void>(
+                      MaterialPageRoute(builder: (_) => const RoutineScreen()),
+                    ),
+                    icon: const Icon(Icons.edit_calendar_outlined),
+                    label: const Text('My routines'),
+                  ),
+                  const SizedBox(height: 16),
+                ],
                 Text(
                   'Make every set count.',
                   style: Theme.of(context).textTheme.headlineMedium,

@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 
 import '../domain/workout.dart';
 import '../domain/rest_timer.dart';
+import '../domain/routine.dart';
 import '../sync/contract_validation.dart';
 import '../sync/transport_contract.dart';
 import '../sync/transport_limits.dart';
@@ -14,6 +15,7 @@ import 'database.dart';
 
 part 'sync_repository.dart';
 part 'recovery_repository.dart';
+part 'routine_repository.dart';
 
 class WorkoutRepository {
   final TrainingDatabase db;
@@ -25,6 +27,15 @@ class WorkoutRepository {
   Stream<void> get commits => _commits.stream;
   void dispose() => unawaited(_commits.close());
   void Function(Duration duration)? onLocalCommit;
+
+  void _signalCommit(Duration duration, {bool changed = true}) {
+    try {
+      onLocalCommit?.call(duration);
+    } catch (_) {
+      /* Observability cannot undo a durable save. */
+    }
+    if (changed && !_commits.isClosed) _commits.add(null);
+  }
 
   WorkoutRepository(
     this.db,
@@ -279,7 +290,15 @@ class WorkoutRepository {
     return id;
   }
 
-  Future<bool> commit(String id, String command, Json payload) async {
+  Future<bool> commit(String id, String command, Json payload) =>
+      _commit(id, command, payload);
+
+  Future<bool> _commit(
+    String id,
+    String command,
+    Json payload, {
+    bool notify = true,
+  }) async {
     final watch = Stopwatch()..start();
     final timing = command == 'record_set' ? await _restClock.sample() : null;
     final result = await db.transaction(() async {
@@ -479,12 +498,7 @@ class WorkoutRepository {
       return true;
     });
     watch.stop();
-    try {
-      onLocalCommit?.call(watch.elapsed);
-    } catch (_) {
-      /* Observability cannot undo a durable save. */
-    }
-    if (result && !_commits.isClosed) _commits.add(null);
+    if (notify) _signalCommit(watch.elapsed, changed: result);
     return result;
   }
 

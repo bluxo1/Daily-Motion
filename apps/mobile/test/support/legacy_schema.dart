@@ -3,6 +3,7 @@ import 'package:daily_motion/data/database.dart';
 /// Only for newly created synthetic test databases. Reconstructs the exact v3
 /// layout by removing additive v4 metadata; original row blobs stay intact.
 Future<void> reconstructSchemaThree(TrainingDatabase db) async {
+  await reconstructSchemaFour(db);
   await db.customStatement('DROP TABLE historical_receipts');
   await db.customStatement('DROP TABLE recovery_state');
   for (final column in ['wire_version', 'origin_context', 'accepted_context']) {
@@ -10,6 +11,15 @@ Future<void> reconstructSchemaThree(TrainingDatabase db) async {
   }
   await db.customStatement('ALTER TABLE shadows DROP COLUMN recovery_context');
   await db.customStatement('PRAGMA user_version=3');
+}
+
+/// Remove only additive local planning structures from newly owned fixtures.
+Future<void> reconstructSchemaFour(TrainingDatabase db) async {
+  await db.customStatement('DROP TABLE routine_starts');
+  await db.customStatement('DROP TABLE routines');
+  await db.customStatement('DROP TABLE workout_templates');
+  await db.customStatement('DROP INDEX local_identity_owner');
+  await db.customStatement('PRAGMA user_version=4');
 }
 
 /// Reconstruct supported pre-recovery shapes only in newly owned test files.

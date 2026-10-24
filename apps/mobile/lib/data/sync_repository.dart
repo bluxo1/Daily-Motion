@@ -292,6 +292,8 @@ extension SynchronizationRepository on WorkoutRepository {
       throw const ContractViolation('wrong_owner');
     }
     for (final table in [
+      'routine_starts',
+      'routines', // Cascades to all immutable template payloads.
       'sessions',
       'shadows',
       'outbox',

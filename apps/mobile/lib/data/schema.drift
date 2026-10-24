@@ -101,3 +101,35 @@ CREATE TABLE historical_receipts (
   mutation_id TEXT NOT NULL PRIMARY KEY,
   evidence TEXT NOT NULL
 );
+
+-- Local-only planning. These rows never enter the workout transport outbox.
+CREATE UNIQUE INDEX local_identity_owner ON local_identity(owner_id);
+CREATE TABLE routines (
+  id TEXT NOT NULL PRIMARY KEY,
+  owner_id TEXT NOT NULL REFERENCES local_identity(owner_id),
+  current_template_id TEXT,
+  local_revision INTEGER NOT NULL CHECK(local_revision >= 0),
+  UNIQUE(owner_id, id),
+  FOREIGN KEY(owner_id, id, current_template_id)
+    REFERENCES workout_templates(owner_id, routine_id, id)
+);
+CREATE TABLE workout_templates (
+  id TEXT NOT NULL PRIMARY KEY,
+  owner_id TEXT NOT NULL,
+  routine_id TEXT NOT NULL,
+  local_revision INTEGER NOT NULL CHECK(local_revision > 0),
+  prescription TEXT NOT NULL,
+  UNIQUE(owner_id, routine_id, id),
+  UNIQUE(owner_id, routine_id, local_revision),
+  FOREIGN KEY(owner_id, routine_id) REFERENCES routines(owner_id, id) ON DELETE CASCADE
+);
+CREATE TABLE routine_starts (
+  attempt_id TEXT NOT NULL PRIMARY KEY,
+  owner_id TEXT NOT NULL,
+  routine_id TEXT NOT NULL,
+  template_id TEXT NOT NULL,
+  timezone TEXT NOT NULL,
+  session_id TEXT NOT NULL UNIQUE,
+  FOREIGN KEY(owner_id, routine_id, template_id)
+    REFERENCES workout_templates(owner_id, routine_id, id) ON DELETE CASCADE
+);

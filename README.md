@@ -40,6 +40,11 @@ personal data or database, and is disabled in release builds. Full routine
 features remain Phase 1. Hosted project/region/backup/processor and named review
 prerequisites are in [the operator handoff](infra/QUALIFICATION.md).
 
+An opt-in [local routine authoring experiment](docs/LOCAL_ROUTINE_AUTHORING.md)
+adds owner-scoped persistence and safe routine-based workout starts. It is off by
+default, does not synchronize routines, and does not authorize a phase rollout.
+The guide records its debug flag, migration boundary and remaining limitations.
+
 [Actual CI on `8e5af65`](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908)
 passed all three jobs: **148 ordinary Flutter + 9 live HTTP cases**, **102 Python
 including 54 PostgreSQL cases**, Android debug/profile/release and unsigned iOS

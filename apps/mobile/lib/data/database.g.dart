@@ -5270,6 +5270,1165 @@ class HistoricalReceiptsCompanion extends UpdateCompanion<HistoricalReceipt> {
   }
 }
 
+class WorkoutTemplates extends Table
+    with TableInfo<WorkoutTemplates, WorkoutTemplate> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  WorkoutTemplates(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _routineIdMeta = const VerificationMeta(
+    'routineId',
+  );
+  late final GeneratedColumn<String> routineId = GeneratedColumn<String>(
+    'routine_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _localRevisionMeta = const VerificationMeta(
+    'localRevision',
+  );
+  late final GeneratedColumn<int> localRevision = GeneratedColumn<int>(
+    'local_revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (local_revision > 0)',
+  );
+  static const VerificationMeta _prescriptionMeta = const VerificationMeta(
+    'prescription',
+  );
+  late final GeneratedColumn<String> prescription = GeneratedColumn<String>(
+    'prescription',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    ownerId,
+    routineId,
+    localRevision,
+    prescription,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'workout_templates';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WorkoutTemplate> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerIdMeta);
+    }
+    if (data.containsKey('routine_id')) {
+      context.handle(
+        _routineIdMeta,
+        routineId.isAcceptableOrUnknown(data['routine_id']!, _routineIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_routineIdMeta);
+    }
+    if (data.containsKey('local_revision')) {
+      context.handle(
+        _localRevisionMeta,
+        localRevision.isAcceptableOrUnknown(
+          data['local_revision']!,
+          _localRevisionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_localRevisionMeta);
+    }
+    if (data.containsKey('prescription')) {
+      context.handle(
+        _prescriptionMeta,
+        prescription.isAcceptableOrUnknown(
+          data['prescription']!,
+          _prescriptionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_prescriptionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {ownerId, routineId, id},
+    {ownerId, routineId, localRevision},
+  ];
+  @override
+  WorkoutTemplate map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WorkoutTemplate(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
+      )!,
+      routineId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}routine_id'],
+      )!,
+      localRevision: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}local_revision'],
+      )!,
+      prescription: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}prescription'],
+      )!,
+    );
+  }
+
+  @override
+  WorkoutTemplates createAlias(String alias) {
+    return WorkoutTemplates(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'UNIQUE(owner_id, routine_id, id)',
+    'UNIQUE(owner_id, routine_id, local_revision)',
+    'FOREIGN KEY(owner_id, routine_id)REFERENCES routines(owner_id, id)ON DELETE CASCADE',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
+  final String id;
+  final String ownerId;
+  final String routineId;
+  final int localRevision;
+  final String prescription;
+  const WorkoutTemplate({
+    required this.id,
+    required this.ownerId,
+    required this.routineId,
+    required this.localRevision,
+    required this.prescription,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['owner_id'] = Variable<String>(ownerId);
+    map['routine_id'] = Variable<String>(routineId);
+    map['local_revision'] = Variable<int>(localRevision);
+    map['prescription'] = Variable<String>(prescription);
+    return map;
+  }
+
+  WorkoutTemplatesCompanion toCompanion(bool nullToAbsent) {
+    return WorkoutTemplatesCompanion(
+      id: Value(id),
+      ownerId: Value(ownerId),
+      routineId: Value(routineId),
+      localRevision: Value(localRevision),
+      prescription: Value(prescription),
+    );
+  }
+
+  factory WorkoutTemplate.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WorkoutTemplate(
+      id: serializer.fromJson<String>(json['id']),
+      ownerId: serializer.fromJson<String>(json['owner_id']),
+      routineId: serializer.fromJson<String>(json['routine_id']),
+      localRevision: serializer.fromJson<int>(json['local_revision']),
+      prescription: serializer.fromJson<String>(json['prescription']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'owner_id': serializer.toJson<String>(ownerId),
+      'routine_id': serializer.toJson<String>(routineId),
+      'local_revision': serializer.toJson<int>(localRevision),
+      'prescription': serializer.toJson<String>(prescription),
+    };
+  }
+
+  WorkoutTemplate copyWith({
+    String? id,
+    String? ownerId,
+    String? routineId,
+    int? localRevision,
+    String? prescription,
+  }) => WorkoutTemplate(
+    id: id ?? this.id,
+    ownerId: ownerId ?? this.ownerId,
+    routineId: routineId ?? this.routineId,
+    localRevision: localRevision ?? this.localRevision,
+    prescription: prescription ?? this.prescription,
+  );
+  WorkoutTemplate copyWithCompanion(WorkoutTemplatesCompanion data) {
+    return WorkoutTemplate(
+      id: data.id.present ? data.id.value : this.id,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      routineId: data.routineId.present ? data.routineId.value : this.routineId,
+      localRevision: data.localRevision.present
+          ? data.localRevision.value
+          : this.localRevision,
+      prescription: data.prescription.present
+          ? data.prescription.value
+          : this.prescription,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WorkoutTemplate(')
+          ..write('id: $id, ')
+          ..write('ownerId: $ownerId, ')
+          ..write('routineId: $routineId, ')
+          ..write('localRevision: $localRevision, ')
+          ..write('prescription: $prescription')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, ownerId, routineId, localRevision, prescription);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WorkoutTemplate &&
+          other.id == this.id &&
+          other.ownerId == this.ownerId &&
+          other.routineId == this.routineId &&
+          other.localRevision == this.localRevision &&
+          other.prescription == this.prescription);
+}
+
+class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
+  final Value<String> id;
+  final Value<String> ownerId;
+  final Value<String> routineId;
+  final Value<int> localRevision;
+  final Value<String> prescription;
+  final Value<int> rowid;
+  const WorkoutTemplatesCompanion({
+    this.id = const Value.absent(),
+    this.ownerId = const Value.absent(),
+    this.routineId = const Value.absent(),
+    this.localRevision = const Value.absent(),
+    this.prescription = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WorkoutTemplatesCompanion.insert({
+    required String id,
+    required String ownerId,
+    required String routineId,
+    required int localRevision,
+    required String prescription,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       ownerId = Value(ownerId),
+       routineId = Value(routineId),
+       localRevision = Value(localRevision),
+       prescription = Value(prescription);
+  static Insertable<WorkoutTemplate> custom({
+    Expression<String>? id,
+    Expression<String>? ownerId,
+    Expression<String>? routineId,
+    Expression<int>? localRevision,
+    Expression<String>? prescription,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (ownerId != null) 'owner_id': ownerId,
+      if (routineId != null) 'routine_id': routineId,
+      if (localRevision != null) 'local_revision': localRevision,
+      if (prescription != null) 'prescription': prescription,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WorkoutTemplatesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? ownerId,
+    Value<String>? routineId,
+    Value<int>? localRevision,
+    Value<String>? prescription,
+    Value<int>? rowid,
+  }) {
+    return WorkoutTemplatesCompanion(
+      id: id ?? this.id,
+      ownerId: ownerId ?? this.ownerId,
+      routineId: routineId ?? this.routineId,
+      localRevision: localRevision ?? this.localRevision,
+      prescription: prescription ?? this.prescription,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
+    if (routineId.present) {
+      map['routine_id'] = Variable<String>(routineId.value);
+    }
+    if (localRevision.present) {
+      map['local_revision'] = Variable<int>(localRevision.value);
+    }
+    if (prescription.present) {
+      map['prescription'] = Variable<String>(prescription.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WorkoutTemplatesCompanion(')
+          ..write('id: $id, ')
+          ..write('ownerId: $ownerId, ')
+          ..write('routineId: $routineId, ')
+          ..write('localRevision: $localRevision, ')
+          ..write('prescription: $prescription, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class Routines extends Table with TableInfo<Routines, Routine> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  Routines(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL REFERENCES local_identity(owner_id)',
+  );
+  static const VerificationMeta _currentTemplateIdMeta = const VerificationMeta(
+    'currentTemplateId',
+  );
+  late final GeneratedColumn<String> currentTemplateId =
+      GeneratedColumn<String>(
+        'current_template_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        $customConstraints: '',
+      );
+  static const VerificationMeta _localRevisionMeta = const VerificationMeta(
+    'localRevision',
+  );
+  late final GeneratedColumn<int> localRevision = GeneratedColumn<int>(
+    'local_revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (local_revision >= 0)',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    ownerId,
+    currentTemplateId,
+    localRevision,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'routines';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Routine> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerIdMeta);
+    }
+    if (data.containsKey('current_template_id')) {
+      context.handle(
+        _currentTemplateIdMeta,
+        currentTemplateId.isAcceptableOrUnknown(
+          data['current_template_id']!,
+          _currentTemplateIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('local_revision')) {
+      context.handle(
+        _localRevisionMeta,
+        localRevision.isAcceptableOrUnknown(
+          data['local_revision']!,
+          _localRevisionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_localRevisionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {ownerId, id},
+  ];
+  @override
+  Routine map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Routine(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
+      )!,
+      currentTemplateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}current_template_id'],
+      ),
+      localRevision: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}local_revision'],
+      )!,
+    );
+  }
+
+  @override
+  Routines createAlias(String alias) {
+    return Routines(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'UNIQUE(owner_id, id)',
+    'FOREIGN KEY(owner_id, id, current_template_id)REFERENCES workout_templates(owner_id, routine_id, id)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class Routine extends DataClass implements Insertable<Routine> {
+  final String id;
+  final String ownerId;
+  final String? currentTemplateId;
+  final int localRevision;
+  const Routine({
+    required this.id,
+    required this.ownerId,
+    this.currentTemplateId,
+    required this.localRevision,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['owner_id'] = Variable<String>(ownerId);
+    if (!nullToAbsent || currentTemplateId != null) {
+      map['current_template_id'] = Variable<String>(currentTemplateId);
+    }
+    map['local_revision'] = Variable<int>(localRevision);
+    return map;
+  }
+
+  RoutinesCompanion toCompanion(bool nullToAbsent) {
+    return RoutinesCompanion(
+      id: Value(id),
+      ownerId: Value(ownerId),
+      currentTemplateId: currentTemplateId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(currentTemplateId),
+      localRevision: Value(localRevision),
+    );
+  }
+
+  factory Routine.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Routine(
+      id: serializer.fromJson<String>(json['id']),
+      ownerId: serializer.fromJson<String>(json['owner_id']),
+      currentTemplateId: serializer.fromJson<String?>(
+        json['current_template_id'],
+      ),
+      localRevision: serializer.fromJson<int>(json['local_revision']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'owner_id': serializer.toJson<String>(ownerId),
+      'current_template_id': serializer.toJson<String?>(currentTemplateId),
+      'local_revision': serializer.toJson<int>(localRevision),
+    };
+  }
+
+  Routine copyWith({
+    String? id,
+    String? ownerId,
+    Value<String?> currentTemplateId = const Value.absent(),
+    int? localRevision,
+  }) => Routine(
+    id: id ?? this.id,
+    ownerId: ownerId ?? this.ownerId,
+    currentTemplateId: currentTemplateId.present
+        ? currentTemplateId.value
+        : this.currentTemplateId,
+    localRevision: localRevision ?? this.localRevision,
+  );
+  Routine copyWithCompanion(RoutinesCompanion data) {
+    return Routine(
+      id: data.id.present ? data.id.value : this.id,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      currentTemplateId: data.currentTemplateId.present
+          ? data.currentTemplateId.value
+          : this.currentTemplateId,
+      localRevision: data.localRevision.present
+          ? data.localRevision.value
+          : this.localRevision,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Routine(')
+          ..write('id: $id, ')
+          ..write('ownerId: $ownerId, ')
+          ..write('currentTemplateId: $currentTemplateId, ')
+          ..write('localRevision: $localRevision')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, ownerId, currentTemplateId, localRevision);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Routine &&
+          other.id == this.id &&
+          other.ownerId == this.ownerId &&
+          other.currentTemplateId == this.currentTemplateId &&
+          other.localRevision == this.localRevision);
+}
+
+class RoutinesCompanion extends UpdateCompanion<Routine> {
+  final Value<String> id;
+  final Value<String> ownerId;
+  final Value<String?> currentTemplateId;
+  final Value<int> localRevision;
+  final Value<int> rowid;
+  const RoutinesCompanion({
+    this.id = const Value.absent(),
+    this.ownerId = const Value.absent(),
+    this.currentTemplateId = const Value.absent(),
+    this.localRevision = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RoutinesCompanion.insert({
+    required String id,
+    required String ownerId,
+    this.currentTemplateId = const Value.absent(),
+    required int localRevision,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       ownerId = Value(ownerId),
+       localRevision = Value(localRevision);
+  static Insertable<Routine> custom({
+    Expression<String>? id,
+    Expression<String>? ownerId,
+    Expression<String>? currentTemplateId,
+    Expression<int>? localRevision,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (ownerId != null) 'owner_id': ownerId,
+      if (currentTemplateId != null) 'current_template_id': currentTemplateId,
+      if (localRevision != null) 'local_revision': localRevision,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RoutinesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? ownerId,
+    Value<String?>? currentTemplateId,
+    Value<int>? localRevision,
+    Value<int>? rowid,
+  }) {
+    return RoutinesCompanion(
+      id: id ?? this.id,
+      ownerId: ownerId ?? this.ownerId,
+      currentTemplateId: currentTemplateId ?? this.currentTemplateId,
+      localRevision: localRevision ?? this.localRevision,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
+    if (currentTemplateId.present) {
+      map['current_template_id'] = Variable<String>(currentTemplateId.value);
+    }
+    if (localRevision.present) {
+      map['local_revision'] = Variable<int>(localRevision.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoutinesCompanion(')
+          ..write('id: $id, ')
+          ..write('ownerId: $ownerId, ')
+          ..write('currentTemplateId: $currentTemplateId, ')
+          ..write('localRevision: $localRevision, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class RoutineStarts extends Table with TableInfo<RoutineStarts, RoutineStart> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  RoutineStarts(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _attemptIdMeta = const VerificationMeta(
+    'attemptId',
+  );
+  late final GeneratedColumn<String> attemptId = GeneratedColumn<String>(
+    'attempt_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _routineIdMeta = const VerificationMeta(
+    'routineId',
+  );
+  late final GeneratedColumn<String> routineId = GeneratedColumn<String>(
+    'routine_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _templateIdMeta = const VerificationMeta(
+    'templateId',
+  );
+  late final GeneratedColumn<String> templateId = GeneratedColumn<String>(
+    'template_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _timezoneMeta = const VerificationMeta(
+    'timezone',
+  );
+  late final GeneratedColumn<String> timezone = GeneratedColumn<String>(
+    'timezone',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL UNIQUE',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    attemptId,
+    ownerId,
+    routineId,
+    templateId,
+    timezone,
+    sessionId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'routine_starts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RoutineStart> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('attempt_id')) {
+      context.handle(
+        _attemptIdMeta,
+        attemptId.isAcceptableOrUnknown(data['attempt_id']!, _attemptIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_attemptIdMeta);
+    }
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerIdMeta);
+    }
+    if (data.containsKey('routine_id')) {
+      context.handle(
+        _routineIdMeta,
+        routineId.isAcceptableOrUnknown(data['routine_id']!, _routineIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_routineIdMeta);
+    }
+    if (data.containsKey('template_id')) {
+      context.handle(
+        _templateIdMeta,
+        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_templateIdMeta);
+    }
+    if (data.containsKey('timezone')) {
+      context.handle(
+        _timezoneMeta,
+        timezone.isAcceptableOrUnknown(data['timezone']!, _timezoneMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_timezoneMeta);
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {attemptId};
+  @override
+  RoutineStart map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RoutineStart(
+      attemptId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}attempt_id'],
+      )!,
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
+      )!,
+      routineId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}routine_id'],
+      )!,
+      templateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_id'],
+      )!,
+      timezone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}timezone'],
+      )!,
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+    );
+  }
+
+  @override
+  RoutineStarts createAlias(String alias) {
+    return RoutineStarts(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'FOREIGN KEY(owner_id, routine_id, template_id)REFERENCES workout_templates(owner_id, routine_id, id)ON DELETE CASCADE',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class RoutineStart extends DataClass implements Insertable<RoutineStart> {
+  final String attemptId;
+  final String ownerId;
+  final String routineId;
+  final String templateId;
+  final String timezone;
+  final String sessionId;
+  const RoutineStart({
+    required this.attemptId,
+    required this.ownerId,
+    required this.routineId,
+    required this.templateId,
+    required this.timezone,
+    required this.sessionId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['attempt_id'] = Variable<String>(attemptId);
+    map['owner_id'] = Variable<String>(ownerId);
+    map['routine_id'] = Variable<String>(routineId);
+    map['template_id'] = Variable<String>(templateId);
+    map['timezone'] = Variable<String>(timezone);
+    map['session_id'] = Variable<String>(sessionId);
+    return map;
+  }
+
+  RoutineStartsCompanion toCompanion(bool nullToAbsent) {
+    return RoutineStartsCompanion(
+      attemptId: Value(attemptId),
+      ownerId: Value(ownerId),
+      routineId: Value(routineId),
+      templateId: Value(templateId),
+      timezone: Value(timezone),
+      sessionId: Value(sessionId),
+    );
+  }
+
+  factory RoutineStart.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RoutineStart(
+      attemptId: serializer.fromJson<String>(json['attempt_id']),
+      ownerId: serializer.fromJson<String>(json['owner_id']),
+      routineId: serializer.fromJson<String>(json['routine_id']),
+      templateId: serializer.fromJson<String>(json['template_id']),
+      timezone: serializer.fromJson<String>(json['timezone']),
+      sessionId: serializer.fromJson<String>(json['session_id']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'attempt_id': serializer.toJson<String>(attemptId),
+      'owner_id': serializer.toJson<String>(ownerId),
+      'routine_id': serializer.toJson<String>(routineId),
+      'template_id': serializer.toJson<String>(templateId),
+      'timezone': serializer.toJson<String>(timezone),
+      'session_id': serializer.toJson<String>(sessionId),
+    };
+  }
+
+  RoutineStart copyWith({
+    String? attemptId,
+    String? ownerId,
+    String? routineId,
+    String? templateId,
+    String? timezone,
+    String? sessionId,
+  }) => RoutineStart(
+    attemptId: attemptId ?? this.attemptId,
+    ownerId: ownerId ?? this.ownerId,
+    routineId: routineId ?? this.routineId,
+    templateId: templateId ?? this.templateId,
+    timezone: timezone ?? this.timezone,
+    sessionId: sessionId ?? this.sessionId,
+  );
+  RoutineStart copyWithCompanion(RoutineStartsCompanion data) {
+    return RoutineStart(
+      attemptId: data.attemptId.present ? data.attemptId.value : this.attemptId,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      routineId: data.routineId.present ? data.routineId.value : this.routineId,
+      templateId: data.templateId.present
+          ? data.templateId.value
+          : this.templateId,
+      timezone: data.timezone.present ? data.timezone.value : this.timezone,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoutineStart(')
+          ..write('attemptId: $attemptId, ')
+          ..write('ownerId: $ownerId, ')
+          ..write('routineId: $routineId, ')
+          ..write('templateId: $templateId, ')
+          ..write('timezone: $timezone, ')
+          ..write('sessionId: $sessionId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    attemptId,
+    ownerId,
+    routineId,
+    templateId,
+    timezone,
+    sessionId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RoutineStart &&
+          other.attemptId == this.attemptId &&
+          other.ownerId == this.ownerId &&
+          other.routineId == this.routineId &&
+          other.templateId == this.templateId &&
+          other.timezone == this.timezone &&
+          other.sessionId == this.sessionId);
+}
+
+class RoutineStartsCompanion extends UpdateCompanion<RoutineStart> {
+  final Value<String> attemptId;
+  final Value<String> ownerId;
+  final Value<String> routineId;
+  final Value<String> templateId;
+  final Value<String> timezone;
+  final Value<String> sessionId;
+  final Value<int> rowid;
+  const RoutineStartsCompanion({
+    this.attemptId = const Value.absent(),
+    this.ownerId = const Value.absent(),
+    this.routineId = const Value.absent(),
+    this.templateId = const Value.absent(),
+    this.timezone = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RoutineStartsCompanion.insert({
+    required String attemptId,
+    required String ownerId,
+    required String routineId,
+    required String templateId,
+    required String timezone,
+    required String sessionId,
+    this.rowid = const Value.absent(),
+  }) : attemptId = Value(attemptId),
+       ownerId = Value(ownerId),
+       routineId = Value(routineId),
+       templateId = Value(templateId),
+       timezone = Value(timezone),
+       sessionId = Value(sessionId);
+  static Insertable<RoutineStart> custom({
+    Expression<String>? attemptId,
+    Expression<String>? ownerId,
+    Expression<String>? routineId,
+    Expression<String>? templateId,
+    Expression<String>? timezone,
+    Expression<String>? sessionId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (attemptId != null) 'attempt_id': attemptId,
+      if (ownerId != null) 'owner_id': ownerId,
+      if (routineId != null) 'routine_id': routineId,
+      if (templateId != null) 'template_id': templateId,
+      if (timezone != null) 'timezone': timezone,
+      if (sessionId != null) 'session_id': sessionId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RoutineStartsCompanion copyWith({
+    Value<String>? attemptId,
+    Value<String>? ownerId,
+    Value<String>? routineId,
+    Value<String>? templateId,
+    Value<String>? timezone,
+    Value<String>? sessionId,
+    Value<int>? rowid,
+  }) {
+    return RoutineStartsCompanion(
+      attemptId: attemptId ?? this.attemptId,
+      ownerId: ownerId ?? this.ownerId,
+      routineId: routineId ?? this.routineId,
+      templateId: templateId ?? this.templateId,
+      timezone: timezone ?? this.timezone,
+      sessionId: sessionId ?? this.sessionId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (attemptId.present) {
+      map['attempt_id'] = Variable<String>(attemptId.value);
+    }
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
+    if (routineId.present) {
+      map['routine_id'] = Variable<String>(routineId.value);
+    }
+    if (templateId.present) {
+      map['template_id'] = Variable<String>(templateId.value);
+    }
+    if (timezone.present) {
+      map['timezone'] = Variable<String>(timezone.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoutineStartsCompanion(')
+          ..write('attemptId: $attemptId, ')
+          ..write('ownerId: $ownerId, ')
+          ..write('routineId: $routineId, ')
+          ..write('templateId: $templateId, ')
+          ..write('timezone: $timezone, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$TrainingDatabase extends GeneratedDatabase {
   _$TrainingDatabase(QueryExecutor e) : super(e);
   $TrainingDatabaseManager get managers => $TrainingDatabaseManager(this);
@@ -5296,6 +6455,13 @@ abstract class _$TrainingDatabase extends GeneratedDatabase {
   late final BootstrapPages bootstrapPages = BootstrapPages(this);
   late final RecoveryState recoveryState = RecoveryState(this);
   late final HistoricalReceipts historicalReceipts = HistoricalReceipts(this);
+  late final Index localIdentityOwner = Index(
+    'local_identity_owner',
+    'CREATE UNIQUE INDEX local_identity_owner ON local_identity (owner_id)',
+  );
+  late final WorkoutTemplates workoutTemplates = WorkoutTemplates(this);
+  late final Routines routines = Routines(this);
+  late final RoutineStarts routineStarts = RoutineStarts(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5318,6 +6484,10 @@ abstract class _$TrainingDatabase extends GeneratedDatabase {
     bootstrapPages,
     recoveryState,
     historicalReceipts,
+    localIdentityOwner,
+    workoutTemplates,
+    routines,
+    routineStarts,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -5356,6 +6526,20 @@ abstract class _$TrainingDatabase extends GeneratedDatabase {
       ),
       result: [TableUpdate('rest_timers', kind: UpdateKind.delete)],
     ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'routines',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('workout_templates', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'workout_templates',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('routine_starts', kind: UpdateKind.delete)],
+    ),
   ]);
 }
 
@@ -5373,6 +6557,30 @@ typedef $LocalIdentityUpdateCompanionBuilder = LocalIdentityCompanion Function({
   Value<int> locked,
   Value<String?> cursor,
 });
+
+final class $LocalIdentityReferences
+    extends
+        BaseReferences<_$TrainingDatabase, LocalIdentity, LocalIdentityData> {
+  $LocalIdentityReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<Routines, List<Routine>> _routinesRefsTable(
+    _$TrainingDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.routines,
+    aliasName: 'local_identity__owner_id__routines__owner_id',
+  );
+
+  $RoutinesProcessedTableManager get routinesRefs {
+    final manager = $RoutinesTableManager($_db, $_db.routines).filter(
+      (f) => f.ownerId.ownerId.sqlEquals($_itemColumn<String>('owner_id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(_routinesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
 
 class $LocalIdentityFilterComposer
     extends Composer<_$TrainingDatabase, LocalIdentity> {
@@ -5407,6 +6615,31 @@ class $LocalIdentityFilterComposer
     column: $table.cursor,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> routinesRefs(
+    Expression<bool> Function($RoutinesFilterComposer f) f,
+  ) {
+    final $RoutinesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ownerId,
+      referencedTable: $db.routines,
+      getReferencedColumn: (t) => t.ownerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $RoutinesFilterComposer(
+            $db: $db,
+            $table: $db.routines,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $LocalIdentityOrderingComposer
@@ -5469,6 +6702,31 @@ class $LocalIdentityAnnotationComposer
 
   GeneratedColumn<String> get cursor =>
       $composableBuilder(column: $table.cursor, builder: (column) => column);
+
+  Expression<T> routinesRefs<T extends Object>(
+    Expression<T> Function($RoutinesAnnotationComposer a) f,
+  ) {
+    final $RoutinesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ownerId,
+      referencedTable: $db.routines,
+      getReferencedColumn: (t) => t.ownerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $RoutinesAnnotationComposer(
+            $db: $db,
+            $table: $db.routines,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $LocalIdentityTableManager
@@ -5482,16 +6740,9 @@ class $LocalIdentityTableManager
           $LocalIdentityAnnotationComposer,
           $LocalIdentityCreateCompanionBuilder,
           $LocalIdentityUpdateCompanionBuilder,
-          (
-            LocalIdentityData,
-            BaseReferences<
-              _$TrainingDatabase,
-              LocalIdentity,
-              LocalIdentityData
-            >,
-          ),
+          (LocalIdentityData, $LocalIdentityReferences),
           LocalIdentityData,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool routinesRefs})
         > {
   $LocalIdentityTableManager(_$TrainingDatabase db, LocalIdentity table)
     : super(
@@ -5536,15 +6787,38 @@ class $LocalIdentityTableManager
               .map(
                 (e) => (
                   e.readTable<LocalIdentity, LocalIdentityData>(table),
-                  BaseReferences<
-                    _$TrainingDatabase,
-                    LocalIdentity,
-                    LocalIdentityData
-                  >(db, table, e),
+                  $LocalIdentityReferences(db, table, e),
                 ),
               )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({routinesRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (routinesRefs) db.routines],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (routinesRefs)
+                    await $_getPrefetchedData<
+                      LocalIdentityData,
+                      LocalIdentity,
+                      Routine
+                    >(
+                      currentTable: table,
+                      referencedTable: $LocalIdentityReferences
+                          ._routinesRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $LocalIdentityReferences(db, table, p0).routinesRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.ownerId == item.ownerId,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -5559,12 +6833,9 @@ typedef $LocalIdentityProcessedTableManager =
       $LocalIdentityAnnotationComposer,
       $LocalIdentityCreateCompanionBuilder,
       $LocalIdentityUpdateCompanionBuilder,
-      (
-        LocalIdentityData,
-        BaseReferences<_$TrainingDatabase, LocalIdentity, LocalIdentityData>,
-      ),
+      (LocalIdentityData, $LocalIdentityReferences),
       LocalIdentityData,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool routinesRefs})
     >;
 typedef $SessionsCreateCompanionBuilder = SessionsCompanion Function({
   required String id,
@@ -9351,6 +10622,746 @@ typedef $HistoricalReceiptsProcessedTableManager =
       HistoricalReceipt,
       PrefetchHooks Function()
     >;
+typedef $WorkoutTemplatesCreateCompanionBuilder =
+    WorkoutTemplatesCompanion Function({
+      required String id,
+      required String ownerId,
+      required String routineId,
+      required int localRevision,
+      required String prescription,
+      Value<int> rowid,
+    });
+typedef $WorkoutTemplatesUpdateCompanionBuilder =
+    WorkoutTemplatesCompanion Function({
+      Value<String> id,
+      Value<String> ownerId,
+      Value<String> routineId,
+      Value<int> localRevision,
+      Value<String> prescription,
+      Value<int> rowid,
+    });
+
+class $WorkoutTemplatesFilterComposer
+    extends Composer<_$TrainingDatabase, WorkoutTemplates> {
+  $WorkoutTemplatesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get localRevision => $composableBuilder(
+    column: $table.localRevision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get prescription => $composableBuilder(
+    column: $table.prescription,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $WorkoutTemplatesOrderingComposer
+    extends Composer<_$TrainingDatabase, WorkoutTemplates> {
+  $WorkoutTemplatesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get localRevision => $composableBuilder(
+    column: $table.localRevision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get prescription => $composableBuilder(
+    column: $table.prescription,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $WorkoutTemplatesAnnotationComposer
+    extends Composer<_$TrainingDatabase, WorkoutTemplates> {
+  $WorkoutTemplatesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get routineId =>
+      $composableBuilder(column: $table.routineId, builder: (column) => column);
+
+  GeneratedColumn<int> get localRevision => $composableBuilder(
+    column: $table.localRevision,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get prescription => $composableBuilder(
+    column: $table.prescription,
+    builder: (column) => column,
+  );
+}
+
+class $WorkoutTemplatesTableManager
+    extends
+        RootTableManager<
+          _$TrainingDatabase,
+          WorkoutTemplates,
+          WorkoutTemplate,
+          $WorkoutTemplatesFilterComposer,
+          $WorkoutTemplatesOrderingComposer,
+          $WorkoutTemplatesAnnotationComposer,
+          $WorkoutTemplatesCreateCompanionBuilder,
+          $WorkoutTemplatesUpdateCompanionBuilder,
+          (
+            WorkoutTemplate,
+            BaseReferences<
+              _$TrainingDatabase,
+              WorkoutTemplates,
+              WorkoutTemplate
+            >,
+          ),
+          WorkoutTemplate,
+          PrefetchHooks Function()
+        > {
+  $WorkoutTemplatesTableManager(_$TrainingDatabase db, WorkoutTemplates table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $WorkoutTemplatesFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $WorkoutTemplatesOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $WorkoutTemplatesAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> ownerId = const Value.absent(),
+                Value<String> routineId = const Value.absent(),
+                Value<int> localRevision = const Value.absent(),
+                Value<String> prescription = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WorkoutTemplatesCompanion(
+                id: id,
+                ownerId: ownerId,
+                routineId: routineId,
+                localRevision: localRevision,
+                prescription: prescription,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String ownerId,
+                required String routineId,
+                required int localRevision,
+                required String prescription,
+                Value<int> rowid = const Value.absent(),
+              }) => WorkoutTemplatesCompanion.insert(
+                id: id,
+                ownerId: ownerId,
+                routineId: routineId,
+                localRevision: localRevision,
+                prescription: prescription,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<WorkoutTemplates, WorkoutTemplate>(table),
+                  BaseReferences<
+                    _$TrainingDatabase,
+                    WorkoutTemplates,
+                    WorkoutTemplate
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $WorkoutTemplatesProcessedTableManager =
+    ProcessedTableManager<
+      _$TrainingDatabase,
+      WorkoutTemplates,
+      WorkoutTemplate,
+      $WorkoutTemplatesFilterComposer,
+      $WorkoutTemplatesOrderingComposer,
+      $WorkoutTemplatesAnnotationComposer,
+      $WorkoutTemplatesCreateCompanionBuilder,
+      $WorkoutTemplatesUpdateCompanionBuilder,
+      (
+        WorkoutTemplate,
+        BaseReferences<_$TrainingDatabase, WorkoutTemplates, WorkoutTemplate>,
+      ),
+      WorkoutTemplate,
+      PrefetchHooks Function()
+    >;
+typedef $RoutinesCreateCompanionBuilder = RoutinesCompanion Function({
+  required String id,
+  required String ownerId,
+  Value<String?> currentTemplateId,
+  required int localRevision,
+  Value<int> rowid,
+});
+typedef $RoutinesUpdateCompanionBuilder = RoutinesCompanion Function({
+  Value<String> id,
+  Value<String> ownerId,
+  Value<String?> currentTemplateId,
+  Value<int> localRevision,
+  Value<int> rowid,
+});
+
+final class $RoutinesReferences
+    extends BaseReferences<_$TrainingDatabase, Routines, Routine> {
+  $RoutinesReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static LocalIdentity _ownerIdTable(_$TrainingDatabase db) => db.localIdentity
+      .createAlias('routines__owner_id__local_identity__owner_id');
+
+  $LocalIdentityProcessedTableManager get ownerId {
+    final $_column = $_itemColumn<String>('owner_id')!;
+
+    final manager = $LocalIdentityTableManager(
+      $_db,
+      $_db.localIdentity,
+    ).filter((f) => f.ownerId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_ownerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $RoutinesFilterComposer extends Composer<_$TrainingDatabase, Routines> {
+  $RoutinesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currentTemplateId => $composableBuilder(
+    column: $table.currentTemplateId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get localRevision => $composableBuilder(
+    column: $table.localRevision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $LocalIdentityFilterComposer get ownerId {
+    final $LocalIdentityFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ownerId,
+      referencedTable: $db.localIdentity,
+      getReferencedColumn: (t) => t.ownerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LocalIdentityFilterComposer(
+            $db: $db,
+            $table: $db.localIdentity,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $RoutinesOrderingComposer extends Composer<_$TrainingDatabase, Routines> {
+  $RoutinesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currentTemplateId => $composableBuilder(
+    column: $table.currentTemplateId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get localRevision => $composableBuilder(
+    column: $table.localRevision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $LocalIdentityOrderingComposer get ownerId {
+    final $LocalIdentityOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ownerId,
+      referencedTable: $db.localIdentity,
+      getReferencedColumn: (t) => t.ownerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LocalIdentityOrderingComposer(
+            $db: $db,
+            $table: $db.localIdentity,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $RoutinesAnnotationComposer
+    extends Composer<_$TrainingDatabase, Routines> {
+  $RoutinesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get currentTemplateId => $composableBuilder(
+    column: $table.currentTemplateId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get localRevision => $composableBuilder(
+    column: $table.localRevision,
+    builder: (column) => column,
+  );
+
+  $LocalIdentityAnnotationComposer get ownerId {
+    final $LocalIdentityAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ownerId,
+      referencedTable: $db.localIdentity,
+      getReferencedColumn: (t) => t.ownerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LocalIdentityAnnotationComposer(
+            $db: $db,
+            $table: $db.localIdentity,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $RoutinesTableManager
+    extends
+        RootTableManager<
+          _$TrainingDatabase,
+          Routines,
+          Routine,
+          $RoutinesFilterComposer,
+          $RoutinesOrderingComposer,
+          $RoutinesAnnotationComposer,
+          $RoutinesCreateCompanionBuilder,
+          $RoutinesUpdateCompanionBuilder,
+          (Routine, $RoutinesReferences),
+          Routine,
+          PrefetchHooks Function({bool ownerId})
+        > {
+  $RoutinesTableManager(_$TrainingDatabase db, Routines table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $RoutinesFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $RoutinesOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $RoutinesAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> ownerId = const Value.absent(),
+                Value<String?> currentTemplateId = const Value.absent(),
+                Value<int> localRevision = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RoutinesCompanion(
+                id: id,
+                ownerId: ownerId,
+                currentTemplateId: currentTemplateId,
+                localRevision: localRevision,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String ownerId,
+                Value<String?> currentTemplateId = const Value.absent(),
+                required int localRevision,
+                Value<int> rowid = const Value.absent(),
+              }) => RoutinesCompanion.insert(
+                id: id,
+                ownerId: ownerId,
+                currentTemplateId: currentTemplateId,
+                localRevision: localRevision,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<Routines, Routine>(table),
+                  $RoutinesReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({ownerId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (ownerId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.ownerId,
+                        referencedTable: $RoutinesReferences._ownerIdTable(db),
+                        referencedColumn: $RoutinesReferences
+                            ._ownerIdTable(db)
+                            .ownerId,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $RoutinesProcessedTableManager =
+    ProcessedTableManager<
+      _$TrainingDatabase,
+      Routines,
+      Routine,
+      $RoutinesFilterComposer,
+      $RoutinesOrderingComposer,
+      $RoutinesAnnotationComposer,
+      $RoutinesCreateCompanionBuilder,
+      $RoutinesUpdateCompanionBuilder,
+      (Routine, $RoutinesReferences),
+      Routine,
+      PrefetchHooks Function({bool ownerId})
+    >;
+typedef $RoutineStartsCreateCompanionBuilder = RoutineStartsCompanion Function({
+  required String attemptId,
+  required String ownerId,
+  required String routineId,
+  required String templateId,
+  required String timezone,
+  required String sessionId,
+  Value<int> rowid,
+});
+typedef $RoutineStartsUpdateCompanionBuilder = RoutineStartsCompanion Function({
+  Value<String> attemptId,
+  Value<String> ownerId,
+  Value<String> routineId,
+  Value<String> templateId,
+  Value<String> timezone,
+  Value<String> sessionId,
+  Value<int> rowid,
+});
+
+class $RoutineStartsFilterComposer
+    extends Composer<_$TrainingDatabase, RoutineStarts> {
+  $RoutineStartsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get attemptId => $composableBuilder(
+    column: $table.attemptId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $RoutineStartsOrderingComposer
+    extends Composer<_$TrainingDatabase, RoutineStarts> {
+  $RoutineStartsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get attemptId => $composableBuilder(
+    column: $table.attemptId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timezone => $composableBuilder(
+    column: $table.timezone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $RoutineStartsAnnotationComposer
+    extends Composer<_$TrainingDatabase, RoutineStarts> {
+  $RoutineStartsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get attemptId =>
+      $composableBuilder(column: $table.attemptId, builder: (column) => column);
+
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get routineId =>
+      $composableBuilder(column: $table.routineId, builder: (column) => column);
+
+  GeneratedColumn<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get timezone =>
+      $composableBuilder(column: $table.timezone, builder: (column) => column);
+
+  GeneratedColumn<String> get sessionId =>
+      $composableBuilder(column: $table.sessionId, builder: (column) => column);
+}
+
+class $RoutineStartsTableManager
+    extends
+        RootTableManager<
+          _$TrainingDatabase,
+          RoutineStarts,
+          RoutineStart,
+          $RoutineStartsFilterComposer,
+          $RoutineStartsOrderingComposer,
+          $RoutineStartsAnnotationComposer,
+          $RoutineStartsCreateCompanionBuilder,
+          $RoutineStartsUpdateCompanionBuilder,
+          (
+            RoutineStart,
+            BaseReferences<_$TrainingDatabase, RoutineStarts, RoutineStart>,
+          ),
+          RoutineStart,
+          PrefetchHooks Function()
+        > {
+  $RoutineStartsTableManager(_$TrainingDatabase db, RoutineStarts table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $RoutineStartsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $RoutineStartsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $RoutineStartsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> attemptId = const Value.absent(),
+                Value<String> ownerId = const Value.absent(),
+                Value<String> routineId = const Value.absent(),
+                Value<String> templateId = const Value.absent(),
+                Value<String> timezone = const Value.absent(),
+                Value<String> sessionId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RoutineStartsCompanion(
+                attemptId: attemptId,
+                ownerId: ownerId,
+                routineId: routineId,
+                templateId: templateId,
+                timezone: timezone,
+                sessionId: sessionId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String attemptId,
+                required String ownerId,
+                required String routineId,
+                required String templateId,
+                required String timezone,
+                required String sessionId,
+                Value<int> rowid = const Value.absent(),
+              }) => RoutineStartsCompanion.insert(
+                attemptId: attemptId,
+                ownerId: ownerId,
+                routineId: routineId,
+                templateId: templateId,
+                timezone: timezone,
+                sessionId: sessionId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<RoutineStarts, RoutineStart>(table),
+                  BaseReferences<
+                    _$TrainingDatabase,
+                    RoutineStarts,
+                    RoutineStart
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $RoutineStartsProcessedTableManager =
+    ProcessedTableManager<
+      _$TrainingDatabase,
+      RoutineStarts,
+      RoutineStart,
+      $RoutineStartsFilterComposer,
+      $RoutineStartsOrderingComposer,
+      $RoutineStartsAnnotationComposer,
+      $RoutineStartsCreateCompanionBuilder,
+      $RoutineStartsUpdateCompanionBuilder,
+      (
+        RoutineStart,
+        BaseReferences<_$TrainingDatabase, RoutineStarts, RoutineStart>,
+      ),
+      RoutineStart,
+      PrefetchHooks Function()
+    >;
 
 class $TrainingDatabaseManager {
   final _$TrainingDatabase _db;
@@ -9382,4 +11393,10 @@ class $TrainingDatabaseManager {
       $RecoveryStateTableManager(_db, _db.recoveryState);
   $HistoricalReceiptsTableManager get historicalReceipts =>
       $HistoricalReceiptsTableManager(_db, _db.historicalReceipts);
+  $WorkoutTemplatesTableManager get workoutTemplates =>
+      $WorkoutTemplatesTableManager(_db, _db.workoutTemplates);
+  $RoutinesTableManager get routines =>
+      $RoutinesTableManager(_db, _db.routines);
+  $RoutineStartsTableManager get routineStarts =>
+      $RoutineStartsTableManager(_db, _db.routineStarts);
 }
