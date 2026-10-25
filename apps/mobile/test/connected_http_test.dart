@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:daily_motion/data/database.dart';
 import 'package:daily_motion/data/workout_repository.dart';
 import 'package:daily_motion/domain/workout.dart';
+import 'package:daily_motion/domain/routine.dart';
 import 'package:daily_motion/sync/coordinator.dart';
 import 'package:daily_motion/sync/transport.dart';
 import 'package:daily_motion/sync/transport_contract.dart';
@@ -92,7 +93,31 @@ void main() {
   }
 
   test('real signed JWT, restricted PostgreSQL upload, own echo and second-device bootstrap', () async {
-    final id = await recorded();
+    final routine = await repo.saveRoutine(
+      id: repo.newId(),
+      expectedRevision: 0,
+      plan: RoutinePlan.fromJson(fixture()['payload'] as Json),
+    );
+    final id = await repo.startRoutine(
+      routineId: routine.id,
+      templateId: routine.templateId,
+      attemptId: repo.newId(),
+      timezone: 'UTC',
+    );
+    await repo.commit(
+      id,
+      'record_set',
+      recordPayload((await repo.workout(id))!),
+    );
+    final activeSnapshot = (await repo.workout(id))!;
+    final futurePlan = routine.plan.json..['name'] = 'Future routine edit';
+    futurePlan['exercises'][0]['sets'][0]['planned']['reps'] = 8;
+    await repo.saveRoutine(
+      id: routine.id,
+      expectedRevision: 1,
+      plan: RoutinePlan.fromJson(futurePlan),
+    );
+    expect(await repo.workout(id), activeSnapshot);
     await sync.synchronize(force: true);
     expect(sync.status.phase, SyncPhase.synchronized, reason: sync.status.code);
     expect((await cloudRoot(id))['revision'], 2);
@@ -101,6 +126,14 @@ void main() {
     final otherSync = SyncCoordinator(other, transport);
     try {
       await otherSync.synchronize(force: true);
+      expect(
+        await other.routines(),
+        isEmpty,
+        reason: 'Local routine content is not part of workout synchronization.',
+      );
+      expect((await other.workout(id))!['name'], routine.plan.name);
+      expect((await other.workout(id))!['timezone'], 'UTC');
+      expect(allSets((await other.workout(id))!).first['planned']['reps'], 5);
       expect(
         allSets((await other.workout(id))!)
             .first['observation']['actual']['reps'],
