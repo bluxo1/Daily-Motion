@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../domain/workout.dart';
 import 'workout_controller.dart';
 import 'workout_screen.dart';
 import 'sync_provider.dart';
 import '../sync/coordinator.dart';
 import '../auth/auth_app.dart';
 import 'routine_screen.dart';
+import 'workout_history.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   final bool syntheticFixture;
@@ -215,55 +215,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
               ] else if (destination == 1) ...[
-                if (items.every((w) => w['status'] == 'active'))
-                  const Text('Your recorded workouts will appear here.'),
-                for (final workout in items.where(
-                  (w) => w['status'] != 'active',
-                ))
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Card(
-                      child: ListTile(
-                        title: Text(workout['name'] as String),
-                        subtitle: Text(
-                          '${workout['status']} · ${allSets(workout).where((s) => s['observation'] != null && s['observation']['execution_status'] != 'skipped').length} recorded sets',
-                        ),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => open(workout['aggregate_id'] as String),
-                      ),
-                    ),
-                  ),
+                WorkoutHistory(workouts: items, onOpen: open),
               ] else ...[
-                Text(
-                  'Observed performance',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Bench press · total external load · bilateral reps',
-                ),
-                const SizedBox(height: 16),
-                if (!items.any(
-                  (w) => allSets(w).any(
-                    (s) => s['observation']?['execution_status'] == 'completed',
-                  ),
-                ))
-                  const Text('Record working sets to see comparable results.'),
-                for (final workout in items)
-                  for (final item in allSets(workout).where(
-                    (s) =>
-                        s['set_class'] == 'working' &&
-                        s['observation']?['execution_status'] == 'completed',
-                  ))
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        '${item['observation']['actual']['load']['value']} ${item['observation']['actual']['load']['unit']} × ${item['observation']['actual']['reps']} reps',
-                      ),
-                      subtitle: Text(
-                        '${workout['started_at']} · saved on this device',
-                      ),
-                    ),
+                ObservedPerformance(workouts: items),
               ],
             ],
           ),
