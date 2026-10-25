@@ -5,6 +5,8 @@ import 'package:daily_motion/data/database.dart';
 import 'package:daily_motion/data/workout_repository.dart';
 import 'package:daily_motion/domain/workout.dart';
 import 'package:daily_motion/domain/routine.dart';
+import 'package:daily_motion/features/workout_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daily_motion/sync/coordinator.dart';
 import 'package:daily_motion/sync/transport.dart';
 import 'package:daily_motion/sync/transport_contract.dart';
@@ -205,6 +207,160 @@ void main() {
       await otherSync.close();
       other.dispose();
       await otherDb.close();
+    }
+
+    // Exercise the production UI command controller against the real HTTP feed
+    // with a separate multi-exercise routine. Keep the corrected-skipped-only
+    // bootstrap controls above intact.
+    final multi = copyJson(fixture()['payload'] as Json);
+    multi['name'] = 'Connected multi-exercise snapshot';
+    final originalExercise = (multi['exercises'] as List).first as Json;
+    multi['exercises'] = [
+      for (var i = 0; i < 3; i++)
+        {
+          ...copyJson(originalExercise),
+          'session_exercise_id': repo.newId(),
+          'variant_id': repo.newId(),
+          'name': ['Single-arm row', 'Push-up', 'Assisted pull-up'][i],
+          'loading_basis': [
+            'per_implement',
+            'bodyweight_only',
+            'assistance',
+          ][i],
+          'rep_convention': i == 0 ? 'per_side' : 'bilateral',
+          'side': i == 0 ? 'left' : 'both',
+          'sets': [
+            {
+              ...copyJson((originalExercise['sets'] as List).first as Json),
+              'set_id': repo.newId(),
+              'planned': {
+                'reps': 5,
+                'load': i == 1
+                    ? null
+                    : {
+                        'value': i == 0 ? '20' : '5',
+                        'unit': 'kg',
+                        'basis': i == 0 ? 'per_implement' : 'assistance',
+                      },
+                'rest_seconds': 120,
+              },
+            },
+          ],
+        },
+    ];
+    final multiRoutine = await repo.saveRoutine(
+      id: repo.newId(),
+      expectedRevision: 0,
+      plan: RoutinePlan.fromJson(multi),
+    );
+    final multiId = await repo.startRoutine(
+      routineId: multiRoutine.id,
+      templateId: multiRoutine.templateId,
+      attemptId: repo.newId(),
+      timezone: 'UTC',
+    );
+    final controllerScope = ProviderContainer(
+      overrides: [repositoryProvider.overrideWithValue(repo)],
+    );
+    final thirdDb = TrainingDatabase(NativeDatabase.memory());
+    final third = await device(thirdDb);
+    final thirdSync = SyncCoordinator(third, transport);
+    try {
+      await controllerScope.read(workoutsProvider.future);
+      final controller = controllerScope.read(workoutsProvider.notifier);
+      final initial = (await repo.workout(multiId))!;
+      for (final i in [2, 0, 1]) {
+        final e = initial['exercises'][i] as Json;
+        await controller.record(multiId, e, e['sets'][0] as Json, {
+          'execution_status': i == 2
+              ? 'failed'
+              : i == 0
+              ? 'partial'
+              : 'completed',
+          'load': i == 0
+              ? '20'
+              : i == 2
+              ? '5'
+              : '',
+          'unit': 'kg',
+          'reps': i == 2 ? '0' : '3',
+          'effort': '',
+          'effort_scale': 'rir',
+        });
+      }
+      await controller.finish(multiId);
+      final bodyweight = initial['exercises'][1] as Json;
+      await controller.record(
+        multiId,
+        bodyweight,
+        bodyweight['sets'][0] as Json,
+        {
+          'execution_status': 'skipped',
+          'load': '',
+          'unit': 'kg',
+          'reps': '',
+          'effort': '',
+          'effort_scale': 'rir',
+        },
+        reason: 'This bodyweight entry was accidental.',
+      );
+      final completed = (await repo.workout(multiId))!;
+      final nextPlan = multiRoutine.plan.json
+        ..['name'] = 'Later multi-exercise plan';
+      nextPlan['exercises'][2]['sets'][0]['planned']['reps'] = 99;
+      await repo.saveRoutine(
+        id: multiRoutine.id,
+        expectedRevision: 1,
+        plan: RoutinePlan.fromJson(nextPlan),
+      );
+      expect(await repo.workout(multiId), completed);
+      await sync.synchronize(force: true);
+      expect(
+        sync.status.phase,
+        SyncPhase.synchronized,
+        reason: sync.status.code,
+      );
+      expect((await cloudRoot(multiId))['revision'], 6);
+      await thirdSync.synchronize(force: true);
+      expect(
+        thirdSync.status.phase,
+        SyncPhase.synchronized,
+        reason: thirdSync.status.code,
+      );
+      final restored = (await third.workout(multiId))!;
+      expect(restored['exercises'], completed['exercises']);
+      expect(restored['status'], 'completed');
+      expect(restored['name'], 'Connected multi-exercise snapshot');
+      expect(restored['timezone'], 'UTC');
+      expect(restored['revision'], 6);
+      expect(
+        (restored['exercises'] as List)
+            .map((e) => e['sets'][0]['observation']['completion_seq'])
+            .toList(),
+        [2, 3, 1],
+      );
+      expect(
+        restored['exercises'][0]['sets'][0]['observation']['execution_status'],
+        'partial',
+      );
+      expect(
+        restored['exercises'][1]['sets'][0]['observation']['actual'],
+        isNull,
+      );
+      expect(
+        restored['exercises'][1]['sets'][0]['observation']['correction_reason'],
+        'This bodyweight entry was accidental.',
+      );
+      expect(
+        restored['exercises'][2]['sets'][0]['observation']['actual']['reps'],
+        0,
+      );
+      expect(await third.routines(), isEmpty);
+    } finally {
+      controllerScope.dispose();
+      await thirdSync.close();
+      third.dispose();
+      await thirdDb.close();
     }
   }, skip: !enabled);
 
