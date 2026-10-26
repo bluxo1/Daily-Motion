@@ -10,6 +10,7 @@ import '../auth/auth_app.dart';
 import 'routine_screen.dart';
 import 'workout_history.dart';
 import 'exercise_progress.dart';
+import 'internal_routine_access.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   final bool syntheticFixture;
@@ -27,10 +28,121 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   var destination = 0;
   var starting = false;
+  var opening = false;
+  var preparing = false;
+  var startingRoutine = false;
+  String? acknowledgedStart;
+  String? startNotice;
 
-  void open(String id) => Navigator.of(
-    context,
-  ).push(MaterialPageRoute<void>(builder: (_) => WorkoutScreen(sessionId: id)));
+  bool get routinesEnabled =>
+      internalRoutineAccess(widget.localRoutinesEnabled);
+
+  bool get trainingBusy => opening || preparing || startingRoutine;
+
+  Future<void> open(String id) async {
+    if (opening) return;
+    setState(() => opening = true);
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute(builder: (_) => WorkoutScreen(sessionId: id)),
+      );
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => startNotice = acknowledgedStart == id
+              ? 'Workout saved on this device. It could not be opened. Use Resume workout or retry loading.'
+              : 'The saved workout could not be opened. Retry from History.',
+        );
+      }
+    } finally {
+      if (mounted) {
+        final current = ref.read(workoutsProvider);
+        setState(() {
+          opening = false;
+          if (current.hasValue &&
+              !current.hasError &&
+              !current.isLoading &&
+              !current.requireValue.any(
+                (w) =>
+                    w['aggregate_id'] == acknowledgedStart &&
+                    w['status'] == 'active',
+              )) {
+            acknowledgedStart = null;
+          }
+        });
+      }
+    }
+  }
+
+  Future<void> retryTraining() async {
+    await ref.read(workoutsProvider.notifier).refresh();
+    if (mounted && !ref.read(workoutsProvider).hasError) {
+      setState(() => startNotice = null);
+    }
+  }
+
+  Future<void> routineStarted(String id, {bool openIfTraining = true}) async {
+    if (!mounted) return;
+    final target = ref.read(repositoryProvider);
+    final shouldOpen = openIfTraining && destination == 0;
+    setState(() {
+      acknowledgedStart = id;
+      startNotice = null;
+      preparing = true;
+    });
+    try {
+      await ref.read(workoutsProvider.notifier).refresh();
+      if (!mounted || !identical(ref.read(repositoryProvider), target)) return;
+      if (ref.read(workoutsProvider).hasError) {
+        setState(
+          () => startNotice = 'Workout saved on this device. Local training could not be reloaded. Retry to resume or view it.',
+        );
+        return;
+      }
+      if (shouldOpen && destination == 0) await open(id);
+    } finally {
+      if (mounted) setState(() => preparing = false);
+    }
+  }
+
+  Future<void> manageRoutines() async {
+    if (trainingBusy) return;
+    final target = ref.read(repositoryProvider);
+    setState(() => opening = true);
+    String? id;
+    late final MaterialPageRoute<String> route;
+    route = MaterialPageRoute<String>(
+      builder: (_) => RoutineScreen(
+        onStartingChanged: (value) {
+          if (mounted && identical(ref.read(repositoryProvider), target)) {
+            setState(() => startingRoutine = value);
+          }
+        },
+        onStarted: (id) async {
+          if (!mounted || !identical(ref.read(repositoryProvider), target)) {
+            return;
+          }
+          if (route.isCurrent) {
+            Navigator.of(context).pop(id);
+          } else {
+            // Management was already dismissed while the transaction waited.
+            // Its late acknowledgement must never pop a different route.
+            await routineStarted(id, openIfTraining: false);
+          }
+        },
+      ),
+    );
+    try {
+      id = await Navigator.of(context).push<String>(route);
+    } finally {
+      if (mounted) setState(() => opening = false);
+    }
+    if (mounted &&
+        identical(ref.read(repositoryProvider), target) &&
+        id != null) {
+      await routineStarted(id);
+    }
+  }
 
   Future<void> start() async {
     if (starting) return;
@@ -51,6 +163,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final workouts = ref.watch(workoutsProvider);
+    final ownerRepository = ref.watch(repositoryProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(['Train', 'History', 'Progress'][destination]),
@@ -114,25 +227,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: SafeArea(
         child: workouts.when(
+          skipLoadingOnRefresh: false,
+          skipLoadingOnReload: false,
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, _) => Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    ref.watch(syncStatusProvider).value?.phase ==
-                            SyncPhase.accountDisabled
-                        ? 'This account was disabled remotely. Local training data has been removed.'
-                        : 'Local history could not be loaded. Saved work is retained.',
-                  ),
-                  const SizedBox(height: 16),
-                  OutlinedButton(
-                    onPressed: () => ref.invalidate(workoutsProvider),
-                    child: const Text('Retry'),
-                  ),
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      ref.watch(syncStatusProvider).value?.phase ==
+                              SyncPhase.accountDisabled
+                          ? 'This account was disabled remotely. Local training data has been removed.'
+                          : startNotice ?? 'Local training could not be loaded. Check account access or local storage, then retry.',
+                    ),
+                    if (acknowledgedStart != null &&
+                        ref.watch(syncStatusProvider).value?.phase !=
+                            SyncPhase.accountDisabled)
+                      OutlinedButton(
+                        onPressed: trainingBusy
+                            ? null
+                            : () => open(acknowledgedStart!),
+                        child: const Text('Open saved workout'),
+                      ),
+                    const SizedBox(height: 16),
+                    OutlinedButton(
+                      onPressed: retryTraining,
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -144,43 +270,74 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const Text('Development fixture · synthetic account'),
               const SizedBox(height: 8),
               Text(
-                ref.watch(syncStatusProvider).value?.label ??
-                    'Saved on this device',
+                'Workouts: ${ref.watch(syncStatusProvider).value?.label ?? 'Saved on this device'}',
               ),
               const SizedBox(height: 24),
               if (items.any((w) => w['status'] == 'active')) ...[
                 FilledButton.icon(
-                  onPressed: () => open(
-                    items.firstWhere(
-                          (w) => w['status'] == 'active',
-                        )['aggregate_id']
-                        as String,
-                  ),
+                  onPressed: trainingBusy
+                      ? null
+                      : () {
+                          setState(() => destination = 0);
+                          open(
+                            items.firstWhere(
+                                  (w) => w['status'] == 'active',
+                                )['aggregate_id']
+                                as String,
+                          );
+                        },
                   icon: const Icon(Icons.play_arrow),
                   label: const Text('Resume workout'),
                 ),
                 const SizedBox(height: 24),
               ],
               if (destination == 0) ...[
-                if (widget.localRoutinesEnabled) ...[
+                if (startNotice != null)
+                  Semantics(liveRegion: true, child: Text(startNotice!)),
+                if (routinesEnabled) ...[
                   OutlinedButton.icon(
-                    onPressed: () => Navigator.of(context).push<void>(
-                      MaterialPageRoute(builder: (_) => const RoutineScreen()),
-                    ),
+                    onPressed: trainingBusy ? null : manageRoutines,
                     icon: const Icon(Icons.edit_calendar_outlined),
                     label: const Text('My routines'),
                   ),
                   const SizedBox(height: 16),
+                  RoutineLibrary(
+                    inline: true,
+                    firstWorkout: items.isEmpty,
+                    enabled: !trainingBusy,
+                    onStartingChanged: (value) {
+                      if (mounted &&
+                          identical(
+                            ref.read(repositoryProvider),
+                            ownerRepository,
+                          )) {
+                        setState(() => startingRoutine = value);
+                      }
+                    },
+                    onStarted: (id) async {
+                      if (mounted &&
+                          identical(
+                            ref.read(repositoryProvider),
+                            ownerRepository,
+                          )) {
+                        await routineStarted(id);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  const SizedBox(height: 16),
                 ],
-                Text(
-                  'Make every set count.',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Your session is saved on this device, even offline.',
-                ),
-                const SizedBox(height: 24),
+                if (!routinesEnabled) ...[
+                  Text(
+                    'Make every set count.',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Record your training on this device, even offline.',
+                  ),
+                  const SizedBox(height: 24),
+                ],
                 if (widget.syntheticFixture)
                   Card(
                     child: Padding(

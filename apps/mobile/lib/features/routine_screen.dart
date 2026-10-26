@@ -14,26 +14,71 @@ final routinesProvider = FutureProvider.autoDispose<List<SavedRoutine>>(
 String _routineError(Object error, String fallback) =>
     error is WorkoutValidation ? error.message : fallback;
 
-class RoutineScreen extends ConsumerStatefulWidget {
-  const RoutineScreen({super.key});
+class RoutineScreen extends StatelessWidget {
+  final Future<void> Function(String)? onStarted;
+  final ValueChanged<bool>? onStartingChanged;
+  const RoutineScreen({super.key, this.onStarted, this.onStartingChanged});
   @override
-  ConsumerState<RoutineScreen> createState() => _RoutineScreenState();
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Routines')),
+    body: SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: RoutineLibrary(
+          onStarted: onStarted,
+          onStartingChanged: onStartingChanged,
+        ),
+      ),
+    ),
+  );
 }
 
-class _RoutineScreenState extends ConsumerState<RoutineScreen> {
+/// The existing routine editor/start flow, shared with the internal Train view.
+/// The caller decides where an acknowledged workout opens; writes stay here in
+/// the existing repository transaction and its stable start-attempt binding.
+class RoutineLibrary extends ConsumerStatefulWidget {
+  final bool inline;
+  final bool firstWorkout;
+  final bool enabled;
+  final Future<void> Function(String)? onStarted;
+  final ValueChanged<bool>? onStartingChanged;
+  const RoutineLibrary({
+    super.key,
+    this.inline = false,
+    this.firstWorkout = false,
+    this.enabled = true,
+    this.onStarted,
+    this.onStartingChanged,
+  });
+  @override
+  ConsumerState<RoutineLibrary> createState() => _RoutineLibraryState();
+}
+
+class _RoutineLibraryState extends ConsumerState<RoutineLibrary> {
   bool starting = false;
+  bool editing = false;
   String? timezone;
   final attempts = <String, String>{};
 
   Future<void> edit([SavedRoutine? routine]) async {
-    await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (_) => RoutineEditorScreen(initial: routine)),
-    );
-    if (mounted) ref.invalidate(routinesProvider);
+    if (editing || starting || !widget.enabled) return;
+    setState(() => editing = true);
+    try {
+      await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => RoutineEditorScreen(initial: routine),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        ref.invalidate(routinesProvider);
+        setState(() => editing = false);
+      }
+    }
   }
 
   Future<void> start(SavedRoutine routine) async {
-    if (starting) return;
+    if (starting || editing || !widget.enabled) return;
     if (timezone == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -44,8 +89,12 @@ class _RoutineScreenState extends ConsumerState<RoutineScreen> {
     }
     setState(() => starting = true);
     final repo = ref.read(repositoryProvider);
+    final onStarted = widget.onStarted;
+    final onStartingChanged = widget.onStartingChanged;
+    onStartingChanged?.call(true);
     final attemptKey = '${routine.templateId}/$timezone';
     final attempt = attempts.putIfAbsent(attemptKey, repo.newId);
+    String? acknowledged;
     try {
       final id = await repo.startRoutine(
         routineId: routine.id,
@@ -53,27 +102,42 @@ class _RoutineScreenState extends ConsumerState<RoutineScreen> {
         attemptId: attempt,
         timezone: timezone,
       );
-      await ref.read(workoutsProvider.notifier).refresh();
-      if (mounted) {
-        await Navigator.of(context).push<void>(
-          MaterialPageRoute(builder: (_) => WorkoutScreen(sessionId: id)),
-        );
-        attempts.remove(attemptKey);
+      acknowledged = id;
+      if (onStarted != null) {
+        // A tab change may dispose these controls while SQLite is committing.
+        // The owner-bound host still needs the acknowledgement for Resume.
+        await onStarted(id);
+      } else {
+        if (!mounted || !identical(ref.read(repositoryProvider), repo)) return;
+        await ref.read(workoutsProvider.notifier).refresh();
+        if (mounted && identical(ref.read(repositoryProvider), repo)) {
+          await Navigator.of(context).push<void>(
+            MaterialPageRoute(builder: (_) => WorkoutScreen(sessionId: id)),
+          );
+        }
       }
+      attempts.remove(attemptKey);
     } catch (error) {
+      if (!mounted || !identical(ref.read(repositoryProvider), repo)) return;
+      // Read after an uncertain response: a committed session may already be
+      // resumable. Retain the attempt until a successful response is known.
+      await ref.read(workoutsProvider.notifier).refresh();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _routineError(
-                error,
-                'The workout could not be opened. Retry here, or resume your active workout from Train.',
-              ),
+              acknowledged != null
+                  ? 'Workout saved on this device. It could not be opened. Resume it from Train.'
+                  : _routineError(
+                      error,
+                      'The workout start could not be confirmed. Check Resume workout on Train before retrying.',
+                    ),
             ),
           ),
         );
       }
     } finally {
+      onStartingChanged?.call(false);
       if (mounted) setState(() => starting = false);
     }
   }
@@ -83,117 +147,143 @@ class _RoutineScreenState extends ConsumerState<RoutineScreen> {
     final routines = ref.watch(routinesProvider);
     final workouts = ref.watch(workoutsProvider);
     final active = workouts.value?.any((w) => w['status'] == 'active') ?? false;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Routines')),
-      body: SafeArea(
-        child: routines.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Routines could not be loaded. Saved work is retained.',
-                  ),
-                  OutlinedButton(
-                    onPressed: () => ref.invalidate(routinesProvider),
-                    child: const Text('Retry'),
-                  ),
-                ],
+    final canStart =
+        widget.enabled &&
+        !starting &&
+        !editing &&
+        !active &&
+        workouts.hasValue &&
+        !workouts.isLoading &&
+        !workouts.hasError;
+    return routines.when(
+      skipLoadingOnRefresh: false,
+      skipLoadingOnReload: false,
+      loading: () => const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (_, _) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Routines could not be loaded. Saved work is retained.'),
+          OutlinedButton(
+            onPressed: () => ref.invalidate(routinesProvider),
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+      data: (items) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (widget.inline) ...[
+            Semantics(
+              header: true,
+              child: Text(
+                items.isEmpty
+                    ? (widget.firstWorkout
+                          ? 'Start your first workout'
+                          : 'Plan your next workout')
+                    : 'Choose a routine',
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
             ),
-          ),
-          data: (items) => ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
+            const SizedBox(height: 8),
+            if (items.isEmpty)
               const Text(
-                'Saved only on this device. Routines are not backed up or synced yet.',
+                'Create a routine, record your sets, then find your training in History and Progress.',
               ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                isExpanded: true,
-                initialValue: timezone,
-                decoration: const InputDecoration(
-                  labelText: 'Workout timezone',
+            const SizedBox(height: 12),
+          ],
+          const Text(
+            'Saved only on this device. Routines are not backed up or synced yet.',
+          ),
+          const SizedBox(height: 16),
+          if (items.isNotEmpty || !widget.inline) ...[
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              initialValue: timezone,
+              decoration: const InputDecoration(labelText: 'Workout timezone'),
+              items: const [
+                DropdownMenuItem(value: 'UTC', child: Text('UTC')),
+                DropdownMenuItem(
+                  value: 'Asia/Kolkata',
+                  child: Text('Asia/Kolkata'),
                 ),
-                items: const [
-                  DropdownMenuItem(value: 'UTC', child: Text('UTC')),
-                  DropdownMenuItem(
-                    value: 'Asia/Kolkata',
-                    child: Text('Asia/Kolkata'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Asia/Calcutta',
-                    child: Text('Asia/Calcutta'),
-                  ),
-                ],
-                onChanged: starting
-                    ? null
-                    : (value) => setState(() => timezone = value),
+                DropdownMenuItem(
+                  value: 'Asia/Calcutta',
+                  child: Text('Asia/Calcutta'),
+                ),
+              ],
+              onChanged: starting || editing || !widget.enabled
+                  ? null
+                  : (value) => setState(() => timezone = value),
+            ),
+            const SizedBox(height: 16),
+          ],
+          FilledButton.icon(
+            onPressed: starting || editing || !widget.enabled
+                ? null
+                : () => edit(),
+            icon: const Icon(Icons.add),
+            label: Text(widget.inline ? 'Create routine' : 'New routine'),
+          ),
+          if (active)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                'Resume or finish your active workout from Train before starting another.',
               ),
-              const SizedBox(height: 16),
-              FilledButton.icon(
-                onPressed: starting ? null : () => edit(),
-                icon: const Icon(Icons.add),
-                label: const Text('New routine'),
-              ),
-              if (active)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text(
-                    'Resume or finish your active workout from Train before starting another.',
-                  ),
-                ),
-              if (items.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Text(
-                    'Create a routine with planned exercises and sets.',
-                  ),
-                ),
-              for (final routine in items)
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
+            ),
+          if (items.isEmpty && !widget.inline)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Text('Create a routine with planned exercises and sets.'),
+            ),
+          for (final routine in items)
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Card(
+                key: ValueKey('routine-${routine.id}'),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Semantics(
+                        header: true,
+                        child: Text(
                           routine.plan.name,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
-                        Text(
-                          '${routine.plan.exercises.length} exercises · ${routine.plan.exercises.fold<int>(0, (n, e) => n + (e['sets'] as List).length)} planned sets',
-                        ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 8,
-                          children: [
-                            OutlinedButton(
-                              onPressed: starting ? null : () => edit(routine),
-                              child: const Text('Edit routine'),
+                      ),
+                      Text(
+                        '${routine.plan.exercises.length} exercises · ${routine.plan.exercises.fold<int>(0, (n, e) => n + (e['sets'] as List).length)} planned sets',
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 8,
+                        children: [
+                          OutlinedButton(
+                            onPressed: starting || editing || !widget.enabled
+                                ? null
+                                : () => edit(routine),
+                            child: const Text('Edit routine'),
+                          ),
+                          FilledButton(
+                            onPressed: canStart ? () => start(routine) : null,
+                            child: Text(
+                              starting ? 'Opening…' : 'Start workout',
                             ),
-                            FilledButton(
-                              onPressed:
-                                  starting || active || !workouts.hasValue
-                                  ? null
-                                  : () => start(routine),
-                              child: Text(
-                                starting ? 'Opening…' : 'Start workout',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-            ],
-          ),
-        ),
+              ),
+            ),
+        ],
       ),
     );
   }
