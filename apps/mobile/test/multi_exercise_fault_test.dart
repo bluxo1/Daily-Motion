@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:daily_motion/data/workout_repository.dart';
 import 'package:daily_motion/domain/workout.dart';
+import 'package:daily_motion/domain/exercise_history.dart';
 import 'package:daily_motion/domain/routine.dart';
 import 'package:daily_motion/features/home_screen.dart';
 import 'package:daily_motion/features/workout_controller.dart';
@@ -198,12 +199,7 @@ void main() {
       await tester.tap(find.text('Progress'));
       await tester.pumpAndSettle();
       final cards = tester.widgetList<Card>(find.byType(Card)).toList();
-      expect(cards.length, 7);
-      expect(
-        find.textContaining(RegExp(r'\n0 kg \u00b7 6 reps$')),
-        findsNWidgets(2),
-      );
-      expect(find.textContaining('15 lb'), findsOneWidget);
+      expect(cards.length, 6); // Two repeated instances share one variant page.
       expect(
         find.textContaining('per implement \u00b7 reps per side \u00b7 right'),
         findsOneWidget,
@@ -217,28 +213,53 @@ void main() {
       expect(find.textContaining('positive assistance'), findsOneWidget);
       expect(find.textContaining('added bodyweight'), findsOneWidget);
       expect(find.textContaining('bodyweight only'), findsOneWidget);
-      final bodyweightId = snapshot['exercises'][5]['sets'][1]['set_id'];
-      final bodyweightCard = find.byKey(
-        ValueKey('performance-$id-$bodyweightId'),
-      );
-      expect(
-        find.descendant(
-          of: bodyweightCard,
-          matching: find.textContaining('kg'),
-        ),
-        findsNothing,
-      );
       final after = (await h.repo.workout(id))!;
-      for (final e in (after['exercises'] as List).cast<Json>()) {
-        for (final set in (e['sets'] as List).cast<Json>()) {
-          final expected =
-              set['set_class'] == 'working' &&
-              set['observation']?['execution_status'] == 'completed';
+      for (final identity
+          in (after['exercises'] as List)
+              .cast<Json>()
+              .map(exerciseKey)
+              .toSet()) {
+        await tester.tap(find.byKey(ValueKey(identity)));
+        await tester.pumpAndSettle();
+        final matching = (after['exercises'] as List).cast<Json>().where(
+          (e) => exerciseKey(e) == identity,
+        );
+        for (final e in matching) {
+          for (final set in (e['sets'] as List).cast<Json>()) {
+            final expected =
+                set['set_class'] == 'working' &&
+                set['observation']?['execution_status'] == 'completed';
+            expect(
+              find.byKey(ValueKey('performance-$id-${set['set_id']}')),
+              expected ? findsOneWidget : findsNothing,
+            );
+          }
+        }
+        if (identity.basis == 'total_external') {
           expect(
-            find.byKey(ValueKey('performance-$id-${set['set_id']}')),
-            expected ? findsOneWidget : findsNothing,
+            find.textContaining('completed · 0 kg · 6 reps'),
+            findsNWidgets(2),
           );
         }
+        if (identity.basis == 'machine_stack') {
+          expect(find.textContaining('15 lb'), findsOneWidget);
+        }
+        if (identity.basis == 'bodyweight_only') {
+          final bodyweightId = snapshot['exercises'][5]['sets'][1]['set_id'];
+          final bodyweightCard = find.byKey(
+            ValueKey('performance-$id-$bodyweightId'),
+          );
+          expect(bodyweightCard, findsOneWidget);
+          expect(
+            find.descendant(
+              of: bodyweightCard,
+              matching: find.textContaining('kg'),
+            ),
+            findsNothing,
+          );
+        }
+        await tester.pageBack();
+        await tester.pumpAndSettle();
       }
       expect(tester.takeException(), isNull);
     },
@@ -345,7 +366,7 @@ void main() {
     await tester.tap(find.text('Progress'));
     await tester.pumpAndSettle();
     expect(
-      find.textContaining('Complete a workout with a completed working set'),
+      find.textContaining('Record work and finish or abandon a workout'),
       findsOneWidget,
     );
   });

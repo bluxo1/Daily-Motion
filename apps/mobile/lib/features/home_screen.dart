@@ -9,6 +9,7 @@ import '../sync/coordinator.dart';
 import '../auth/auth_app.dart';
 import 'routine_screen.dart';
 import 'workout_history.dart';
+import 'exercise_progress.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   final bool syntheticFixture;
@@ -136,6 +137,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           data: (items) => ListView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.all(16),
             children: [
               if (widget.syntheticFixture)
@@ -217,7 +219,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ] else if (destination == 1) ...[
                 WorkoutHistory(workouts: items, onOpen: open),
               ] else ...[
-                ObservedPerformance(workouts: items),
+                ExerciseProgress(onOpenWorkout: open),
               ],
             ],
           ),
