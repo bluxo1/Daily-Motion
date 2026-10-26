@@ -5,6 +5,7 @@ import 'package:daily_motion/data/database.dart';
 import 'package:daily_motion/data/workout_repository.dart';
 import 'package:daily_motion/domain/routine.dart';
 import 'package:daily_motion/domain/workout.dart';
+import 'package:daily_motion/domain/exercise_history.dart';
 import 'package:daily_motion/domain/rest_timer.dart';
 import 'package:daily_motion/design/theme.dart';
 import 'package:daily_motion/features/home_screen.dart';
@@ -613,6 +614,11 @@ void main() {
       );
       await tester.tap(find.text('Progress'));
       await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(ValueKey(exerciseKey(completed['exercises'][0] as Json))),
+      );
+      await tester.pumpAndSettle();
+      await h.reveal(find.byKey(ValueKey('performance-$id-${setId(0, 0)}')));
       expect(
         find.byKey(ValueKey('performance-$id-${setId(0, 0)}')),
         findsOneWidget,
@@ -621,7 +627,28 @@ void main() {
         find.byKey(ValueKey('performance-$id-${setId(1, 0)}')),
         findsNothing,
       );
-      expect(find.textContaining('0 kg'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(ValueKey('performance-$id-${setId(0, 0)}')),
+          matching: find.textContaining('completed · 0 kg ·'),
+        ),
+        findsOneWidget,
+      );
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(ValueKey(exerciseKey(completed['exercises'][1] as Json))),
+      );
+      await tester.pumpAndSettle();
+      await h.reveal(find.byKey(ValueKey('observation-$id-${setId(1, 0)}')));
+      expect(
+        find.textContaining('This bodyweight entry was accidental'),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(ValueKey('performance-$id-${setId(1, 0)}')),
+        findsNothing,
+      );
       expect(tester.takeException(), isNull);
     },
   );

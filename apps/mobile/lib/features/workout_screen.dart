@@ -8,6 +8,7 @@ import '../domain/rest_timer.dart';
 import 'workout_controller.dart';
 import 'sync_provider.dart';
 import 'workout_presentation.dart';
+import 'exercise_progress.dart';
 
 class WorkoutScreen extends ConsumerStatefulWidget {
   final String sessionId;
@@ -191,6 +192,14 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen>
           ),
           const SizedBox(height: 8),
           Text(exerciseConvention(exercise)),
+          if (workout['status'] == 'active')
+            PreviousPerformance(
+              exercise: exercise,
+              sessionId: widget.sessionId,
+              onOpenWorkout: (id) => Navigator.of(context).push<void>(
+                MaterialPageRoute(builder: (_) => WorkoutScreen(sessionId: id)),
+              ),
+            ),
           const SizedBox(height: 16),
           for (final (index, item) in sets.indexed)
             ListTile(

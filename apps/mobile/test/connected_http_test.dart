@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:daily_motion/data/database.dart';
 import 'package:daily_motion/data/workout_repository.dart';
 import 'package:daily_motion/domain/workout.dart';
+import 'package:daily_motion/domain/exercise_history.dart';
 import 'package:daily_motion/domain/routine.dart';
 import 'package:daily_motion/features/workout_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -290,6 +291,24 @@ void main() {
       }
       await controller.finish(multiId);
       final bodyweight = initial['exercises'][1] as Json;
+      // The query uses real HTTP/PostgreSQL-installed projections, both before
+      // and after a correction. No alternative history store or report oracle.
+      await sync.synchronize(force: true);
+      expect(sync.status.phase, SyncPhase.synchronized);
+      await thirdSync.synchronize(force: true);
+      expect(thirdSync.status.phase, SyncPhase.synchronized);
+      final beforeCorrection = buildExerciseHistory(await third.workouts());
+      final reference = beforeCorrection.byExercise[exerciseKey(bodyweight)]!
+          .previous()!;
+      expect(reference.workout['aggregate_id'], multiId);
+      expect(
+        reference.completedWorking.single.$2['observation']['actual']['reps'],
+        3,
+      );
+      expect(
+        reference.completedWorking.single.$2['observation']['actual']['load'],
+        isNull,
+      );
       await controller.record(
         multiId,
         bodyweight,
@@ -356,6 +375,15 @@ void main() {
         0,
       );
       expect(await third.routines(), isEmpty);
+      final history = buildExerciseHistory(await third.workouts());
+      for (final exercise in (restored['exercises'] as List).cast<Json>()) {
+        final group = history.byExercise[exerciseKey(exercise)]!;
+        final visit = group.visits.singleWhere(
+          (v) => v.workout['aggregate_id'] == multiId,
+        );
+        expect(visit.occurrences.single.exercise, exercise);
+        expect(group.previous(), isNull); // partial, corrected-skipped, failed
+      }
     } finally {
       controllerScope.dispose();
       await thirdSync.close();
