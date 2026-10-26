@@ -13,13 +13,22 @@ final workoutsProvider = AsyncNotifierProvider<WorkoutController, List<Json>>(
 class WorkoutController extends AsyncNotifier<List<Json>> {
   WorkoutRepository get repository => ref.read(repositoryProvider);
   Future<void> _pending = Future.value();
+  var _projectionRead = 0;
 
   @override
-  Future<List<Json>> build() => ref.watch(repositoryProvider).workouts();
+  Future<List<Json>> build() {
+    ++_projectionRead;
+    return ref.watch(repositoryProvider).workouts();
+  }
 
   Future<void> _refresh(WorkoutRepository target) async {
+    final read = ++_projectionRead;
     final next = await AsyncValue.guard(target.workouts);
-    if (ref.mounted && identical(ref.read(repositoryProvider), target)) {
+    // A read sampled before a correction or access error must not restore old
+    // presentation data. Reads stay independent of the serialized write queue.
+    if (ref.mounted &&
+        read == _projectionRead &&
+        identical(ref.read(repositoryProvider), target)) {
       state = next;
     }
   }
