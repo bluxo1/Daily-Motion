@@ -5,6 +5,9 @@ import '../domain/exercise_history.dart';
 import '../domain/workout.dart';
 import 'exercise_history_provider.dart';
 import 'workout_presentation.dart';
+import 'measured_progress_view.dart';
+import 'sync_provider.dart';
+import '../sync/coordinator.dart';
 
 void openExerciseHistory(
   BuildContext context,
@@ -217,6 +220,7 @@ class ExerciseHistoryScreen extends ConsumerStatefulWidget {
 }
 
 class _ExerciseHistoryScreenState extends ConsumerState<ExerciseHistoryScreen> {
+  var measured = false;
   var page = 0;
   var oldestFirst = false;
   var completedOnly = false;
@@ -225,248 +229,321 @@ class _ExerciseHistoryScreenState extends ConsumerState<ExerciseHistoryScreen> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Exercise history')),
     body: SafeArea(
-      child: ref
-          .watch(exerciseHistoryProvider)
-          .when(
-            skipLoadingOnRefresh: false,
-            skipLoadingOnReload: false,
-            loading: () =>
-                const Center(child: Text('Loading exercise history…')),
-            error: (_, _) => const Padding(
-              padding: EdgeInsets.all(16),
-              child: HistoryReadError(),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Wrap(
+              spacing: 8,
+              children: [
+                Semantics(
+                  selected: !measured,
+                  child: TextButton(
+                    onPressed: () => setState(() => measured = false),
+                    child: const Text('Source history'),
+                  ),
+                ),
+                Semantics(
+                  selected: measured,
+                  child: TextButton(
+                    onPressed: () => setState(() => measured = true),
+                    child: const Text('Measured charts'),
+                  ),
+                ),
+              ],
             ),
-            data: (index) {
-              final history = index.byExercise[widget.identity];
-              if (history == null) {
-                return const Center(
-                  child: Text('No recorded history for this exercise.'),
-                );
-              }
-              final orderedVisits = oldestFirst
-                  ? history.visits.reversed.toList()
-                  : history.visits;
-              final units = history.recordedUnits;
-              final selectedUnit = units.contains(unit) ? unit : null;
-              bool matchesSet(ExerciseVisit visit, Json set) {
-                if (completedOnly &&
-                    (visit.workout['status'] != 'completed' ||
-                        set['set_class'] != 'working' ||
-                        set['observation']?['execution_status'] !=
-                            'completed')) {
-                  return false;
-                }
-                return selectedUnit == null ||
-                    (set['observation'] != null &&
-                        observationUnit(set) == selectedUnit);
-              }
-
-              // Filter source workouts before slicing pages, using the same
-              // predicate as their rows. Keep all context when filters are off.
-              final visits = orderedVisits
-                  .where(
-                    (visit) =>
-                        (!completedOnly && selectedUnit == null) ||
-                        visit.occurrences.any(
-                          (e) => e.sets.any((s) => matchesSet(visit, s)),
-                        ),
-                  )
-                  .toList();
-              final pages = (visits.length / 10).ceil();
-              final currentPage = pages == 0 ? 0 : page.clamp(0, pages - 1);
-              final selected = visits.skip(currentPage * 10).take(10);
-              // Flatten only this page. ListView constructs visible rows lazily.
-              final rows = <Widget Function(BuildContext)>[];
-              for (final visit in selected) {
-                rows.add(
-                  (_) => Card(
-                    key: ValueKey(
-                      'source-workout-${visit.workout['aggregate_id']}',
-                    ),
-                    child: ListTile(
-                      title: Text(
-                        '${visit.workout['name']} · ${visit.workout['status']}',
-                      ),
-                      subtitle: Text(
-                        '${workoutDate(visit.workout)}${visit.workout['conflict'] == true ? '\nSaved on this device · sync needs review' : ''}',
-                      ),
-                      trailing: const Icon(Icons.open_in_new),
-                      onTap: () => widget.onOpenWorkout(
-                        visit.workout['aggregate_id'] as String,
-                      ),
-                    ),
-                  ),
-                );
-                for (final occurrence in visit.occurrences) {
-                  rows.add(
-                    (_) => Semantics(
-                      header: true,
-                      child: Text(
-                        '${occurrence.exercise['name']} · exercise instance ${occurrence.ordinal + 1}',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                  );
-                  for (final (ordinal, set) in occurrence.sets.indexed) {
-                    final eligible =
-                        visit.workout['status'] == 'completed' &&
-                        set['set_class'] == 'working' &&
-                        set['observation']?['execution_status'] == 'completed';
-                    if (!matchesSet(visit, set)) continue;
-                    rows.add(
-                      (_) => Card(
-                        key: ValueKey(
-                          '${eligible ? 'performance' : 'observation'}-${visit.workout['aggregate_id']}-${set['set_id']}',
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Text(
-                            'Set ${ordinal + 1} · ${set['set_class']} · ${set['set_purpose']}\n${setSummary(set)}',
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-                }
-              }
-              if (visits.isEmpty) {
-                rows.add(
-                  (_) => const Text(
-                    'No source workouts match these filters. Show all outcomes or choose another recorded unit.',
-                  ),
-                );
-              }
-              return Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      key: ValueKey((
-                        widget.identity,
-                        currentPage,
-                        oldestFirst,
-                        completedOnly,
-                        unit,
-                      )),
-                      padding: const EdgeInsets.all(16),
-                      itemCount: rows.length + 1,
-                      itemBuilder: (context, i) => i == 0
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Text(
-                                  history.name,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall,
-                                ),
-                                Text(
-                                  exerciseConvention(
-                                    history.latestRecorded.exercise,
-                                  ),
-                                ),
-                                const Text(
-                                  'Recorded values in original units. Workouts are ordered by start time; sets retain prescription order.',
-                                ),
-                                SwitchListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  title: const Text('Oldest workouts first'),
-                                  value: oldestFirst,
-                                  onChanged: (v) => setState(() {
-                                    oldestFirst = v;
-                                    page = 0;
-                                  }),
-                                ),
-                                SwitchListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  title: const Text(
-                                    'Completed working sets only',
-                                  ),
-                                  value: completedOnly,
-                                  onChanged: (v) => setState(() {
-                                    completedOnly = v;
-                                    page = 0;
-                                  }),
-                                ),
-                                DropdownButtonFormField<String>(
-                                  key: ValueKey((
-                                    units.join('|'),
-                                    selectedUnit,
-                                  )),
-                                  initialValue: selectedUnit ?? 'all',
-                                  isExpanded: true,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Recorded load unit',
-                                  ),
-                                  items: [
-                                    const DropdownMenuItem(
-                                      value: 'all',
-                                      child: Text(
-                                        'All original units (individual values)',
-                                      ),
-                                    ),
-                                    for (final u in units)
-                                      DropdownMenuItem(
-                                        value: u,
-                                        child: Text(u),
-                                      ),
-                                  ],
-                                  onChanged: (v) => setState(() {
-                                    unit = v == 'all' ? null : v;
-                                    page = 0;
-                                  }),
-                                ),
-                                const ExpansionTile(
-                                  tilePadding: EdgeInsets.zero,
-                                  title: Text('How to read these observations'),
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 12),
-                                      child: Text(
-                                        'Read load and reps together. Units are never converted or combined; these are individual measurements, without scores or rankings. Warm-ups, partial/failed attempts, skipped and unperformed sets remain context. Only completed working sets in completed workouts are previous-performance references. Positive assistance is assistance, not added load. No recorded load is not zero load.',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                              ],
-                            )
-                          : Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: rows[i - 1](context),
-                            ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 8,
-                      children: [
-                        TextButton(
-                          onPressed: currentPage == 0
-                              ? null
-                              : () => setState(() => page = currentPage - 1),
-                          child: const Text('Previous page'),
-                        ),
-                        Text(
-                          visits.isEmpty
-                              ? 'Workouts 0 of 0'
-                              : 'Workouts ${currentPage * 10 + 1}–${(currentPage * 10 + 10).clamp(1, visits.length)} of ${visits.length}',
-                        ),
-                        TextButton(
-                          onPressed: currentPage + 1 >= pages
-                              ? null
-                              : () => setState(() => page = currentPage + 1),
-                          child: const Text('Next page'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
           ),
+          Expanded(
+            // Observe account status on the current route too. The offstage
+            // Home subscription may be paused; authoritative disable must hide
+            // this route and let the existing coordinator finish closing.
+            child:
+                ref.watch(syncStatusProvider).value?.phase ==
+                    SyncPhase.accountDisabled
+                ? const Center(
+                    child: Text(
+                      'This account was disabled remotely. Local training data has been removed.',
+                    ),
+                  )
+                : measured
+                ? MeasuredProgressView(
+                    identity: widget.identity,
+                    onOpenWorkout: widget.onOpenWorkout,
+                  )
+                : ref
+                      .watch(exerciseHistoryProvider)
+                      .when(
+                        skipLoadingOnRefresh: false,
+                        skipLoadingOnReload: false,
+                        loading: () => const Center(
+                          child: Text('Loading exercise history…'),
+                        ),
+                        error: (_, _) => const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: HistoryReadError(),
+                        ),
+                        data: (index) {
+                          final history = index.byExercise[widget.identity];
+                          if (history == null) {
+                            return const Center(
+                              child: Text(
+                                'No recorded history for this exercise.',
+                              ),
+                            );
+                          }
+                          final orderedVisits = oldestFirst
+                              ? history.visits.reversed.toList()
+                              : history.visits;
+                          final units = history.recordedUnits;
+                          final selectedUnit = units.contains(unit)
+                              ? unit
+                              : null;
+                          bool matchesSet(ExerciseVisit visit, Json set) {
+                            if (completedOnly &&
+                                (visit.workout['status'] != 'completed' ||
+                                    set['set_class'] != 'working' ||
+                                    set['observation']?['execution_status'] !=
+                                        'completed')) {
+                              return false;
+                            }
+                            return selectedUnit == null ||
+                                (set['observation'] != null &&
+                                    observationUnit(set) == selectedUnit);
+                          }
+
+                          // Filter source workouts before slicing pages, using the same
+                          // predicate as their rows. Keep all context when filters are off.
+                          final visits = orderedVisits
+                              .where(
+                                (visit) =>
+                                    (!completedOnly && selectedUnit == null) ||
+                                    visit.occurrences.any(
+                                      (e) => e.sets.any(
+                                        (s) => matchesSet(visit, s),
+                                      ),
+                                    ),
+                              )
+                              .toList();
+                          final pages = (visits.length / 10).ceil();
+                          final currentPage = pages == 0
+                              ? 0
+                              : page.clamp(0, pages - 1);
+                          final selected = visits
+                              .skip(currentPage * 10)
+                              .take(10);
+                          // Flatten only this page. ListView constructs visible rows lazily.
+                          final rows = <Widget Function(BuildContext)>[];
+                          for (final visit in selected) {
+                            rows.add(
+                              (_) => Card(
+                                key: ValueKey(
+                                  'source-workout-${visit.workout['aggregate_id']}',
+                                ),
+                                child: ListTile(
+                                  title: Text(
+                                    '${visit.workout['name']} · ${visit.workout['status']}',
+                                  ),
+                                  subtitle: Text(
+                                    '${workoutDate(visit.workout)}${visit.workout['conflict'] == true ? '\nSaved on this device · sync needs review' : ''}',
+                                  ),
+                                  trailing: const Icon(Icons.open_in_new),
+                                  onTap: () => widget.onOpenWorkout(
+                                    visit.workout['aggregate_id'] as String,
+                                  ),
+                                ),
+                              ),
+                            );
+                            for (final occurrence in visit.occurrences) {
+                              rows.add(
+                                (_) => Semantics(
+                                  header: true,
+                                  child: Text(
+                                    '${occurrence.exercise['name']} · exercise instance ${occurrence.ordinal + 1}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium,
+                                  ),
+                                ),
+                              );
+                              for (final (ordinal, set)
+                                  in occurrence.sets.indexed) {
+                                final eligible =
+                                    visit.workout['status'] == 'completed' &&
+                                    set['set_class'] == 'working' &&
+                                    set['observation']?['execution_status'] ==
+                                        'completed';
+                                if (!matchesSet(visit, set)) continue;
+                                rows.add(
+                                  (_) => Card(
+                                    key: ValueKey(
+                                      '${eligible ? 'performance' : 'observation'}-${visit.workout['aggregate_id']}-${set['set_id']}',
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Text(
+                                        'Set ${ordinal + 1} · ${set['set_class']} · ${set['set_purpose']}\n${setSummary(set)}',
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                          }
+                          if (visits.isEmpty) {
+                            rows.add(
+                              (_) => const Text(
+                                'No source workouts match these filters. Show all outcomes or choose another recorded unit.',
+                              ),
+                            );
+                          }
+                          return Column(
+                            children: [
+                              Expanded(
+                                child: ListView.builder(
+                                  key: ValueKey((
+                                    widget.identity,
+                                    currentPage,
+                                    oldestFirst,
+                                    completedOnly,
+                                    unit,
+                                  )),
+                                  padding: const EdgeInsets.all(16),
+                                  itemCount: rows.length + 1,
+                                  itemBuilder: (context, i) => i == 0
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            Text(
+                                              history.name,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall,
+                                            ),
+                                            Text(
+                                              exerciseConvention(
+                                                history.latestRecorded.exercise,
+                                              ),
+                                            ),
+                                            const Text(
+                                              'Recorded values in original units. Workouts are ordered by start time; sets retain prescription order.',
+                                            ),
+                                            SwitchListTile(
+                                              contentPadding: EdgeInsets.zero,
+                                              title: const Text(
+                                                'Oldest workouts first',
+                                              ),
+                                              value: oldestFirst,
+                                              onChanged: (v) => setState(() {
+                                                oldestFirst = v;
+                                                page = 0;
+                                              }),
+                                            ),
+                                            SwitchListTile(
+                                              contentPadding: EdgeInsets.zero,
+                                              title: const Text(
+                                                'Completed working sets only',
+                                              ),
+                                              value: completedOnly,
+                                              onChanged: (v) => setState(() {
+                                                completedOnly = v;
+                                                page = 0;
+                                              }),
+                                            ),
+                                            DropdownButtonFormField<String>(
+                                              key: ValueKey((
+                                                units.join('|'),
+                                                selectedUnit,
+                                              )),
+                                              initialValue:
+                                                  selectedUnit ?? 'all',
+                                              isExpanded: true,
+                                              decoration: const InputDecoration(
+                                                labelText: 'Recorded load unit',
+                                              ),
+                                              items: [
+                                                const DropdownMenuItem(
+                                                  value: 'all',
+                                                  child: Text(
+                                                    'All original units (individual values)',
+                                                  ),
+                                                ),
+                                                for (final u in units)
+                                                  DropdownMenuItem(
+                                                    value: u,
+                                                    child: Text(u),
+                                                  ),
+                                              ],
+                                              onChanged: (v) => setState(() {
+                                                unit = v == 'all' ? null : v;
+                                                page = 0;
+                                              }),
+                                            ),
+                                            const ExpansionTile(
+                                              tilePadding: EdgeInsets.zero,
+                                              title: Text(
+                                                'How to read these observations',
+                                              ),
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                    bottom: 12,
+                                                  ),
+                                                  child: Text(
+                                                    'Read load and reps together. Units are never converted or combined; these are individual measurements, without scores or rankings. Warm-ups, partial/failed attempts, skipped and unperformed sets remain context. Only completed working sets in completed workouts are previous-performance references. Positive assistance is assistance, not added load. No recorded load is not zero load.',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 16),
+                                          ],
+                                        )
+                                      : Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 8,
+                                          ),
+                                          child: rows[i - 1](context),
+                                        ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Wrap(
+                                  alignment: WrapAlignment.center,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 8,
+                                  children: [
+                                    TextButton(
+                                      onPressed: currentPage == 0
+                                          ? null
+                                          : () => setState(
+                                              () => page = currentPage - 1,
+                                            ),
+                                      child: const Text('Previous page'),
+                                    ),
+                                    Text(
+                                      visits.isEmpty
+                                          ? 'Workouts 0 of 0'
+                                          : 'Workouts ${currentPage * 10 + 1}–${(currentPage * 10 + 10).clamp(1, visits.length)} of ${visits.length}',
+                                    ),
+                                    TextButton(
+                                      onPressed: currentPage + 1 >= pages
+                                          ? null
+                                          : () => setState(
+                                              () => page = currentPage + 1,
+                                            ),
+                                      child: const Text('Next page'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+          ),
+        ],
+      ),
     ),
   );
 }
