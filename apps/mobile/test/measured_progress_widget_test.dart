@@ -5,6 +5,7 @@ import 'package:daily_motion/domain/workout.dart';
 import 'package:daily_motion/domain/routine.dart';
 import 'package:daily_motion/design/theme.dart';
 import 'package:daily_motion/features/exercise_progress.dart';
+import 'package:daily_motion/features/exercise_history_provider.dart';
 import 'package:daily_motion/features/measured_progress_provider.dart';
 import 'package:daily_motion/features/measured_progress_view.dart';
 import 'package:daily_motion/features/workout_controller.dart';
@@ -18,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'exercise_history_provider_test.dart' show LargeProjection;
+import 'exercise_history_provider_test.dart' show LargeProjection, HeldWorkouts;
 import 'exercise_history_test.dart' show exercise, workout;
 import 'multi_exercise_test.dart' show Harness, entry, multiPlan;
 import 'exercise_progress_test.dart' show recorded;
@@ -103,6 +104,73 @@ Future<T> drain<T>(WidgetTester tester, Future<T> operation) async {
   return result as T;
 }
 
+/// Wait for the current subscribed view, not a Future sampled before its build.
+/// pumpAndSettle only drains scheduled frames; native workers can still be busy.
+Future<MeasuredProgress> waitForMeasuredChart(
+  WidgetTester tester,
+  ProviderContainer container,
+  ExerciseKey identity, {
+  Duration timeout = const Duration(seconds: 10),
+}) async {
+  final elapsed = Stopwatch()..start();
+  String historyState = 'not inspected';
+  String measuredState = 'not inspected';
+  Never fail(String reason) => throw TestFailure(
+    '$reason\nExercise history: $historyState\nMeasured history: $measuredState\n'
+    'Chart widgets: ${find.byType(MeasuredScatter).evaluate().length}; '
+    'scrollables: ${find.byType(Scrollable).evaluate().length}\n'
+    '${tester.binding.rootElement?.toStringDeep()}',
+  );
+  while (true) {
+    // Small histories use Future() on the fake timer queue; large histories use
+    // a real worker. Advance the fake clock as well as yielding below.
+    await tester.pump(const Duration(milliseconds: 1));
+    final pending = tester.takeException();
+    if (pending != null) {
+      fail('Flutter exception while waiting for measured chart: $pending');
+    }
+    final views = find.byType(MeasuredProgressView).evaluate().toList();
+    if (views.length != 1 ||
+        (views.single.widget as MeasuredProgressView).identity != identity) {
+      fail('Expected measured view disappeared or changed exercise.');
+    }
+    final history = container.read(exerciseHistoryProvider);
+    final measured = container.read(measuredProgressProvider(identity));
+    historyState = 'loading=${history.isLoading}, error=${history.error}';
+    measuredState =
+        'loading=${measured.isLoading}, error=${measured.error}, '
+        'points=${measured.asData?.value.repetitions.length}';
+    if (history.hasError || measured.hasError) {
+      fail('Provider failure while waiting for measured chart.');
+    }
+    if (!history.isLoading &&
+        !measured.isLoading &&
+        measured.asData != null &&
+        find.byType(MeasuredScatter).evaluate().length == 1 &&
+        find.byType(Scrollable).evaluate().isNotEmpty) {
+      return measured.requireValue;
+    }
+    if (elapsed.elapsed >= timeout) {
+      fail('Timed out waiting for the rendered measured chart.');
+    }
+    // Give real isolate/read completions an event-loop turn, then recheck UI.
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 1)),
+    );
+  }
+}
+
+Future<TestFailure> chartReadinessFailure(
+  Future<MeasuredProgress> Function() action,
+) async {
+  try {
+    await action();
+  } on TestFailure catch (failure) {
+    return failure;
+  }
+  throw TestFailure('The readiness guard unexpectedly succeeded.');
+}
+
 Future<void> chooseMetric(WidgetTester tester, String label) async {
   final field = find.byType(DropdownButtonFormField<MeasuredMetric>);
   await reveal(tester, field);
@@ -124,6 +192,127 @@ Finder row(String root, Json e, [int ordinal = 0]) => find.byKey(
 );
 
 void main() {
+  testWidgets(
+    'chart readiness reports real owner-access failures without showing old data',
+    (tester) async {
+      final h = Harness(tester);
+      await h.open();
+      addTearDown(h.close);
+      final (_, e) = await recorded(h);
+      await h.mount(
+        ExerciseHistoryScreen(identity: exerciseKey(e), onOpenWorkout: (_) {}),
+      );
+      await tester.tap(find.text('Measured charts'));
+      await waitForMeasuredChart(tester, h.container!, exerciseKey(e));
+      await h.repo.signOut();
+      await h.container!.read(workoutsProvider.notifier).refresh();
+      final failure = await chartReadinessFailure(
+        () => waitForMeasuredChart(tester, h.container!, exerciseKey(e)),
+      );
+      expect(
+        failure.message,
+        allOf(
+          contains('Provider failure'),
+          contains('Exercise history:'),
+          contains('Measured history:'),
+        ),
+      );
+      expect(find.byType(MeasuredScatter), findsNothing);
+      expect(find.textContaining('25 kg'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'chart readiness reports a removed view instead of reading a missing scrollable',
+    (tester) async {
+      final e = exercise();
+      final c = await mountProjection(tester, [
+        workout('one', [e]),
+      ], e);
+      await tester.tap(find.text('Measured charts'));
+      await waitForMeasuredChart(tester, c, exerciseKey(e));
+      await tester.pumpWidget(const SizedBox.shrink());
+      final failure = await chartReadinessFailure(
+        () => waitForMeasuredChart(tester, c, exerciseKey(e)),
+      );
+      expect(failure.message, contains('view disappeared'));
+    },
+  );
+
+  testWidgets(
+    'chart readiness times out diagnostically on a held real read and later recovers',
+    (tester) async {
+      final h = Harness(tester);
+      await h.open();
+      addTearDown(h.close);
+      final owner = h.repo.ownerId;
+      h.repo.dispose();
+      final held = HeldWorkouts(h.db, owner);
+      h.repo = held;
+      final (_, e) = await recorded(h);
+      await h.mount(
+        ExerciseHistoryScreen(identity: exerciseKey(e), onOpenWorkout: (_) {}),
+      );
+      await tester.tap(find.text('Measured charts'));
+      await waitForMeasuredChart(tester, h.container!, exerciseKey(e));
+      held.hold = true;
+      h.container!.invalidate(workoutsProvider);
+      try {
+        final failure = await chartReadinessFailure(
+          () => waitForMeasuredChart(
+            tester,
+            h.container!,
+            exerciseKey(e),
+            timeout: const Duration(milliseconds: 50),
+          ),
+        );
+        expect(
+          failure.message,
+          allOf(
+            contains('Timed out'),
+            contains('loading=true'),
+            contains('scrollables: 0'),
+          ),
+        );
+        expect(
+          find.textContaining('Loading measured observations'),
+          findsOneWidget,
+        );
+      } finally {
+        held.hold = false;
+        held.release.complete();
+      }
+      await drain(tester, h.container!.read(workoutsProvider.future));
+      final recovered = await waitForMeasuredChart(
+        tester,
+        h.container!,
+        exerciseKey(e),
+      );
+      expect(recovered.repetitions, hasLength(1));
+    },
+  );
+
+  testWidgets(
+    'chart readiness turns a pending Flutter exception into a diagnostic failure',
+    (tester) async {
+      final e = exercise();
+      final c = await mountProjection(tester, [
+        workout('one', [e]),
+      ], e);
+      await tester.tap(find.text('Measured charts'));
+      await waitForMeasuredChart(tester, c, exerciseKey(e));
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: StateError('controlled readiness exception'),
+        ),
+      );
+      final failure = await chartReadinessFailure(
+        () => waitForMeasuredChart(tester, c, exerciseKey(e)),
+      );
+      expect(failure.message, contains('controlled readiness exception'));
+    },
+  );
+
   testWidgets(
     'real corrections clamp the oldest page and replace a removed selected unit',
     (tester) async {
@@ -686,11 +875,19 @@ void main() {
         for (var i = 0; i < 2600; i++) workout('source-$i', [copyJson(e)]),
       ], e);
       await tester.tap(find.text('Measured charts'));
-      await drain(
-        tester,
-        c.read(measuredProgressProvider(exerciseKey(e)).future),
+      final model = await waitForMeasuredChart(tester, c, exerciseKey(e));
+      expect(model.repetitions, hasLength(2600));
+      expect(model.repetitions.map((p) => p.source).toSet(), hasLength(2600));
+      expect(model.repetitions.map((p) => p.startedAt).toSet(), hasLength(1));
+      expect(model.loads['kg']!.every((p) => p.load!.original == '0'), isTrue);
+      expect(
+        c
+            .read(exerciseHistoryProvider)
+            .requireValue
+            .byExercise[exerciseKey(e)]!
+            .visits,
+        hasLength(2600),
       );
-      await tester.pumpAndSettle();
       await reveal(tester, find.byType(MeasuredScatter));
       final plot =
           tester
@@ -703,13 +900,34 @@ void main() {
       expect(plot.points.every((p) => p.x == 0.5 && p.y == 0.5), isTrue);
       expect(find.byType(ListTile).evaluate().length, lessThan(12));
       expect(find.text('Observations 2521–2600 of 2600'), findsOneWidget);
+      final source = model.window(MeasuredMetric.load, unit: 'kg').points.first;
+      final exact = row(source.workoutId, e);
+      await reveal(tester, exact);
+      expect(
+        find.descendant(of: exact, matching: find.text('0 kg')),
+        findsOneWidget,
+      );
       await tester.tap(find.text('Older observations'));
       await tester.pumpAndSettle();
       expect(find.text('Observations 2441–2520 of 2600'), findsOneWidget);
       expect(find.byType(ListTile).evaluate().length, lessThan(12));
+      final olderSource = model
+          .window(MeasuredMetric.load, unit: 'kg', page: 1)
+          .points
+          .first;
+      final olderExact = row(olderSource.workoutId, e);
+      await reveal(tester, olderExact);
+      expect(
+        find.descendant(of: olderExact, matching: find.text('0 kg')),
+        findsOneWidget,
+      );
+      expect(exact, findsNothing);
       await tester.tap(find.text('Newer observations'));
       await tester.pumpAndSettle();
       expect(find.text('Observations 2521–2600 of 2600'), findsOneWidget);
+      await reveal(tester, exact);
+      expect(exact, findsOneWidget);
+      expect(olderExact, findsNothing);
     },
   );
 }
