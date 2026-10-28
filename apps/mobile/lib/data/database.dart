@@ -21,7 +21,7 @@ class TrainingDatabase extends _$TrainingDatabase {
   );
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -92,6 +92,9 @@ class TrainingDatabase extends _$TrainingDatabase {
         await migrator.createTable(routines);
         await migrator.createTable(workoutTemplates);
         await migrator.createTable(routineStarts);
+      }
+      if (from < 6) {
+        await migrator.createTable(customExerciseDefinitions);
       }
       // Drift updates its version after the callback. Persist it with the DDL
       // too, so process loss after commit cannot retry an already-applied ALTER.

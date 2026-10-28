@@ -133,3 +133,12 @@ CREATE TABLE routine_starts (
   FOREIGN KEY(owner_id, routine_id, template_id)
     REFERENCES workout_templates(owner_id, routine_id, id) ON DELETE CASCADE
 );
+
+-- Private local catalog revisions never enter workout transport or bootstrap.
+CREATE TABLE custom_exercise_definitions (
+  owner_id TEXT NOT NULL REFERENCES local_identity(owner_id),
+  variant_id TEXT NOT NULL,
+  definition_revision INTEGER NOT NULL CHECK(definition_revision > 0),
+  definition TEXT NOT NULL,
+  PRIMARY KEY(owner_id, variant_id, definition_revision)
+);

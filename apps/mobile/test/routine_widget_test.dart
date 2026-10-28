@@ -17,6 +17,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'repository_test.dart' show owner;
 import 'routine_repository_test.dart' show routineId, routinePlan;
 import 'support/owned_fixture.dart';
+import 'support/catalog_ui.dart';
 
 class _InterruptedReadRepository extends WorkoutRepository {
   _InterruptedReadRepository(super.db, super.ownerId);
@@ -302,8 +303,7 @@ void main() {
       find.byKey(const ValueKey('routine-name')),
       'My saved routine',
     );
-    await h.tap('Add exercise');
-    await h.enter(field('Exercise name'), 'Dumbbell row');
+    await addPrivateExerciseFromPicker(tester, 'Dumbbell row');
     await h.enter(field('Planned load').first, '22.5');
     await h.tap('Save routine');
     expect(find.text('My saved routine'), findsOneWidget);
@@ -343,8 +343,7 @@ void main() {
       await h.tap('Save routine');
       expect(find.byKey(const ValueKey('routine-error')), findsOneWidget);
       expect(await h.repo.routines(), isEmpty);
-      await h.tap('Add exercise');
-      await h.enter(field('Exercise name'), 'Bench press');
+      await addPrivateExerciseFromPicker(tester, 'Bench press');
       await h.db.customStatement(
         "CREATE TRIGGER fail_ui BEFORE INSERT ON workout_templates BEGIN SELECT RAISE(ABORT,'PRIVATE SQL DETAIL'); END",
       );
@@ -480,9 +479,8 @@ void main() {
       );
       await h.mount();
       await h.tap('Edit routine');
-      await h.tap('Add exercise');
+      await addPrivateExerciseFromPicker(tester, 'Second exercise');
       await h.reveal(find.text('Exercise 2'));
-      await h.enter(field('Exercise name').last, 'Second exercise');
       final up = find.byTooltip('Move exercise 2 up');
       await h.reveal(up);
       await tester.tap(up);

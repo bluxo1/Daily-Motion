@@ -846,7 +846,7 @@ void main() {
             .data
             .values
             .single,
-        5,
+        6,
       );
       final saved = await save();
       await reopen();

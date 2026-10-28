@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import '../domain/workout.dart';
 import '../domain/rest_timer.dart';
 import '../domain/routine.dart';
+import '../domain/exercise_catalog.dart';
 import '../sync/contract_validation.dart';
 import '../sync/transport_contract.dart';
 import '../sync/transport_limits.dart';
@@ -16,6 +17,7 @@ import 'database.dart';
 part 'sync_repository.dart';
 part 'recovery_repository.dart';
 part 'routine_repository.dart';
+part 'catalog_repository.dart';
 
 class WorkoutRepository {
   final TrainingDatabase db;
