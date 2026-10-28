@@ -1,5 +1,10 @@
 # Local routine authoring experiment
 
+The 2026-10-27 [local catalog follow-up](LOCAL_EXERCISE_CATALOG.md) adds a searchable
+picker, reusable private variants and additive schema 6. The earlier routine
+design and dated qualification below remain the historical foundation; the
+follow-up documents the current picker and forward-only compatibility boundary.
+
 This exploratory implementation is local and subject to human review. Phase 0
 remains in progress; it does not close a phase gate or authorize Phase 1 rollout.
 The disposable [interaction prototype](../apps/mobile/lib/qualification/routine_prototype.dart)

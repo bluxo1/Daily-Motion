@@ -292,6 +292,7 @@ extension SynchronizationRepository on WorkoutRepository {
       throw const ContractViolation('wrong_owner');
     }
     for (final table in [
+      'custom_exercise_definitions',
       'routine_starts',
       'routines', // Cascades to all immutable template payloads.
       'sessions',

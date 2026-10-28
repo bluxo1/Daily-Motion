@@ -6,6 +6,8 @@ import 'package:daily_motion/data/workout_repository.dart';
 import 'package:daily_motion/domain/workout.dart';
 import 'package:daily_motion/domain/exercise_history.dart';
 import 'package:daily_motion/domain/routine.dart';
+import 'package:daily_motion/domain/exercise_catalog.dart';
+import 'package:daily_motion/domain/measured_progress.dart';
 import 'package:daily_motion/features/workout_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daily_motion/sync/coordinator.dart';
@@ -389,6 +391,152 @@ void main() {
       await thirdSync.close();
       third.dispose();
       await thirdDb.close();
+    }
+
+    // A separate catalog-based session preserves the earlier skipped-only and
+    // multi-exercise controls. Reusable catalog rows stay local; self-contained
+    // workout snapshots use the unchanged owner-scoped workout protocol.
+    final curated = curatedExercises[1]; // per-implement dumbbell bench press
+    final custom = CatalogDefinition(
+      movementId: curated.movementId,
+      variantId: repo.newId(),
+      revision: 1,
+      name: 'Private machine press',
+      equipment: CatalogEquipment.machine,
+      setup: 'Synthetic machine A; seat 3',
+      category: MovementCategory.push,
+      loading: CatalogLoading.machineStack,
+      repetitions: CatalogRepetitions.bilateral,
+      side: null,
+      source: CatalogSource.privateCustom,
+    );
+    await repo.saveCustomExercise(definition: custom, expectedRevision: 0);
+    final catalogRoutine = await repo.saveRoutine(
+      id: repo.newId(),
+      expectedRevision: 0,
+      plan: RoutinePlan(
+        name: 'Connected catalog snapshot',
+        exercises: [
+          curated.prescription(repo.newId, plannedSets: 1),
+          custom.prescription(repo.newId, plannedSets: 1),
+        ],
+      ),
+    );
+    expect(
+      await repo.pendingCount(),
+      0,
+      reason: 'Catalog definitions and routines have no cloud write path.',
+    );
+    final catalogId = await repo.startRoutine(
+      routineId: catalogRoutine.id,
+      templateId: catalogRoutine.templateId,
+      attemptId: repo.newId(),
+      timezone: 'UTC',
+    );
+    final catalogScope = ProviderContainer(
+      overrides: [repositoryProvider.overrideWithValue(repo)],
+    );
+    final catalogDb = TrainingDatabase(NativeDatabase.memory());
+    final catalogOther = await device(catalogDb);
+    final catalogSync = SyncCoordinator(catalogOther, transport);
+    try {
+      await catalogScope.read(workoutsProvider.future);
+      final controller = catalogScope.read(workoutsProvider.notifier);
+      final source = (await repo.workout(catalogId))!;
+      for (var i = 0; i < 2; i++) {
+        final e = source['exercises'][i] as Json;
+        await controller.record(catalogId, e, e['sets'][0] as Json, {
+          'execution_status': 'completed',
+          'load': i == 0 ? '12.5' : '40',
+          'unit': 'kg',
+          'reps': i == 0 ? '7' : '8',
+          'effort': '',
+          'effort_scale': 'rir',
+        });
+      }
+      await controller.finish(catalogId);
+      final snapshot = (await repo.workout(catalogId))!;
+      await repo.saveCustomExercise(
+        definition: custom.displayRevision(
+          name: 'Renamed private machine',
+          archived: true,
+        ),
+        expectedRevision: 1,
+      );
+      final renamed = curated.displayRevision(name: 'Renamed curated display');
+      await repo.saveRoutine(
+        id: catalogRoutine.id,
+        expectedRevision: 1,
+        plan: RoutinePlan(
+          name: 'Future catalog plan',
+          exercises: [renamed.prescription(repo.newId)],
+        ),
+      );
+      expect(await repo.workout(catalogId), snapshot);
+      await sync.synchronize(force: true);
+      expect(sync.status.phase, SyncPhase.synchronized);
+      await catalogSync.synchronize(force: true);
+      expect(catalogSync.status.phase, SyncPhase.synchronized);
+      expect(await catalogOther.routines(), isEmpty);
+      expect(
+        (await catalogOther.exerciseCatalog()).where(
+          (d) => d.source == CatalogSource.privateCustom,
+        ),
+        isEmpty,
+      );
+      final restored = (await catalogOther.workout(catalogId))!;
+      // The existing server Prescription contract materializes an omitted
+      // optional planned load as null. Preserve the sparse frozen local request
+      // and compare every snapshot field against that documented default.
+      final expectedExercises = (copyJson(snapshot)['exercises'] as List)
+          .cast<Json>();
+      for (final exercise in expectedExercises) {
+        for (final set in (exercise['sets'] as List).cast<Json>()) {
+          (set['planned'] as Json).putIfAbsent('load', () => null);
+        }
+      }
+      expect(restored['exercises'], expectedExercises);
+      final history = buildExerciseHistory(await catalogOther.workouts());
+      for (final (i, e)
+          in (restored['exercises'] as List).cast<Json>().indexed) {
+        final points = buildMeasuredProgress(
+          history.byExercise[exerciseKey(e)]!,
+        );
+        expect(points.repetitions.single.workoutId, catalogId);
+        expect(
+          points.loads['kg']!.single.load!.original,
+          i == 0 ? '12.5' : '40',
+        );
+        expect(
+          points.identity.variant,
+          i == 0 ? curated.variantId : custom.variantId,
+        );
+      }
+      final e = source['exercises'][0] as Json;
+      await controller.record(catalogId, e, e['sets'][0] as Json, {
+        'execution_status': 'completed',
+        'load': '12.5',
+        'unit': 'kg',
+        'reps': '9',
+        'effort': '',
+        'effort_scale': 'rir',
+      }, reason: 'Corrected connected catalog set');
+      await sync.synchronize(force: true);
+      expect(sync.status.phase, SyncPhase.synchronized);
+      await catalogSync.synchronize(force: true);
+      expect(catalogSync.status.phase, SyncPhase.synchronized);
+      final current = buildExerciseHistory(await catalogOther.workouts());
+      final measured = buildMeasuredProgress(
+        current.byExercise[exerciseKey(e)]!,
+      );
+      expect(measured.repetitions.single.repetitions, 9);
+      expect(measured.repetitions.single.exerciseName, curated.name);
+      expect(measured.repetitions.single.identity, exerciseKey(e));
+    } finally {
+      catalogScope.dispose();
+      await catalogSync.close();
+      catalogOther.dispose();
+      await catalogDb.close();
     }
   }, skip: !enabled);
 

@@ -6429,6 +6429,351 @@ class RoutineStartsCompanion extends UpdateCompanion<RoutineStart> {
   }
 }
 
+class CustomExerciseDefinitions extends Table
+    with TableInfo<CustomExerciseDefinitions, CustomExerciseDefinition> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  CustomExerciseDefinitions(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL REFERENCES local_identity(owner_id)',
+  );
+  static const VerificationMeta _variantIdMeta = const VerificationMeta(
+    'variantId',
+  );
+  late final GeneratedColumn<String> variantId = GeneratedColumn<String>(
+    'variant_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _definitionRevisionMeta =
+      const VerificationMeta('definitionRevision');
+  late final GeneratedColumn<int> definitionRevision = GeneratedColumn<int>(
+    'definition_revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (definition_revision > 0)',
+  );
+  static const VerificationMeta _definitionMeta = const VerificationMeta(
+    'definition',
+  );
+  late final GeneratedColumn<String> definition = GeneratedColumn<String>(
+    'definition',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    ownerId,
+    variantId,
+    definitionRevision,
+    definition,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'custom_exercise_definitions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CustomExerciseDefinition> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerIdMeta);
+    }
+    if (data.containsKey('variant_id')) {
+      context.handle(
+        _variantIdMeta,
+        variantId.isAcceptableOrUnknown(data['variant_id']!, _variantIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_variantIdMeta);
+    }
+    if (data.containsKey('definition_revision')) {
+      context.handle(
+        _definitionRevisionMeta,
+        definitionRevision.isAcceptableOrUnknown(
+          data['definition_revision']!,
+          _definitionRevisionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_definitionRevisionMeta);
+    }
+    if (data.containsKey('definition')) {
+      context.handle(
+        _definitionMeta,
+        definition.isAcceptableOrUnknown(data['definition']!, _definitionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_definitionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {
+    ownerId,
+    variantId,
+    definitionRevision,
+  };
+  @override
+  CustomExerciseDefinition map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CustomExerciseDefinition(
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
+      )!,
+      variantId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}variant_id'],
+      )!,
+      definitionRevision: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}definition_revision'],
+      )!,
+      definition: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}definition'],
+      )!,
+    );
+  }
+
+  @override
+  CustomExerciseDefinitions createAlias(String alias) {
+    return CustomExerciseDefinitions(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'PRIMARY KEY(owner_id, variant_id, definition_revision)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class CustomExerciseDefinition extends DataClass
+    implements Insertable<CustomExerciseDefinition> {
+  final String ownerId;
+  final String variantId;
+  final int definitionRevision;
+  final String definition;
+  const CustomExerciseDefinition({
+    required this.ownerId,
+    required this.variantId,
+    required this.definitionRevision,
+    required this.definition,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['owner_id'] = Variable<String>(ownerId);
+    map['variant_id'] = Variable<String>(variantId);
+    map['definition_revision'] = Variable<int>(definitionRevision);
+    map['definition'] = Variable<String>(definition);
+    return map;
+  }
+
+  CustomExerciseDefinitionsCompanion toCompanion(bool nullToAbsent) {
+    return CustomExerciseDefinitionsCompanion(
+      ownerId: Value(ownerId),
+      variantId: Value(variantId),
+      definitionRevision: Value(definitionRevision),
+      definition: Value(definition),
+    );
+  }
+
+  factory CustomExerciseDefinition.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CustomExerciseDefinition(
+      ownerId: serializer.fromJson<String>(json['owner_id']),
+      variantId: serializer.fromJson<String>(json['variant_id']),
+      definitionRevision: serializer.fromJson<int>(json['definition_revision']),
+      definition: serializer.fromJson<String>(json['definition']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'owner_id': serializer.toJson<String>(ownerId),
+      'variant_id': serializer.toJson<String>(variantId),
+      'definition_revision': serializer.toJson<int>(definitionRevision),
+      'definition': serializer.toJson<String>(definition),
+    };
+  }
+
+  CustomExerciseDefinition copyWith({
+    String? ownerId,
+    String? variantId,
+    int? definitionRevision,
+    String? definition,
+  }) => CustomExerciseDefinition(
+    ownerId: ownerId ?? this.ownerId,
+    variantId: variantId ?? this.variantId,
+    definitionRevision: definitionRevision ?? this.definitionRevision,
+    definition: definition ?? this.definition,
+  );
+  CustomExerciseDefinition copyWithCompanion(
+    CustomExerciseDefinitionsCompanion data,
+  ) {
+    return CustomExerciseDefinition(
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      variantId: data.variantId.present ? data.variantId.value : this.variantId,
+      definitionRevision: data.definitionRevision.present
+          ? data.definitionRevision.value
+          : this.definitionRevision,
+      definition: data.definition.present
+          ? data.definition.value
+          : this.definition,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomExerciseDefinition(')
+          ..write('ownerId: $ownerId, ')
+          ..write('variantId: $variantId, ')
+          ..write('definitionRevision: $definitionRevision, ')
+          ..write('definition: $definition')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(ownerId, variantId, definitionRevision, definition);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CustomExerciseDefinition &&
+          other.ownerId == this.ownerId &&
+          other.variantId == this.variantId &&
+          other.definitionRevision == this.definitionRevision &&
+          other.definition == this.definition);
+}
+
+class CustomExerciseDefinitionsCompanion
+    extends UpdateCompanion<CustomExerciseDefinition> {
+  final Value<String> ownerId;
+  final Value<String> variantId;
+  final Value<int> definitionRevision;
+  final Value<String> definition;
+  final Value<int> rowid;
+  const CustomExerciseDefinitionsCompanion({
+    this.ownerId = const Value.absent(),
+    this.variantId = const Value.absent(),
+    this.definitionRevision = const Value.absent(),
+    this.definition = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CustomExerciseDefinitionsCompanion.insert({
+    required String ownerId,
+    required String variantId,
+    required int definitionRevision,
+    required String definition,
+    this.rowid = const Value.absent(),
+  }) : ownerId = Value(ownerId),
+       variantId = Value(variantId),
+       definitionRevision = Value(definitionRevision),
+       definition = Value(definition);
+  static Insertable<CustomExerciseDefinition> custom({
+    Expression<String>? ownerId,
+    Expression<String>? variantId,
+    Expression<int>? definitionRevision,
+    Expression<String>? definition,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (ownerId != null) 'owner_id': ownerId,
+      if (variantId != null) 'variant_id': variantId,
+      if (definitionRevision != null) 'definition_revision': definitionRevision,
+      if (definition != null) 'definition': definition,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CustomExerciseDefinitionsCompanion copyWith({
+    Value<String>? ownerId,
+    Value<String>? variantId,
+    Value<int>? definitionRevision,
+    Value<String>? definition,
+    Value<int>? rowid,
+  }) {
+    return CustomExerciseDefinitionsCompanion(
+      ownerId: ownerId ?? this.ownerId,
+      variantId: variantId ?? this.variantId,
+      definitionRevision: definitionRevision ?? this.definitionRevision,
+      definition: definition ?? this.definition,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
+    if (variantId.present) {
+      map['variant_id'] = Variable<String>(variantId.value);
+    }
+    if (definitionRevision.present) {
+      map['definition_revision'] = Variable<int>(definitionRevision.value);
+    }
+    if (definition.present) {
+      map['definition'] = Variable<String>(definition.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomExerciseDefinitionsCompanion(')
+          ..write('ownerId: $ownerId, ')
+          ..write('variantId: $variantId, ')
+          ..write('definitionRevision: $definitionRevision, ')
+          ..write('definition: $definition, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$TrainingDatabase extends GeneratedDatabase {
   _$TrainingDatabase(QueryExecutor e) : super(e);
   $TrainingDatabaseManager get managers => $TrainingDatabaseManager(this);
@@ -6462,6 +6807,8 @@ abstract class _$TrainingDatabase extends GeneratedDatabase {
   late final WorkoutTemplates workoutTemplates = WorkoutTemplates(this);
   late final Routines routines = Routines(this);
   late final RoutineStarts routineStarts = RoutineStarts(this);
+  late final CustomExerciseDefinitions customExerciseDefinitions =
+      CustomExerciseDefinitions(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6488,6 +6835,7 @@ abstract class _$TrainingDatabase extends GeneratedDatabase {
     workoutTemplates,
     routines,
     routineStarts,
+    customExerciseDefinitions,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -6580,6 +6928,35 @@ final class $LocalIdentityReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    CustomExerciseDefinitions,
+    List<CustomExerciseDefinition>
+  >
+  _customExerciseDefinitionsRefsTable(_$TrainingDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.customExerciseDefinitions,
+        aliasName:
+            'local_identity__owner_id__custom_exercise_definitions__owner_id',
+      );
+
+  $CustomExerciseDefinitionsProcessedTableManager
+  get customExerciseDefinitionsRefs {
+    final manager =
+        $CustomExerciseDefinitionsTableManager(
+          $_db,
+          $_db.customExerciseDefinitions,
+        ).filter(
+          (f) => f.ownerId.ownerId.sqlEquals($_itemColumn<String>('owner_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _customExerciseDefinitionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $LocalIdentityFilterComposer
@@ -6632,6 +7009,31 @@ class $LocalIdentityFilterComposer
           }) => $RoutinesFilterComposer(
             $db: $db,
             $table: $db.routines,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> customExerciseDefinitionsRefs(
+    Expression<bool> Function($CustomExerciseDefinitionsFilterComposer f) f,
+  ) {
+    final $CustomExerciseDefinitionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ownerId,
+      referencedTable: $db.customExerciseDefinitions,
+      getReferencedColumn: (t) => t.ownerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $CustomExerciseDefinitionsFilterComposer(
+            $db: $db,
+            $table: $db.customExerciseDefinitions,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -6727,6 +7129,32 @@ class $LocalIdentityAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> customExerciseDefinitionsRefs<T extends Object>(
+    Expression<T> Function($CustomExerciseDefinitionsAnnotationComposer a) f,
+  ) {
+    final $CustomExerciseDefinitionsAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.ownerId,
+          referencedTable: $db.customExerciseDefinitions,
+          getReferencedColumn: (t) => t.ownerId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $CustomExerciseDefinitionsAnnotationComposer(
+                $db: $db,
+                $table: $db.customExerciseDefinitions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $LocalIdentityTableManager
@@ -6742,7 +7170,10 @@ class $LocalIdentityTableManager
           $LocalIdentityUpdateCompanionBuilder,
           (LocalIdentityData, $LocalIdentityReferences),
           LocalIdentityData,
-          PrefetchHooks Function({bool routinesRefs})
+          PrefetchHooks Function({
+            bool routinesRefs,
+            bool customExerciseDefinitionsRefs,
+          })
         > {
   $LocalIdentityTableManager(_$TrainingDatabase db, LocalIdentity table)
     : super(
@@ -6791,34 +7222,64 @@ class $LocalIdentityTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({routinesRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (routinesRefs) db.routines],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (routinesRefs)
-                    await $_getPrefetchedData<
-                      LocalIdentityData,
-                      LocalIdentity,
-                      Routine
-                    >(
-                      currentTable: table,
-                      referencedTable: $LocalIdentityReferences
-                          ._routinesRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $LocalIdentityReferences(db, table, p0).routinesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.ownerId == item.ownerId,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({routinesRefs = false, customExerciseDefinitionsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (routinesRefs) db.routines,
+                    if (customExerciseDefinitionsRefs)
+                      db.customExerciseDefinitions,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (routinesRefs)
+                        await $_getPrefetchedData<
+                          LocalIdentityData,
+                          LocalIdentity,
+                          Routine
+                        >(
+                          currentTable: table,
+                          referencedTable: $LocalIdentityReferences
+                              ._routinesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $LocalIdentityReferences(
+                                db,
+                                table,
+                                p0,
+                              ).routinesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.ownerId == item.ownerId,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (customExerciseDefinitionsRefs)
+                        await $_getPrefetchedData<
+                          LocalIdentityData,
+                          LocalIdentity,
+                          CustomExerciseDefinition
+                        >(
+                          currentTable: table,
+                          referencedTable: $LocalIdentityReferences
+                              ._customExerciseDefinitionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $LocalIdentityReferences(
+                                db,
+                                table,
+                                p0,
+                              ).customExerciseDefinitionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.ownerId == item.ownerId,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -6835,7 +7296,10 @@ typedef $LocalIdentityProcessedTableManager =
       $LocalIdentityUpdateCompanionBuilder,
       (LocalIdentityData, $LocalIdentityReferences),
       LocalIdentityData,
-      PrefetchHooks Function({bool routinesRefs})
+      PrefetchHooks Function({
+        bool routinesRefs,
+        bool customExerciseDefinitionsRefs,
+      })
     >;
 typedef $SessionsCreateCompanionBuilder = SessionsCompanion Function({
   required String id,
@@ -11362,6 +11826,328 @@ typedef $RoutineStartsProcessedTableManager =
       RoutineStart,
       PrefetchHooks Function()
     >;
+typedef $CustomExerciseDefinitionsCreateCompanionBuilder =
+    CustomExerciseDefinitionsCompanion Function({
+      required String ownerId,
+      required String variantId,
+      required int definitionRevision,
+      required String definition,
+      Value<int> rowid,
+    });
+typedef $CustomExerciseDefinitionsUpdateCompanionBuilder =
+    CustomExerciseDefinitionsCompanion Function({
+      Value<String> ownerId,
+      Value<String> variantId,
+      Value<int> definitionRevision,
+      Value<String> definition,
+      Value<int> rowid,
+    });
+
+final class $CustomExerciseDefinitionsReferences
+    extends
+        BaseReferences<
+          _$TrainingDatabase,
+          CustomExerciseDefinitions,
+          CustomExerciseDefinition
+        > {
+  $CustomExerciseDefinitionsReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static LocalIdentity _ownerIdTable(_$TrainingDatabase db) =>
+      db.localIdentity.createAlias(
+        'custom_exercise_definitions__owner_id__local_identity__owner_id',
+      );
+
+  $LocalIdentityProcessedTableManager get ownerId {
+    final $_column = $_itemColumn<String>('owner_id')!;
+
+    final manager = $LocalIdentityTableManager(
+      $_db,
+      $_db.localIdentity,
+    ).filter((f) => f.ownerId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_ownerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $CustomExerciseDefinitionsFilterComposer
+    extends Composer<_$TrainingDatabase, CustomExerciseDefinitions> {
+  $CustomExerciseDefinitionsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get variantId => $composableBuilder(
+    column: $table.variantId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get definitionRevision => $composableBuilder(
+    column: $table.definitionRevision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get definition => $composableBuilder(
+    column: $table.definition,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $LocalIdentityFilterComposer get ownerId {
+    final $LocalIdentityFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ownerId,
+      referencedTable: $db.localIdentity,
+      getReferencedColumn: (t) => t.ownerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LocalIdentityFilterComposer(
+            $db: $db,
+            $table: $db.localIdentity,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $CustomExerciseDefinitionsOrderingComposer
+    extends Composer<_$TrainingDatabase, CustomExerciseDefinitions> {
+  $CustomExerciseDefinitionsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get variantId => $composableBuilder(
+    column: $table.variantId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get definitionRevision => $composableBuilder(
+    column: $table.definitionRevision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get definition => $composableBuilder(
+    column: $table.definition,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $LocalIdentityOrderingComposer get ownerId {
+    final $LocalIdentityOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ownerId,
+      referencedTable: $db.localIdentity,
+      getReferencedColumn: (t) => t.ownerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LocalIdentityOrderingComposer(
+            $db: $db,
+            $table: $db.localIdentity,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $CustomExerciseDefinitionsAnnotationComposer
+    extends Composer<_$TrainingDatabase, CustomExerciseDefinitions> {
+  $CustomExerciseDefinitionsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get variantId =>
+      $composableBuilder(column: $table.variantId, builder: (column) => column);
+
+  GeneratedColumn<int> get definitionRevision => $composableBuilder(
+    column: $table.definitionRevision,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get definition => $composableBuilder(
+    column: $table.definition,
+    builder: (column) => column,
+  );
+
+  $LocalIdentityAnnotationComposer get ownerId {
+    final $LocalIdentityAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ownerId,
+      referencedTable: $db.localIdentity,
+      getReferencedColumn: (t) => t.ownerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LocalIdentityAnnotationComposer(
+            $db: $db,
+            $table: $db.localIdentity,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $CustomExerciseDefinitionsTableManager
+    extends
+        RootTableManager<
+          _$TrainingDatabase,
+          CustomExerciseDefinitions,
+          CustomExerciseDefinition,
+          $CustomExerciseDefinitionsFilterComposer,
+          $CustomExerciseDefinitionsOrderingComposer,
+          $CustomExerciseDefinitionsAnnotationComposer,
+          $CustomExerciseDefinitionsCreateCompanionBuilder,
+          $CustomExerciseDefinitionsUpdateCompanionBuilder,
+          (CustomExerciseDefinition, $CustomExerciseDefinitionsReferences),
+          CustomExerciseDefinition,
+          PrefetchHooks Function({bool ownerId})
+        > {
+  $CustomExerciseDefinitionsTableManager(
+    _$TrainingDatabase db,
+    CustomExerciseDefinitions table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $CustomExerciseDefinitionsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $CustomExerciseDefinitionsOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $CustomExerciseDefinitionsAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> ownerId = const Value.absent(),
+                Value<String> variantId = const Value.absent(),
+                Value<int> definitionRevision = const Value.absent(),
+                Value<String> definition = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CustomExerciseDefinitionsCompanion(
+                ownerId: ownerId,
+                variantId: variantId,
+                definitionRevision: definitionRevision,
+                definition: definition,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String ownerId,
+                required String variantId,
+                required int definitionRevision,
+                required String definition,
+                Value<int> rowid = const Value.absent(),
+              }) => CustomExerciseDefinitionsCompanion.insert(
+                ownerId: ownerId,
+                variantId: variantId,
+                definitionRevision: definitionRevision,
+                definition: definition,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    CustomExerciseDefinitions,
+                    CustomExerciseDefinition
+                  >(table),
+                  $CustomExerciseDefinitionsReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({ownerId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (ownerId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.ownerId,
+                        referencedTable: $CustomExerciseDefinitionsReferences
+                            ._ownerIdTable(db),
+                        referencedColumn: $CustomExerciseDefinitionsReferences
+                            ._ownerIdTable(db)
+                            .ownerId,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $CustomExerciseDefinitionsProcessedTableManager =
+    ProcessedTableManager<
+      _$TrainingDatabase,
+      CustomExerciseDefinitions,
+      CustomExerciseDefinition,
+      $CustomExerciseDefinitionsFilterComposer,
+      $CustomExerciseDefinitionsOrderingComposer,
+      $CustomExerciseDefinitionsAnnotationComposer,
+      $CustomExerciseDefinitionsCreateCompanionBuilder,
+      $CustomExerciseDefinitionsUpdateCompanionBuilder,
+      (CustomExerciseDefinition, $CustomExerciseDefinitionsReferences),
+      CustomExerciseDefinition,
+      PrefetchHooks Function({bool ownerId})
+    >;
 
 class $TrainingDatabaseManager {
   final _$TrainingDatabase _db;
@@ -11399,4 +12185,9 @@ class $TrainingDatabaseManager {
       $RoutinesTableManager(_db, _db.routines);
   $RoutineStartsTableManager get routineStarts =>
       $RoutineStartsTableManager(_db, _db.routineStarts);
+  $CustomExerciseDefinitionsTableManager get customExerciseDefinitions =>
+      $CustomExerciseDefinitionsTableManager(
+        _db,
+        _db.customExerciseDefinitions,
+      );
 }

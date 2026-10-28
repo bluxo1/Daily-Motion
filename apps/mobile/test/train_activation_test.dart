@@ -18,6 +18,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'support/auth_fakes.dart';
 import 'support/owned_fixture.dart';
+import 'support/catalog_ui.dart';
 import 'support/sync_server.dart';
 import 'multi_exercise_test.dart' show multiPlan;
 
@@ -275,18 +276,10 @@ void main() {
           'My first workout',
         );
         for (var i = 1; i <= 3; i++) {
-          await h.tap('Add exercise');
-          final heading = find.text('Exercise $i');
-          await h.reveal(heading);
-          final card = find
-              .ancestor(of: heading, matching: find.byType(Card))
-              .first;
-          final name = find.descendant(
-            of: card,
-            matching: find.widgetWithText(TextField, 'Exercise name'),
+          await addPrivateExerciseFromPicker(
+            tester,
+            ['Row', 'Press', 'Squat'][i - 1],
           );
-          await h.reveal(name);
-          await tester.enterText(name, ['Row', 'Press', 'Squat'][i - 1]);
         }
         await h.tap('Save routine');
         expect(find.text('Choose a routine'), findsOneWidget);
@@ -712,10 +705,7 @@ void main() {
             find.byKey(const ValueKey('routine-name')),
             'Accessible plan',
           );
-          await h.tap('Add exercise');
-          final name = find.widgetWithText(TextField, 'Exercise name');
-          await h.reveal(name);
-          await tester.enterText(name, 'Offline row');
+          await addPrivateExerciseFromPicker(tester, 'Offline row');
           await h.tap('Save routine');
           await h.reveal(find.text('1 exercises · 3 planned sets'));
           expect(find.text('1 exercises · 3 planned sets'), findsOneWidget);

@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/routine.dart';
+import '../domain/exercise_catalog.dart';
 import '../domain/workout.dart';
 import '../data/workout_repository.dart';
 import 'workout_controller.dart';
 import 'workout_screen.dart';
+import 'exercise_catalog_screen.dart';
+import 'sync_provider.dart';
+import '../sync/coordinator.dart';
 
 final routinesProvider = FutureProvider.autoDispose<List<SavedRoutine>>(
   (ref) => ref.watch(repositoryProvider).routines(),
@@ -298,18 +302,47 @@ class RoutineEditorScreen extends ConsumerStatefulWidget {
 }
 
 class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
+  late final repository = ref.read(repositoryProvider);
   late final name = TextEditingController(
     text: widget.initial?.plan.name ?? '',
   );
-  late final id = widget.initial?.id ?? ref.read(repositoryProvider).newId();
+  late final id = widget.initial?.id ?? repository.newId();
   late final exercises = [
     for (final e in widget.initial?.plan.exercises ?? <Json>[])
       _ExerciseFields(e),
   ];
   bool dirty = false;
   bool saving = false;
+  bool picking = false;
   bool leaving = false;
   String? error;
+
+  Future<void> addExercise() async {
+    if (saving || picking || leaving || exercises.length >= 50) return;
+    setState(() => picking = true);
+    try {
+      final selected = await Navigator.of(context).push<CatalogDefinition>(
+        MaterialPageRoute(builder: (_) => const ExerciseCatalogScreen()),
+      );
+      if (!mounted ||
+          !identical(ref.read(repositoryProvider), repository) ||
+          selected == null) {
+        return;
+      }
+      setState(() {
+        exercises.add(
+          _ExerciseFields(
+            selected.prescription(repository.newId),
+            catalogSelection: true,
+          ),
+        );
+        dirty = true;
+        error = null;
+      });
+    } finally {
+      if (mounted) setState(() => picking = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -401,14 +434,19 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
   }
 
   Future<void> save() async {
-    if (saving || leaving) return;
+    if (saving ||
+        leaving ||
+        picking ||
+        !identical(ref.read(repositoryProvider), repository)) {
+      return;
+    }
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       saving = true;
       error = null;
     });
     try {
-      final repo = ref.read(repositoryProvider);
+      final repo = repository;
       final plan = RoutinePlan(
         name: name.text,
         exercises: [for (final e in exercises) e.json(repo.newId)],
@@ -418,7 +456,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
         expectedRevision: widget.initial?.localRevision ?? 0,
         plan: plan,
       );
-      if (mounted) {
+      if (mounted && identical(ref.read(repositoryProvider), repo)) {
         setState(() {
           dirty = false;
           leaving = true;
@@ -446,6 +484,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     String label, {
     Key? key,
     bool text = false,
+    bool readOnly = false,
     String? hint,
   }) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
@@ -453,6 +492,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
       key: key,
       controller: controller,
       enabled: !saving,
+      readOnly: readOnly,
       keyboardType: text
           ? TextInputType.text
           : const TextInputType.numberWithOptions(decimal: true),
@@ -503,72 +543,115 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
   );
 
   @override
-  Widget build(BuildContext context) => PopScope(
-    canPop: leaving || (!dirty && !saving),
-    onPopInvokedWithResult: (didPop, _) {
-      if (!didPop) leave();
-    },
-    child: Scaffold(
-      appBar: AppBar(
-        title: Text(widget.initial == null ? 'Create routine' : 'Edit routine'),
-        leading: BackButton(onPressed: leave),
-      ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            const Text(
-              'Plan future work. Nothing here records performed sets.',
-            ),
-            const SizedBox(height: 16),
-            field(
-              name,
-              'Routine name',
-              key: const ValueKey('routine-name'),
-              text: true,
-            ),
-            for (var i = 0; i < exercises.length; i++)
-              exerciseCard(exercises[i], i),
-            OutlinedButton.icon(
-              onPressed: saving || exercises.length >= 50
-                  ? null
-                  : () => setState(() {
-                      exercises.add(
-                        _ExerciseFields.blank(
-                          ref.read(repositoryProvider).newId,
-                        ),
-                      );
-                      dirty = true;
-                    }),
-              icon: const Icon(Icons.add),
-              label: const Text('Add exercise'),
-            ),
-            if (error != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Semantics(
+  Widget build(BuildContext context) {
+    if (!identical(ref.watch(repositoryProvider), repository) ||
+        ref.watch(syncStatusProvider).value?.phase ==
+            SyncPhase.accountDisabled) {
+      return const Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: Text('This account is unavailable. Return to sign in.'),
+          ),
+        ),
+      );
+    }
+    final catalog = ref.watch(exerciseCatalogProvider);
+    final knownVariants = {
+      for (final d in catalog.value ?? <CatalogDefinition>[]) d.variantId,
+    };
+    return PopScope(
+      canPop: leaving || (!dirty && !saving),
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) leave();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            widget.initial == null ? 'Create routine' : 'Edit routine',
+          ),
+          leading: BackButton(onPressed: leave),
+        ),
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              const Text(
+                'Plan future work. Nothing here records performed sets.',
+              ),
+              const SizedBox(height: 16),
+              field(
+                name,
+                'Routine name',
+                key: const ValueKey('routine-name'),
+                text: true,
+              ),
+              if (catalog.hasError) ...[
+                Semantics(
                   liveRegion: true,
-                  child: Text(
-                    error!,
-                    key: const ValueKey('routine-error'),
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
+                  child: const Text(
+                    'Exercise definitions could not be verified. Existing definition fields are temporarily read-only.',
+                    key: ValueKey('routine-catalog-error'),
+                  ),
+                ),
+                OutlinedButton(
+                  key: const ValueKey('routine-catalog-retry'),
+                  onPressed: saving || picking || leaving
+                      ? null
+                      : () => ref.invalidate(exerciseCatalogProvider),
+                  child: const Text('Retry exercise catalog'),
+                ),
+              ],
+              for (var i = 0; i < exercises.length; i++)
+                exerciseCard(
+                  exercises[i],
+                  i,
+                  readOnlyDefinition:
+                      exercises[i].catalogSelection ||
+                      !catalog.hasValue ||
+                      catalog.isLoading ||
+                      catalog.hasError ||
+                      knownVariants.contains(
+                        exercises[i].original['variant_id'],
+                      ),
+                ),
+              OutlinedButton.icon(
+                onPressed: saving || picking || exercises.length >= 50
+                    ? null
+                    : addExercise,
+                icon: const Icon(Icons.add),
+                label: const Text('Add exercise'),
+              ),
+              if (error != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Semantics(
+                    liveRegion: true,
+                    child: Text(
+                      error!,
+                      key: const ValueKey('routine-error'),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                     ),
                   ),
                 ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: saving ? null : save,
+                child: Text(saving ? 'Saving…' : 'Save routine'),
               ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: saving ? null : save,
-              child: Text(saving ? 'Saving…' : 'Save routine'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 
-  Widget exerciseCard(_ExerciseFields e, int index) => Card(
+  Widget exerciseCard(
+    _ExerciseFields e,
+    int index, {
+    required bool readOnlyDefinition,
+  }) => Card(
     key: ValueKey(e.id),
     child: Padding(
       padding: const EdgeInsets.all(16),
@@ -608,42 +691,52 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
             'Exercise name',
             key: ValueKey('exercise-name-${e.id}'),
             text: true,
+            readOnly: readOnlyDefinition,
           ),
-          const Text(
-            'Changing the name or conventions starts a separate exercise history.',
-          ),
-          const SizedBox(height: 12),
-          choice(
-            e.basis,
-            'Load convention',
-            [
-              'total_external',
-              'per_implement',
-              'machine_stack',
-              'added_bodyweight',
-              'assistance',
-              'bodyweight_only',
-            ],
-            (v) {
-              e.basis = v;
-              if (v == 'bodyweight_only') {
-                for (final s in e.sets) {
-                  s.load.clear();
+          if (readOnlyDefinition) ...[
+            const Text(
+              'Saved definition snapshot. Catalog renames do not rewrite this plan. Use the picker for another variant.',
+            ),
+            Text(
+              '${e.basis.replaceAll('_', ' ')} · ${e.reps.replaceAll('_', ' ')} · side: ${e.side}',
+            ),
+          ] else ...[
+            const Text(
+              'Changing the name or conventions starts a separate exercise history.',
+            ),
+            const SizedBox(height: 12),
+            choice(
+              e.basis,
+              'Load convention',
+              [
+                'total_external',
+                'per_implement',
+                'machine_stack',
+                'added_bodyweight',
+                'assistance',
+                'bodyweight_only',
+              ],
+              (v) {
+                e.basis = v;
+                if (v == 'bodyweight_only') {
+                  for (final s in e.sets) {
+                    s.load.clear();
+                  }
                 }
-              }
-            },
-          ),
-          choice(e.reps, 'Rep convention', [
-            'bilateral',
-            'per_side',
-            'alternating_total',
-          ], (v) => e.reps = v),
-          choice(e.side, 'Side', [
-            'left',
-            'right',
-            'both',
-            'unspecified',
-          ], (v) => e.side = v),
+              },
+            ),
+            choice(e.reps, 'Rep convention', [
+              'bilateral',
+              'per_side',
+              'alternating_total',
+            ], (v) => e.reps = v),
+            choice(e.side, 'Side', [
+              'left',
+              'right',
+              'both',
+              'unspecified',
+            ], (v) => e.side = v),
+          ],
           for (var j = 0; j < e.sets.length; j++) setFields(e, e.sets[j], j),
           OutlinedButton(
             onPressed: saving || e.sets.length >= 100
@@ -717,35 +810,27 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
 class _ExerciseFields {
   final String id;
   final Json original;
+  final bool catalogSelection;
   final TextEditingController name;
   String basis;
   String reps;
   String side;
   String? changedVariant;
   final List<_SetFields> sets;
-  _ExerciseFields(Json e)
+  _ExerciseFields(Json e, {this.catalogSelection = false})
     : original = copyJson(e),
       id = e['session_exercise_id'] as String,
       name = TextEditingController(text: e['name'] as String),
       basis = e['loading_basis'] as String,
       reps = e['rep_convention'] as String,
-      side = e['side'] as String? ?? 'both',
+      side = e['side'] as String? ?? 'unspecified',
       sets = [for (final s in (e['sets'] as List).cast<Json>()) _SetFields(s)];
-  factory _ExerciseFields.blank(String Function() newId) => _ExerciseFields({
-    'session_exercise_id': newId(),
-    'variant_id': newId(),
-    'name': '',
-    'loading_basis': 'total_external',
-    'rep_convention': 'bilateral',
-    'side': 'both',
-    'sets': [for (var i = 0; i < 3; i++) _SetFields.blankJson(newId())],
-  });
   Json json(String Function() newId) {
     final definitionChanged =
         name.text.trim() != original['name'] ||
         basis != original['loading_basis'] ||
         reps != original['rep_convention'] ||
-        side != (original['side'] ?? 'both');
+        side != (original['side'] ?? 'unspecified');
     return {
       'session_exercise_id': id,
       'variant_id': definitionChanged
@@ -754,7 +839,7 @@ class _ExerciseFields {
       'name': name.text.trim(),
       'loading_basis': basis,
       'rep_convention': reps,
-      'side': side,
+      if (original.containsKey('side') || side != 'unspecified') 'side': side,
       'sets': [for (final s in sets) s.json(basis)],
     };
   }
