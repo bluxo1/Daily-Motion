@@ -29,6 +29,15 @@ from daily_motion.contracts import (
     SnapshotPage,
 )
 from daily_motion.db import database_readiness
+from daily_motion.routine_contracts import (
+    BootstrapManifest3,
+    MeResponse3,
+    PublishRoutineTemplate,
+    PullResponse3,
+    PushRequest3,
+    PushResponse3,
+    SnapshotPage3,
+)
 from daily_motion.sync import accept, bootstrap, me, pull, snapshot_page, validate_snapshot
 
 
@@ -92,7 +101,14 @@ def sync_openapi() -> dict[str, Any]:
         schema = get_openapi(title=app.title, version=app.version, routes=app.routes)
         components = schema["components"]["schemas"]
         # Describe command-specific payloads while keeping raw receipt/echo bytes.
-        for model in (CreateSession, RecordSet, EmptyPayload, OperationV2, PushRequestV2):
+        for model in (
+            CreateSession,
+            RecordSet,
+            EmptyPayload,
+            OperationV2,
+            PushRequestV2,
+            PublishRoutineTemplate,
+        ):
             definition = model.model_json_schema(ref_template="#/components/schemas/{model}")
             components.update(definition.pop("$defs", {}))
             components[model.__name__] = definition
@@ -105,7 +121,11 @@ app.openapi = sync_openapi  # type: ignore[method-assign]
 
 @app.middleware("http")
 async def private_responses(request: Request, call_next: Any) -> Response:
-    if request.url.path.startswith("/v1/") and request.headers.get("X-DM-Contract", "1") != "1":
+    expected = "3" if request.url.path.startswith("/v3/") else "1"
+    if (
+        request.url.path.startswith(("/v1/", "/v3/"))
+        and request.headers.get("X-DM-Contract", expected) != expected
+    ):
         return Response(
             '{"detail":{"code":"upgrade_required"}}',
             status_code=426,
@@ -180,3 +200,43 @@ def get_page(owner: Owner, token: str, page: Annotated[int, Path(ge=0)]) -> dict
 @app.get("/v1/sync/bootstrap/validate", response_model=MeResponse)
 def validate(owner: Owner, token: str) -> dict[str, Any]:
     return validate_snapshot(owner, token)
+
+
+@app.get("/v3/me", response_model=MeResponse3)
+def get_me3(owner: Owner) -> dict[str, Any]:
+    return me(owner, 3)
+
+
+@app.post("/v3/sync/push", response_model=PushResponse3)
+def push3(request: PushRequest3, owner: Owner) -> dict[str, Any]:
+    results = [accept(owner, op, 3) for op in request.operations]
+    context = me(owner, 3)
+    return {
+        key: context[key] for key in ["schema_version", "owner_id", "generation", "erasure_epoch"]
+    } | {"results": results}
+
+
+@app.get("/v3/sync/pull", response_model=PullResponse3)
+def get_pull3(
+    owner: Owner, cursor: str | None = None, limit: Annotated[int, Query(ge=1, le=100)] = 100
+) -> dict[str, Any]:
+    return pull(owner, cursor, limit, 3)
+
+
+@app.post("/v3/sync/bootstrap", response_model=BootstrapManifest3)
+def post_bootstrap3(request: BootstrapRequest, owner: Owner) -> dict[str, Any]:
+    return bootstrap(owner, request.installation_id, 3)
+
+
+@app.get(
+    "/v3/sync/bootstrap/pages/{page}",
+    response_model=SnapshotPage3,
+    response_model_exclude_unset=True,
+)
+def get_page3(owner: Owner, token: str, page: Annotated[int, Path(ge=0)]) -> dict[str, Any]:
+    return snapshot_page(owner, token, page, 3)
+
+
+@app.get("/v3/sync/bootstrap/validate", response_model=MeResponse3)
+def validate3(owner: Owner, token: str) -> dict[str, Any]:
+    return validate_snapshot(owner, token, 3)

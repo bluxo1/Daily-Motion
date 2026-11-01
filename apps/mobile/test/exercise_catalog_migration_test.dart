@@ -24,7 +24,7 @@ class InterruptedVersionDatabase extends TrainingDatabase {
   InterruptedVersionDatabase(File file) : super(NativeDatabase(file));
   @override
   Future<void> customStatement(String statement, [List<Object?>? args]) async {
-    if (statement == 'PRAGMA user_version=6') {
+    if (statement == 'PRAGMA user_version=7') {
       final created = await customSelect(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='custom_exercise_definitions'",
       ).get();
@@ -161,7 +161,7 @@ void main() {
             .data
             .values
             .single,
-        6,
+        7,
       );
       final state = (await repo.workouts()).single;
       expect(state['status'], 'active');
@@ -189,7 +189,11 @@ void main() {
       repo.dispose();
       await db.close();
     }
-    final after = frozenRows(file)..remove('custom_exercise_definitions');
+    final after = frozenRows(file)
+      ..remove('custom_exercise_definitions')
+      ..remove('routine_sync_state')
+      ..remove('routine_cloud_templates')
+      ..remove('routine_mutations');
     expect(after, before);
     final reopened = TrainingDatabase.open(file);
     final restored = WorkoutRepository(reopened, owner);
@@ -252,7 +256,14 @@ void main() {
     try {
       await recovery.initialize();
       expect(await recovery.pendingCount(), 1);
-      expect(frozenRows(file)..remove('custom_exercise_definitions'), before);
+      expect(
+        frozenRows(file)
+          ..remove('custom_exercise_definitions')
+          ..remove('routine_sync_state')
+          ..remove('routine_cloud_templates')
+          ..remove('routine_mutations'),
+        before,
+      );
     } finally {
       recovery.dispose();
       await retry.close();

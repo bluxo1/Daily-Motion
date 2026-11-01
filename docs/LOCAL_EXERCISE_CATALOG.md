@@ -51,6 +51,11 @@ all definition fields read-only until the owner-scoped catalog can be verified.
 The visible **Retry exercise catalog** action requests a fresh guarded read;
 it never guesses legacy identity from a name. There is no automatic migration of names.
 
+For [cloud-restored routine prescriptions](ROUTINE_CLOUD_SYNC.md), unknown private
+definitions remain snapshot-only and read-only even when the local catalog read
+succeeds. Planned targets can still be edited safely. Cloud routine delivery does
+not claim that the missing catalog definition was downloaded.
+
 ## First-party catalog provenance
 
 All bundled labels and category assignments were authored for Daily Motion on
@@ -95,10 +100,11 @@ an explicit owner predicate. Another owner cannot read or edit it; sign-out lock
 and retains it. Owner replacement/disable hides private picker/form content.
 Cached verified-owner use needs no network or fresh cloud token.
 
-Reusable definitions and routines are local-only: no catalog/routine sync or
-backup is implemented. A started workout intentionally copies its supported
-definition fields into the existing owner-private workout snapshot, which follows
-normal workout synchronization. This is not a new cloud catalog write path.
+Private catalog definitions remain local-only. The internally gated
+[routine synchronization increment](ROUTINE_CLOUD_SYNC.md) transfers routine
+prescription snapshots and stable variant UUIDs; it does not download custom
+catalog definitions. A started workout copies supported definition fields into
+its owner-private snapshot and follows normal workout synchronization.
 
 ## Schema 6 and rollback boundary
 

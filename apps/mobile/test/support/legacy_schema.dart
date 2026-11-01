@@ -15,6 +15,9 @@ Future<void> reconstructSchemaThree(TrainingDatabase db) async {
 
 /// Remove only additive local planning structures from newly owned fixtures.
 Future<void> reconstructSchemaFour(TrainingDatabase db) async {
+  await db.customStatement('DROP TABLE routine_cloud_templates');
+  await db.customStatement('DROP TABLE routine_mutations');
+  await db.customStatement('DROP TABLE routine_sync_state');
   await db.customStatement('DROP TABLE custom_exercise_definitions');
   await db.customStatement('DROP TABLE routine_starts');
   await db.customStatement('DROP TABLE routines');

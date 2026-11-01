@@ -6,6 +6,7 @@ These cases do not certify a provider or a complete B0-B6 implementation.
 """
 
 import hashlib
+import inspect
 import os
 import threading
 import time
@@ -40,8 +41,15 @@ from daily_motion.recovery_db import (
     close_admission,
     require_read_committed,
 )
+from tests.fixtures.baseline_workout_create import _create as create_legacy_workout
 from tests.recovery_authority import ConformanceAuthority
 from tests.recovery_lab import NativeRecoveryLab, RecoveryLab, fingerprint, migrate
+
+
+def test_legacy_schema3_seed_writer_is_byte_frozen() -> None:
+    assert hashlib.sha256(inspect.getsource(create_legacy_workout).encode()).hexdigest() == (
+        "a7a342c7c8128b98c65ec274e1e2ae333e17ee98bb0a3171b2b660a5cb7e5512"
+    )
 
 
 @pytest.fixture(scope="module")
@@ -272,7 +280,7 @@ def test_new_private_metadata_has_forced_owner_rls_and_legacy_receipts_are_uncha
         ).one()
         assert receipt.acknowledgement == result
         assert "origin_incarnation" not in receipt.acknowledgement
-        assert connection.scalar(text("SELECT version_num FROM public.alembic_version")) == "0004"
+        assert connection.scalar(text("SELECT version_num FROM public.alembic_version")) == "0005"
         assert (
             connection.scalar(
                 text("""SELECT bool_and(relrowsecurity AND relforcerowsecurity)
@@ -329,10 +337,37 @@ def test_additive_migration_and_old_binary_denial(
                 config.attributes["connection"] = connection
                 alembic_command.upgrade(config, "head")
             after = fingerprint(admin)
-            assert after["revision"] == "0004"
-            assert all(after["rows"][name] == rows for name, rows in before["rows"].items())
+            assert after["revision"] == "0005"
+            # Compare every pre-existing column byte-for-byte. The new columns
+            # are separately asserted to contain only their compatibility default.
+            preserved = fingerprint(
+                admin,
+                {
+                    "owner_state": ["minimum_sync_contract"],
+                    "snapshots": ["sync_contract"],
+                },
+            )
+            assert all(preserved["rows"][name] == rows for name, rows in before["rows"].items())
             assert after["rows"]["recovery_owners"]["count"] == 0
             assert after["rows"]["recovery_attempts"]["count"] == 0
+            assert after["rows"]["routines"]["count"] == 0
+            assert after["rows"]["routine_templates"]["count"] == 0
+            with admin.connect() as connection:
+                assert (
+                    connection.scalar(
+                        text(
+                            "SELECT count(*) FROM training.owner_state "
+                            "WHERE minimum_sync_contract<>1"
+                        )
+                    )
+                    == 0
+                )
+                assert (
+                    connection.scalar(
+                        text("SELECT count(*) FROM training.snapshots WHERE sync_contract<>1")
+                    )
+                    == 0
+                )
             with admin.begin() as connection:
                 assert connection.scalar(text("SELECT count(*) FROM recovery.control")) == 0
                 # Match the existing owned lab's restricted role, never its
@@ -378,7 +413,7 @@ def test_additive_migration_and_old_binary_denial(
             with Session(admin) as session, session.begin():
                 close_admission(session)
             before_downgrade = fingerprint(admin)
-            with pytest.raises(RuntimeError, match="compatible forward fix"):
+            with pytest.raises(RuntimeError, match="forward fix"):
                 with admin.begin() as connection:
                     config.attributes["connection"] = connection
                     alembic_command.downgrade(config, "0003")
@@ -399,17 +434,17 @@ def seed_legacy_upgrade(
     operation: Operation,
     create_body: dict[str, Any],
 ) -> None:
-    session.add(
-        OwnerState(
-            owner_id=owner,
-            status="active",
-            generation=uuid4(),
-            position=1,
-            erasure_epoch=3,
-        )
+    # This fixture really is schema 3. Current ORM defaults must not invent
+    # columns that did not exist in that supported upgrade baseline.
+    session.execute(
+        text(
+            "INSERT INTO training.owner_state(owner_id,status,generation,position,erasure_epoch) "
+            "VALUES(:owner,'active',:generation,1,3)"
+        ),
+        {"owner": owner, "generation": uuid4()},
     )
     session.flush()
-    sync._create(session, owner, operation)
+    create_legacy_workout(session, owner, operation)
     session.add(
         Receipt(
             owner_id=owner,
@@ -1278,3 +1313,31 @@ def test_echo_duplicate_and_context_blocked_before_certificate(
         "aggregate_id": str(operation.aggregate_id),
         "status": "publication_pending",
     }
+
+
+def test_schema_four_recovery_downgrade_remains_refused(recovery_lab: RecoveryLab) -> None:
+    root = Path(__file__).parents[1]
+    config = Config(str(root / "alembic.ini"))
+    config.set_main_option("script_location", str(root / "migrations"))
+    with recovery_lab.target() as name:
+        admin = recovery_lab.engine(name)
+        try:
+            with admin.begin() as connection:
+                config.attributes["connection"] = connection
+                alembic_command.upgrade(config, "0004")
+                connection.execute(
+                    text(
+                        "INSERT INTO training.owner_state(owner_id,status,generation) "
+                        "VALUES(:owner,'active',:generation)"
+                    ),
+                    {"owner": uuid4(), "generation": uuid4()},
+                )
+            before = fingerprint(admin)
+            assert before["revision"] == "0004"
+            with pytest.raises(RuntimeError, match="compatible forward fix"):
+                with admin.begin() as connection:
+                    config.attributes["connection"] = connection
+                    alembic_command.downgrade(config, "0003")
+            assert fingerprint(admin) == before
+        finally:
+            admin.dispose()

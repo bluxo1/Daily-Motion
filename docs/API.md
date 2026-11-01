@@ -1,5 +1,9 @@
 # API and domain interfaces
 
+The internally gated [routine synchronization extension](ROUTINE_CLOUD_SYNC.md)
+uses contract 3 at `/v3/sync/*` and `/v3/me`. The original workout contract remains
+unchanged; upgraded owners require compatible synchronization clients.
+
 Status: accepted planning baseline. Updated: 2026-10-13. The Phase 0 service implements scoped workout/sync and account-initialization proofs; [IMPLEMENTATION.md](IMPLEMENTATION.md) and [checked OpenAPI](../contracts/openapi.json) identify its actual surface. Other interfaces/examples below remain planned, not released.
 
 Keep a small versioned HTTP/JSON surface around domain capabilities. FastAPI owns authorization and authoritative cloud mutations; mobile domain controllers own immediate local actions. Numerical prediction and assistant interfaces are planned now but implemented only in their roadmap phases.

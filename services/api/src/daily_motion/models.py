@@ -2,7 +2,15 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKeyConstraint, String
+from sqlalchemy import (
+    BigInteger,
+    CheckConstraint,
+    DateTime,
+    ForeignKeyConstraint,
+    Index,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -20,6 +28,7 @@ class OwnerState(Base):
     position: Mapped[int] = mapped_column(BigInteger, default=0)
     erasure_epoch: Mapped[int] = mapped_column(BigInteger, default=0)
     minimum_position: Mapped[int] = mapped_column(BigInteger, default=0)
+    minimum_sync_contract: Mapped[int] = mapped_column(default=1)
 
 
 class Profile(Base):
@@ -136,3 +145,60 @@ class Snapshot(Base):
     installation_id: Mapped[UUID]
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     pages: Mapped[list[dict[str, Any]]] = mapped_column(JSONB)
+    sync_contract: Mapped[int] = mapped_column(default=1)
+
+
+class Routine(Base):
+    __tablename__ = "routines"
+    __table_args__ = (
+        CheckConstraint("revision > 0"),
+        ForeignKeyConstraint(["owner_id"], ["training.owner_state.owner_id"]),
+        ForeignKeyConstraint(
+            ["owner_id", "id", "current_template_id"],
+            [
+                "training.routine_templates.owner_id",
+                "training.routine_templates.routine_id",
+                "training.routine_templates.id",
+            ],
+            deferrable=True,
+            initially="DEFERRED",
+            use_alter=True,
+            name="routine_current_template",
+        ),
+        {"schema": "training"},
+    )
+    owner_id: Mapped[UUID] = mapped_column(primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    revision: Mapped[int] = mapped_column(BigInteger)
+    current_template_id: Mapped[UUID]
+
+
+class RoutineTemplate(Base):
+    __tablename__ = "routine_templates"
+    __table_args__ = (
+        UniqueConstraint("owner_id", "routine_id", "id"),
+        UniqueConstraint("owner_id", "routine_id", "revision"),
+        CheckConstraint("revision > 0"),
+        CheckConstraint("(revision=1)=(predecessor_template_id IS NULL)"),
+        Index("routine_template_predecessor", "owner_id", "routine_id", "predecessor_template_id"),
+        ForeignKeyConstraint(
+            ["owner_id", "routine_id"],
+            ["training.routines.owner_id", "training.routines.id"],
+            ondelete="CASCADE",
+        ),
+        ForeignKeyConstraint(
+            ["owner_id", "routine_id", "predecessor_template_id"],
+            [
+                "training.routine_templates.owner_id",
+                "training.routine_templates.routine_id",
+                "training.routine_templates.id",
+            ],
+        ),
+        {"schema": "training"},
+    )
+    owner_id: Mapped[UUID] = mapped_column(primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    routine_id: Mapped[UUID]
+    revision: Mapped[int] = mapped_column(BigInteger)
+    predecessor_template_id: Mapped[UUID | None]
+    prescription: Mapped[dict[str, Any]] = mapped_column(JSONB)

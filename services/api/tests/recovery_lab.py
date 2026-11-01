@@ -389,7 +389,7 @@ def migrate(engine: Engine) -> None:
         connection.execute(text("GRANT SELECT ON public.alembic_version TO dm_recovery_runtime"))
 
 
-def fingerprint(engine: Engine) -> dict[str, Any]:
+def fingerprint(engine: Engine, omit_columns: dict[str, list[str]] | None = None) -> dict[str, Any]:
     """Compare content, policies, grants and structural metadata without logging rows."""
     with engine.connect() as db:
         tables = db.scalars(
@@ -400,10 +400,11 @@ def fingerprint(engine: Engine) -> dict[str, Any]:
             assert re.fullmatch(r"[a-z_]+", table)
             payload = db.scalar(
                 text(
-                    "SELECT coalesce(jsonb_agg(to_jsonb(t) "
-                    "ORDER BY to_jsonb(t)::text),'[]'::jsonb) "
+                    "SELECT coalesce(jsonb_agg((to_jsonb(t)-CAST(:omit AS text[])) "
+                    "ORDER BY (to_jsonb(t)-CAST(:omit AS text[]))::text),'[]'::jsonb) "
                     f'FROM training."{table}" t'
-                )
+                ),
+                {"omit": (omit_columns or {}).get(table, [])},
             )
             encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
             rows[table] = {"count": len(payload), "sha256": hashlib.sha256(encoded).hexdigest()}

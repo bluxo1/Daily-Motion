@@ -10,6 +10,7 @@ import 'workout_screen.dart';
 import 'exercise_catalog_screen.dart';
 import 'sync_provider.dart';
 import '../sync/coordinator.dart';
+import 'routine_sync_status.dart';
 
 final routinesProvider = FutureProvider.autoDispose<List<SavedRoutine>>(
   (ref) => ref.watch(repositoryProvider).routines(),
@@ -148,7 +149,21 @@ class _RoutineLibraryState extends ConsumerState<RoutineLibrary> {
 
   @override
   Widget build(BuildContext context) {
+    final repository = ref.watch(repositoryProvider);
+    ref.listen(routineChangesProvider, (_, next) {
+      if (next.hasValue && mounted) ref.invalidate(routinesProvider);
+    });
     final routines = ref.watch(routinesProvider);
+    final cloud = ref.watch(syncCoordinatorProvider);
+    final phase = ref.watch(syncStatusProvider).value?.phase;
+    if (phase == SyncPhase.accountDisabled) {
+      return const Text('This account is unavailable. Return to sign in.');
+    }
+    if ((routines.value ?? <SavedRoutine>[]).any(
+      (r) => r.ownerId != repository.ownerId,
+    )) {
+      return const Center(child: CircularProgressIndicator());
+    }
     final workouts = ref.watch(workoutsProvider);
     final active = workouts.value?.any((w) => w['status'] == 'active') ?? false;
     final canStart =
@@ -160,7 +175,7 @@ class _RoutineLibraryState extends ConsumerState<RoutineLibrary> {
         !workouts.isLoading &&
         !workouts.hasError;
     return routines.when(
-      skipLoadingOnRefresh: false,
+      skipLoadingOnRefresh: true,
       skipLoadingOnReload: false,
       loading: () => const Padding(
         padding: EdgeInsets.all(24),
@@ -198,12 +213,15 @@ class _RoutineLibraryState extends ConsumerState<RoutineLibrary> {
               ),
             const SizedBox(height: 12),
           ],
-          const Text(
-            'Saved only on this device. Routines are not backed up or synced yet.',
+          Text(
+            cloud?.routineConnection == null
+                ? 'Saved on this device. Routine cloud sync is unavailable in this build.'
+                : 'Routines save on this device first. Check the cloud status below.',
           ),
           const SizedBox(height: 16),
           if (items.isNotEmpty || !widget.inline) ...[
             DropdownButtonFormField<String>(
+              key: const ValueKey('routine-timezone'),
               isExpanded: true,
               initialValue: timezone,
               decoration: const InputDecoration(labelText: 'Workout timezone'),
@@ -225,6 +243,7 @@ class _RoutineLibraryState extends ConsumerState<RoutineLibrary> {
             const SizedBox(height: 16),
           ],
           FilledButton.icon(
+            key: const ValueKey('routine-create'),
             onPressed: starting || editing || !widget.enabled
                 ? null
                 : () => edit(),
@@ -245,6 +264,9 @@ class _RoutineLibraryState extends ConsumerState<RoutineLibrary> {
             ),
           for (final routine in items)
             Padding(
+              key: ValueKey(
+                'routine-container-${routine.ownerId}-${routine.id}',
+              ),
               padding: const EdgeInsets.only(top: 16),
               child: Card(
                 key: ValueKey('routine-${routine.id}'),
@@ -262,6 +284,12 @@ class _RoutineLibraryState extends ConsumerState<RoutineLibrary> {
                       ),
                       Text(
                         '${routine.plan.exercises.length} exercises · ${routine.plan.exercises.fold<int>(0, (n, e) => n + (e['sets'] as List).length)} planned sets',
+                      ),
+                      RoutineSyncStatus(
+                        key: ValueKey(
+                          'routine-status-${routine.ownerId}-${routine.id}',
+                        ),
+                        routine: routine,
                       ),
                       const SizedBox(height: 12),
                       Wrap(
@@ -556,6 +584,13 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
       );
     }
     final catalog = ref.watch(exerciseCatalogProvider);
+    final delivery = ref.watch(routineDeliveryProvider(id));
+    final cloudSource =
+        (delivery.value?['server_revision'] as int? ?? 0) > 0 ||
+        delivery.value?['has_cloud_history'] == true;
+    final unknownDelivery =
+        widget.initial != null &&
+        (!delivery.hasValue || delivery.isLoading || delivery.hasError);
     final knownVariants = {
       for (final d in catalog.value ?? <CatalogDefinition>[]) d.variantId,
     };
@@ -601,16 +636,39 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
                   child: const Text('Retry exercise catalog'),
                 ),
               ],
+              if (widget.initial != null && delivery.hasError) ...[
+                Semantics(
+                  liveRegion: true,
+                  child: const Text(
+                    'Routine cloud details could not be verified. Existing definitions are temporarily read-only.',
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: saving || picking || leaving
+                      ? null
+                      : () => ref.invalidate(routineDeliveryProvider(id)),
+                  child: const Text('Retry routine details'),
+                ),
+              ],
               for (var i = 0; i < exercises.length; i++)
                 exerciseCard(
                   exercises[i],
                   i,
                   readOnlyDefinition:
                       exercises[i].catalogSelection ||
+                      unknownDelivery ||
+                      cloudSource ||
                       !catalog.hasValue ||
                       catalog.isLoading ||
                       catalog.hasError ||
                       knownVariants.contains(
+                        exercises[i].original['variant_id'],
+                      ),
+                  snapshotOnly:
+                      cloudSource &&
+                      catalog.hasValue &&
+                      !catalog.isLoading &&
+                      !knownVariants.contains(
                         exercises[i].original['variant_id'],
                       ),
                 ),
@@ -651,6 +709,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     _ExerciseFields e,
     int index, {
     required bool readOnlyDefinition,
+    bool snapshotOnly = false,
   }) => Card(
     key: ValueKey(e.id),
     child: Padding(
@@ -694,6 +753,11 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
             readOnly: readOnlyDefinition,
           ),
           if (readOnlyDefinition) ...[
+            if (snapshotOnly)
+              const Text(
+                'Only the saved exercise snapshot is available on this device. Catalog details have not been downloaded. Planned sets remain editable.',
+                key: ValueKey('routine-snapshot-only'),
+              ),
             const Text(
               'Saved definition snapshot. Catalog renames do not rewrite this plan. Use the picker for another variant.',
             ),

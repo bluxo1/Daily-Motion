@@ -42,8 +42,10 @@ prerequisites are in [the operator handoff](infra/QUALIFICATION.md).
 
 An opt-in [local routine authoring experiment](docs/LOCAL_ROUTINE_AUTHORING.md)
 adds owner-scoped persistence and safe routine-based workout starts. It is off by
-default, does not synchronize routines, and does not authorize a phase rollout.
-The guide records its debug flag, migration boundary and remaining limitations.
+default. The same internal gate now enables [routine cloud synchronization](docs/ROUTINE_CLOUD_SYNC.md)
+with explicit client compatibility, durable pending edits and immutable templates.
+The guides record migration boundaries and limitations; this does not authorize a
+phase rollout or enable private catalog synchronization.
 
 [Actual CI on `8e5af65`](https://github.com/bluxo1/Daily-Motion/actions/runs/38587594908)
 passed all three jobs: **148 ordinary Flutter + 9 live HTTP cases**, **102 Python

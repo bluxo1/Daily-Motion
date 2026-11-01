@@ -29,10 +29,13 @@ from daily_motion.models import (
     OwnerState,
     Receipt,
     RetiredId,
+    Routine,
+    RoutineTemplate,
     Snapshot,
     Workout,
     WorkoutSet,
 )
+from daily_motion.routine_contracts import RoutineOperation
 
 
 class DomainError(Exception):
@@ -40,7 +43,7 @@ class DomainError(Exception):
         self.code = code
 
 
-def owner_guard(db: Session, owner: UUID) -> OwnerState:
+def owner_guard(db: Session, owner: UUID, contract: int = 1) -> OwnerState:
     state = db.scalar(select(OwnerState).where(OwnerState.owner_id == owner).with_for_update())
     if state is None:
         raise HTTPException(
@@ -57,7 +60,13 @@ def owner_guard(db: Session, owner: UUID) -> OwnerState:
         raise HTTPException(
             403, detail={"code": "account_inactive", "owner_id": str(owner), "schema_version": 1}
         )
+    require_sync_contract(state, contract)
     return state
+
+
+def require_sync_contract(state: OwnerState, contract: int) -> None:
+    if contract not in (1, 3) or contract < state.minimum_sync_contract:
+        raise HTTPException(426, detail={"code": "upgrade_required"})
 
 
 def _token(value: dict[str, Any]) -> str:
@@ -94,20 +103,20 @@ def cursor(owner: UUID, generation: UUID, position: int) -> str:
     )
 
 
-def sync_context(owner: UUID, state: OwnerState) -> dict[str, Any]:
+def sync_context(owner: UUID, state: OwnerState, contract: int = 1) -> dict[str, Any]:
     return {
-        "schema_version": 1,
+        "schema_version": contract,
         "owner_id": str(owner),
         "generation": str(state.generation),
         "erasure_epoch": state.erasure_epoch,
     }
 
 
-def me(owner: UUID) -> dict[str, Any]:
+def me(owner: UUID, contract: int = 1) -> dict[str, Any]:
     with next_transaction(owner) as db:
-        state = owner_guard(db, owner)
+        state = owner_guard(db, owner, contract)
         return {
-            **sync_context(owner, state),
+            **sync_context(owner, state, contract),
             "position": state.position,
             "minimum_position": state.minimum_position,
             "account_status": "active",
@@ -128,7 +137,7 @@ def _create(db: Session, owner: UUID, op: Operation) -> Workout:
     if db.scalar(select(RetiredId).where(RetiredId.owner_id == owner, RetiredId.id.in_(ids))):
         raise DomainError("retired_id")
     # Child identities cannot be reused in a different live session.
-    for model in (Workout, Exercise, WorkoutSet):
+    for model in (Workout, Exercise, WorkoutSet, Routine, RoutineTemplate):
         if db.scalar(select(model).where(model.owner_id == owner, model.id.in_(ids))):
             raise DomainError("duplicate_id")
     workout = Workout(
@@ -299,11 +308,13 @@ def apply_domain_change(
     return workout, retired
 
 
-def accept(owner: UUID, op: Operation) -> dict[str, Any]:
+def accept(owner: UUID, op: Operation | RoutineOperation, contract: int = 1) -> dict[str, Any]:
+    if isinstance(op, RoutineOperation) and contract != 3:
+        raise HTTPException(426, detail={"code": "upgrade_required"})
     body = op.model_dump(mode="json")
     digest = hashlib.sha256(canonical_json(body).encode()).hexdigest()
     with next_transaction(owner) as db:
-        state = owner_guard(db, owner)
+        state = owner_guard(db, owner, contract)
         receipt = db.get(Receipt, (owner, op.mutation_id))
         if receipt:
             if receipt.digest != digest:
@@ -311,7 +322,11 @@ def accept(owner: UUID, op: Operation) -> dict[str, Any]:
             if receipt.acknowledgement["status"] == "accepted":
                 return dict(receipt.acknowledgement, status="duplicate")
             return receipt.acknowledgement
-        workout = db.get(Workout, (owner, op.aggregate_id))
+        workout = (
+            db.get(Routine, (owner, op.aggregate_id))
+            if isinstance(op, RoutineOperation)
+            else db.get(Workout, (owner, op.aggregate_id))
+        )
         if db.get(RetiredId, (owner, op.aggregate_id)):
             return _remember(db, owner, op, digest, _rejected(op, "retired_id"))
         current = workout.revision if workout else 0
@@ -328,7 +343,15 @@ def accept(owner: UUID, op: Operation) -> dict[str, Any]:
         try:
             # Validation failures roll back all intermediate projections before returning rejection.
             with db.begin_nested():
-                workout, retired = apply_domain_change(db, owner, op, state, workout)
+                if isinstance(op, RoutineOperation):
+                    from daily_motion.routines import apply_routine_change
+
+                    assert workout is None or isinstance(workout, Routine)
+                    workout = apply_routine_change(db, owner, op, state, workout)
+                    retired: list[UUID] = []
+                else:
+                    assert workout is None or isinstance(workout, Workout)
+                    workout, retired = apply_domain_change(db, owner, op, state, workout)
                 accepted_revision = workout.revision
                 accepted_at = datetime.now(UTC)
                 state.position += 1
@@ -371,7 +394,7 @@ def accept(owner: UUID, op: Operation) -> dict[str, Any]:
 
 
 def _remember(
-    db: Session, owner: UUID, op: Operation, digest: str, result: dict[str, Any]
+    db: Session, owner: UUID, op: Operation | RoutineOperation, digest: str, result: dict[str, Any]
 ) -> dict[str, Any]:
     db.add(
         Receipt(owner_id=owner, mutation_id=op.mutation_id, digest=digest, acknowledgement=result)
@@ -379,7 +402,7 @@ def _remember(
     return result
 
 
-def _rejected(op: Operation, code: str) -> dict[str, Any]:
+def _rejected(op: Operation | RoutineOperation, code: str) -> dict[str, Any]:
     return {
         "mutation_id": str(op.mutation_id),
         "aggregate_id": str(op.aggregate_id),
@@ -392,9 +415,9 @@ def _rejected(op: Operation, code: str) -> dict[str, Any]:
 next_transaction = contextmanager(tenant_transaction)
 
 
-def pull(owner: UUID, token: str | None, limit: int) -> dict[str, Any]:
+def pull(owner: UUID, token: str | None, limit: int, contract: int = 1) -> dict[str, Any]:
     with next_transaction(owner) as db:
-        state = owner_guard(db, owner)
+        state = owner_guard(db, owner, contract)
         position = 0
         if token:
             value = _untoken(token, owner, "cursor")
@@ -422,7 +445,7 @@ def pull(owner: UUID, token: str | None, limit: int) -> dict[str, Any]:
             size += batch_size
         next_position = page[-1]["position"] if page else position
         return {
-            **sync_context(owner, state),
+            **sync_context(owner, state, contract),
             "changes": page,
             "next_cursor": cursor(owner, state.generation, next_position),
             "next_position": next_position,
@@ -459,7 +482,7 @@ def projection(db: Session, owner: UUID, workout: Workout) -> dict[str, Any]:
     }
 
 
-def bootstrap(owner: UUID, installation: UUID | None = None) -> dict[str, Any]:
+def bootstrap(owner: UUID, installation: UUID | None = None, contract: int = 1) -> dict[str, Any]:
     # Materialize under a short consistent snapshot, then publish under the owner guard.
     with next_transaction(owner, "REPEATABLE READ") as db:
         state = db.get(OwnerState, owner)
@@ -479,9 +502,14 @@ def bootstrap(owner: UUID, installation: UUID | None = None) -> dict[str, Any]:
                 403,
                 detail={"code": "account_inactive", "owner_id": str(owner), "schema_version": 1},
             )
+        require_sync_contract(state, contract)
         generation, epoch, position = state.generation, state.erasure_epoch, state.position
         pages: list[dict[str, Any]] = []
-        page: dict[str, Any] = {"roots": [], "retired_ids": []}
+        page: dict[str, Any] = {
+            "roots": [],
+            "retired_ids": [],
+            **({"routines": []} if contract == 3 else {}),
+        }
         total = 0
         for workout in db.scalars(
             select(Workout).where(Workout.owner_id == owner).order_by(Workout.id)
@@ -495,8 +523,32 @@ def bootstrap(owner: UUID, installation: UUID | None = None) -> dict[str, Any]:
                 raise HTTPException(413, detail={"code": "snapshot_root_capacity"})
             if len(canonical_json(page).encode()) + root_size + 1 > PAGE_LIMIT:
                 pages.append(page)
-                page = {"roots": [], "retired_ids": []}
+                page = {
+                    "roots": [],
+                    "retired_ids": [],
+                    **({"routines": []} if contract == 3 else {}),
+                }
             page["roots"].append(root)
+        if contract == 3:
+            from daily_motion.routines import routine_projections
+
+            for routine in db.scalars(
+                select(Routine)
+                .where(Routine.owner_id == owner)
+                .order_by(Routine.id)
+                .execution_options(yield_per=128)
+            ):
+                for root in routine_projections(db, owner, routine):
+                    root_size = len(canonical_json(root).encode())
+                    total += root_size + 1
+                    if total > SNAPSHOT_LIMIT:
+                        raise HTTPException(413, detail={"code": "snapshot_capacity"})
+                    if root_size + 96 > PAGE_LIMIT:
+                        raise HTTPException(413, detail={"code": "snapshot_root_capacity"})
+                    if len(canonical_json(page).encode()) + root_size + 1 > PAGE_LIMIT:
+                        pages.append(page)
+                        page = {"roots": [], "retired_ids": [], "routines": []}
+                    page["routines"].append(root)
         for retired in db.scalars(
             select(RetiredId).where(RetiredId.owner_id == owner).order_by(RetiredId.id)
         ):
@@ -505,14 +557,18 @@ def bootstrap(owner: UUID, installation: UUID | None = None) -> dict[str, Any]:
                 raise HTTPException(413, detail={"code": "snapshot_capacity"})
             if len(canonical_json(page).encode()) + 40 > PAGE_LIMIT:
                 pages.append(page)
-                page = {"roots": [], "retired_ids": []}
+                page = {
+                    "roots": [],
+                    "retired_ids": [],
+                    **({"routines": []} if contract == 3 else {}),
+                }
             page["retired_ids"].append(str(retired.id))
         pages.append(page)
         total = sum(len(canonical_json(item).encode()) for item in pages)
         if total > SNAPSHOT_LIMIT or len(pages) > 4096:
             raise HTTPException(413, detail={"code": "snapshot_capacity"})
     with next_transaction(owner) as db:
-        state = owner_guard(db, owner)
+        state = owner_guard(db, owner, contract)
         if (state.generation, state.erasure_epoch) != (generation, epoch):
             raise HTTPException(409, detail={"code": "snapshot_invalidated"})
         identifier = uuid4()
@@ -535,13 +591,14 @@ def bootstrap(owner: UUID, installation: UUID | None = None) -> dict[str, Any]:
                 installation_id=installation,
                 expires_at=expires,
                 pages=pages,
+                sync_contract=contract,
             )
         )
         return {
-            **sync_context(owner, state),
+            **sync_context(owner, state, contract),
             "installation_id": str(installation),
             "token": _token({"kind": "snapshot", "owner": str(owner), "id": str(identifier)}),
-            "schema_version": 1,
+            "schema_version": contract,
             "page_count": len(pages),
             "checksums": [
                 hashlib.sha256(canonical_json(page).encode()).hexdigest() for page in pages
@@ -552,13 +609,14 @@ def bootstrap(owner: UUID, installation: UUID | None = None) -> dict[str, Any]:
         }
 
 
-def snapshot_page(owner: UUID, token: str, page: int) -> dict[str, Any]:
+def snapshot_page(owner: UUID, token: str, page: int, contract: int = 1) -> dict[str, Any]:
     value = _untoken(token, owner, "snapshot")
     with next_transaction(owner) as db:
-        state = owner_guard(db, owner)
+        state = owner_guard(db, owner, contract)
         snapshot = db.get(Snapshot, (owner, UUID(value["id"])))
         if (
             snapshot is None
+            or snapshot.sync_contract != contract
             or snapshot.expires_at <= datetime.now(UTC)
             or snapshot.erasure_epoch != state.erasure_epoch
             or snapshot.generation != state.generation
@@ -571,22 +629,24 @@ def snapshot_page(owner: UUID, token: str, page: int) -> dict[str, Any]:
 
 def disable_account(owner: UUID) -> None:
     """Internal lifecycle primitive; public reauthentication/erasure jobs are Phase 1."""
+    contract = 3
     with next_transaction(owner) as db:
-        state = owner_guard(db, owner)
+        state = owner_guard(db, owner, contract)
         state.status = "deleting"
         state.erasure_epoch += 1
         db.execute(delete(Snapshot).where(Snapshot.owner_id == owner))
 
 
-def validate_snapshot(owner: UUID, token: str) -> dict[str, Any]:
+def validate_snapshot(owner: UUID, token: str, contract: int = 1) -> dict[str, Any]:
     # Revalidate immediately before client activation; never hold a transaction over HTTP.
-    snapshot_page(owner, token, 0)
-    return me(owner)
+    snapshot_page(owner, token, 0, contract)
+    return me(owner, contract)
 
 
 def prune_feed(owner: UUID, before: datetime) -> None:
+    contract = 3
     with next_transaction(owner) as db:
-        state = owner_guard(db, owner)
+        state = owner_guard(db, owner, contract)
         expired = db.scalars(
             select(Change)
             .where(Change.owner_id == owner, Change.created_at < before)

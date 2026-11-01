@@ -85,7 +85,7 @@ def initialize_account(owner: UUID) -> dict[str, Any]:
             )
             .on_conflict_do_nothing(index_elements=[OwnerState.owner_id])
         )
-        owner_guard(db, owner)
+        owner_guard(db, owner, 3)
         db.execute(
             insert(Profile)
             .values(owner_id=owner, unit="kg")
@@ -94,7 +94,7 @@ def initialize_account(owner: UUID) -> dict[str, Any]:
         profile = db.get(Profile, owner)
         assert profile is not None
         unit = profile.unit
-    return {**me(owner), "profile": {"unit": unit}}
+    return {**dict(me(owner, 3), schema_version=1), "profile": {"unit": unit}}
 
 
 def mark_account_retired(owner: UUID) -> None:
@@ -112,3 +112,6 @@ def mark_account_retired(owner: UUID) -> None:
             .values(owner_id=owner, retired_at=datetime.now(UTC))
             .on_conflict_do_nothing(index_elements=[AccountRetirement.owner_id])
         )
+        from daily_motion.routines import erase_routine_planning
+
+        erase_routine_planning(db, owner)

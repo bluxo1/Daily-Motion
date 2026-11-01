@@ -17,6 +17,7 @@ import 'database.dart';
 part 'sync_repository.dart';
 part 'recovery_repository.dart';
 part 'routine_repository.dart';
+part 'routine_sync_repository.dart';
 part 'catalog_repository.dart';
 
 class WorkoutRepository {

@@ -6,6 +6,7 @@ import '../domain/workout.dart';
 import 'contract_validation.dart';
 import 'transport.dart';
 import 'batch.dart';
+import 'transport_contract.dart';
 
 enum SyncPhase {
   savedLocally,
@@ -21,16 +22,51 @@ class SyncStatus {
   final SyncPhase phase;
   final String? code;
   const SyncStatus(this.phase, [this.code]);
-  String get label => switch (phase) {
-    SyncPhase.savedLocally => 'Saved on this device',
-    SyncPhase.pending => 'Saved on this device · pending sync',
-    SyncPhase.syncing => 'Saved on this device · syncing',
-    SyncPhase.synchronized => 'Synchronized',
-    SyncPhase.attention => 'Saved on this device · sync needs attention',
-    SyncPhase.authenticationRequired =>
-      'Saved on this device · sign in to sync',
-    SyncPhase.accountDisabled => 'Account disabled remotely',
+
+  String? get cloudInterruptionLabel => switch (code) {
+    'upgrade_required' => 'App update required to sync',
+    'routine_sync_unavailable' => 'Cloud sync capability unavailable',
+    'recovery_unavailable' ||
+    'recovery_metadata_unverified' ||
+    'publication_pending' ||
+    'timeline_reconciliation_required' => 'Cloud recovery needs attention',
+    _
+        when phase == SyncPhase.pending &&
+            (['offline', 'timeout', 'connection_dropped'].contains(code) ||
+                RegExp(r'^http_(429|5[0-9]{2})$').hasMatch(code ?? '')) =>
+      'Cloud sync temporarily unavailable',
+    _ => null,
   };
+
+  String? get cloudInterruptionExplanation => switch (code) {
+    'upgrade_required' => 'Update to a compatible app to resume cloud synchronization. Your saved work stays on this device.',
+    'routine_sync_unavailable' => 'Routine cloud synchronization is unavailable on this server or in this build. Your saved work stays on this device.',
+    'recovery_unavailable' ||
+    'recovery_metadata_unverified' ||
+    'publication_pending' ||
+    'timeline_reconciliation_required' => 'Cloud synchronization is paused while the service is checked. You can continue training on this device.',
+    _ when cloudInterruptionLabel != null => 'Your saved work is retained. Retry when the cloud connection is available.',
+    _ => null,
+  };
+
+  String get label {
+    final interruption = cloudInterruptionLabel;
+    if (interruption != null &&
+        phase != SyncPhase.accountDisabled &&
+        phase != SyncPhase.authenticationRequired) {
+      return 'Saved on this device · ${interruption.toLowerCase()}';
+    }
+    return switch (phase) {
+      SyncPhase.savedLocally => 'Saved on this device',
+      SyncPhase.pending => 'Saved on this device · pending sync',
+      SyncPhase.syncing => 'Saved on this device · syncing',
+      SyncPhase.synchronized => 'Synchronized',
+      SyncPhase.attention => 'Saved on this device · sync needs attention',
+      SyncPhase.authenticationRequired =>
+        'Saved on this device · sign in to sync',
+      SyncPhase.accountDisabled => 'Account disabled remotely',
+    };
+  }
 }
 
 /// Single foreground runner. Durable retry metadata survives process restarts;
@@ -42,6 +78,8 @@ class SyncCoordinator {
   final double Function() jitter;
   final Future<void> Function()? onInstalled;
   final _statuses = StreamController<SyncStatus>.broadcast();
+  final _installations = StreamController<void>.broadcast();
+  Stream<void> get installations => _installations.stream;
   Stream<SyncStatus> get statuses => _statuses.stream;
   SyncStatus status = const SyncStatus(SyncPhase.savedLocally);
   StreamSubscription<void>? _commits;
@@ -54,6 +92,14 @@ class SyncCoordinator {
   bool _forceNext = false;
   SyncTransport? _cycle;
   SyncTransport get connection => _cycle ?? transport;
+  RoutineSyncTransport? get routineConnection {
+    final candidate = connection;
+    if (candidate case final RoutineSyncTransport channel) {
+      return channel.routineSyncEnabled ? channel : null;
+    }
+    return null;
+  }
+
   SyncCoordinator(
     this.repository,
     this.transport, {
@@ -66,6 +112,11 @@ class SyncCoordinator {
   void _status(SyncPhase phase, [String? code]) {
     status = SyncStatus(phase, code);
     if (!_closed) _statuses.add(status);
+  }
+
+  Future<void> _notifyInstalled() async {
+    if (!_closed) _installations.add(null);
+    await onInstalled?.call();
   }
 
   void start() {
@@ -141,6 +192,7 @@ class SyncCoordinator {
             'authentication_required',
             'invalid_credentials',
             'upgrade_required',
+            'routine_sync_unavailable',
             'wrong_owner',
             'malformed_response',
             'snapshot_checksum',
@@ -159,7 +211,15 @@ class SyncCoordinator {
       }
       _status(SyncPhase.syncing);
       _cycle = await transport.beginCycle();
-      final identity = await connection.me();
+      final routineChannel = routineConnection;
+      // A validated context-only view for common lifecycle fields. Requests,
+      // receipts and staged snapshots retain their original contract and bytes.
+      final identity = routineChannel == null
+          ? await connection.me()
+          : MeResponseDto.fromJson({
+              ...(await routineChannel.routineMe()).json,
+              'schema_version': 1,
+            });
       if (identity.ownerId != repository.ownerId) {
         throw const ContractViolation('wrong_owner');
       }
@@ -179,7 +239,11 @@ class SyncCoordinator {
           meta['generation'] != identity.generation ||
           meta['erasure_epoch'] != identity.erasureEpoch ||
           (meta['position'] as int) < identity.minimumPosition) {
-        await _bootstrap();
+        if (routineChannel == null) {
+          await _bootstrap();
+        } else {
+          await _bootstrapRoutines(routineChannel);
+        }
       }
       if (!_foreground || _closed || !_authorized) {
         _status(
@@ -195,17 +259,42 @@ class SyncCoordinator {
           final body = await repository.prepareHead(root);
           if (body != null) heads.add(body);
         }
-        final batch = packFrozenHeads(heads);
+        if (routineChannel != null) {
+          for (final root in await repository.pendingRoutineRoots()) {
+            final body = await repository.prepareRoutineHead(root);
+            if (body != null) heads.add(body);
+          }
+        }
+        final batch = packFrozenHeads(
+          heads,
+          schemaVersion: routineChannel == null ? 1 : 3,
+        );
         for (final mutation in batch.oversized) {
-          await repository.markOversized(mutation);
+          if (routineChannel == null) {
+            await repository.markOversized(mutation);
+          } else {
+            await repository.markMixedOversized(mutation);
+          }
         }
         if (batch.operations.isEmpty) break;
         if (_closed || !_foreground || !_authorized) return;
-        await repository.markAttempts(batch.mutations);
+        if (routineChannel == null) {
+          await repository.markAttempts(batch.mutations);
+        } else {
+          await repository.markMixedAttempts(batch.mutations);
+        }
         if (_closed || !_foreground || !_authorized) return;
-        final response = await connection.push(batch.body);
-        await repository.installAcknowledgements(response, batch.mutations);
-        await onInstalled?.call();
+        if (routineChannel == null) {
+          final response = await connection.push(batch.body);
+          await repository.installAcknowledgements(response, batch.mutations);
+        } else {
+          final response = await routineChannel.pushRoutines(batch.body);
+          await repository.installRoutineAcknowledgements(
+            response,
+            batch.mutations,
+          );
+        }
+        await _notifyInstalled();
         await _pull();
         if (round == 49) _again = true;
       }
@@ -216,9 +305,13 @@ class SyncCoordinator {
             ? SyncPhase.authenticationRequired
             : _again || !_foreground
             ? SyncPhase.pending
-            : await repository.attentionCount() > 0
+            : await repository.attentionCount() > 0 ||
+                  routineChannel != null &&
+                      await repository.routineAttentionCount() > 0
             ? SyncPhase.attention
-            : await repository.pendingCount() > 0
+            : await repository.pendingCount() > 0 ||
+                  routineChannel != null &&
+                      await repository.routinePendingCount() > 0
             ? SyncPhase.pending
             : SyncPhase.synchronized,
       );
@@ -233,7 +326,7 @@ class SyncCoordinator {
           error.ownerId == repository.ownerId) {
         await repository.disableRemoteAccount();
         _status(SyncPhase.accountDisabled, code);
-        await onInstalled?.call();
+        await _notifyInstalled();
         return;
       }
       if (code == 'account_inactive') {
@@ -298,10 +391,18 @@ class SyncCoordinator {
       final meta = await repository.syncMetadata();
       final cursor = meta['cursor'] as String?;
       if (_closed || !_foreground || !_authorized) return;
-      final result = await connection.pull(cursor);
-      await repository.installPull(result, requestedCursor: cursor);
-      if (result.changes.isNotEmpty) await onInstalled?.call();
-      if (!result.hasMore) return;
+      final routineChannel = routineConnection;
+      if (routineChannel == null) {
+        final result = await connection.pull(cursor);
+        await repository.installPull(result, requestedCursor: cursor);
+        if (result.changes.isNotEmpty) await _notifyInstalled();
+        if (!result.hasMore) return;
+      } else {
+        final result = await routineChannel.pullRoutines(cursor);
+        await repository.installRoutinePull(result, requestedCursor: cursor);
+        if (result.changes.isNotEmpty) await _notifyInstalled();
+        if (!result.hasMore) return;
+      }
     }
     _again = true;
   }
@@ -331,7 +432,38 @@ class SyncCoordinator {
     if (!_foreground || _closed || !_authorized) return;
     final current = await connection.validateSnapshot(manifest.token);
     await repository.activateBootstrap(current);
-    await onInstalled?.call();
+    await _notifyInstalled();
+  }
+
+  Future<void> _bootstrapRoutines(RoutineSyncTransport channel) async {
+    var manifest = await repository.stagedRoutineBootstrap();
+    if (manifest != null &&
+        !DateTime.parse(manifest.expiresAt).isAfter(now().toUtc())) {
+      await repository.discardBootstrap();
+      manifest = null;
+    }
+    if (manifest == null) {
+      final meta = await repository.syncMetadata();
+      manifest = await channel.bootstrapRoutines(
+        meta['installation_id'] as String,
+      );
+      await repository.stageRoutineBootstrap(manifest);
+    }
+    final downloaded = await repository.stagedPageIndices();
+    for (var index = 0; index < manifest.pageCount; index++) {
+      if (!_foreground || _closed || !_authorized) return;
+      if (!downloaded.contains(index)) {
+        await repository.stageRoutineBootstrapPage(
+          index,
+          await channel.routinePage(manifest.token, index),
+        );
+      }
+    }
+    if (!_foreground || _closed || !_authorized) return;
+    await repository.activateRoutineBootstrap(
+      await channel.validateRoutineSnapshot(manifest.token),
+    );
+    await _notifyInstalled();
   }
 
   Future<void> close() async {
@@ -341,5 +473,6 @@ class SyncCoordinator {
     await _commits?.cancel();
     await _running;
     await _statuses.close();
+    await _installations.close();
   }
 }

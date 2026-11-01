@@ -2362,3 +2362,30 @@ These describe the reviewed local snapshot; final committed-tree execution and
 fresh exact-head CI remain publication gates. Focused counts are subsets.
 Three external cases remain unexecuted; no provider or physical qualification.
 D1-D11 remain unapproved, G1/B4/B5 unchanged, Phase 0 in progress, Phase 1 not started.
+
+
+## 2026-10-29 ? internal routine cloud extension under local review
+
+The [routine synchronization slice](ROUTINE_CLOUD_SYNC.md) adds additive
+PostgreSQL routine/template ownership and immutable lineage, SQLite schema-7
+pending publications and accepted history, contract-3 mixed feed/bootstrap,
+foreground coordinator integration and factual internal UI status/conflict review.
+Original frozen workout envelopes and the separate recovery authority remain
+unchanged. The new feature stays behind the internal routine gate.
+
+Actual two-file Flutter/HTTP/JWT/PostgreSQL controls exercise offline creation,
+restart, second-device restore/start/finish, measured observations, response loss,
+CAS conflicts, independent workout delivery, owner changes and authoritative
+retirement. New negative controls cover local transaction failures, unsupported
+wire data, snapshot lineage/identity/cursor corruption and pre-upgrade migration
+rollback. The exact approved-baseline schema-6 reader refuses schema 7 without
+persistent data changes. Review also reproduced and repaired an older runtime's
+partial retirement-marker effect after its upgraded owner guard became hidden.
+A restrictive insert policy rejects that unsupported transaction atomically.
+
+These are local review results; the final source-bound regression matrix,
+requirement audit and patch package must identify their precise executions.
+Focused, ordinary, internal-feature and connected counts are separate. No hosted
+provider or physical-device qualification is inferred. No commit, publication,
+public enablement, O3 D1-D11 approval or G1/B4/B5 recovery change is authorized by
+this increment. Phase 0 remains in progress and Phase 1 has not started.
