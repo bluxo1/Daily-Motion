@@ -1,5 +1,10 @@
 # Offline persistence and synchronization
 
+The implemented internal [routine extension](ROUTINE_CLOUD_SYNC.md) defines the
+contract-3 compatibility boundary, immutable template lineage, pending branches
+and mixed bootstrap/feed behavior. The contract-1 workout shapes and separate
+O3 recovery authority are preserved.
+
 Status: accepted planning baseline. Updated: 2026-10-12. Implementation and fault qualification are still required.
 
 Connected Phase 0 desktop implementation evidence is recorded in

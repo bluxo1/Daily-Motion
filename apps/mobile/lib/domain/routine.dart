@@ -70,6 +70,25 @@ class RoutinePlan {
       utf8.encode(canonicalJson(bounded)).length <= commandByteLimit,
       'This routine is too large to start safely. Reduce its planned content.',
     );
+    final routineEnvelope = {
+      'mutation_id': uuid,
+      'installation_id': uuid,
+      'aggregate_type': 'routine',
+      'aggregate_id': uuid,
+      'expected_revision': 9223372036854775807,
+      'command': 'publish_template',
+      'occurred_at': instant,
+      'recorded_at': instant,
+      'payload': {
+        'template_id': uuid,
+        'predecessor_template_id': uuid,
+        'prescription': content,
+      },
+    };
+    require(
+      utf8.encode(canonicalJson(routineEnvelope)).length <= commandByteLimit,
+      'This routine is too large to synchronize safely. Reduce its planned content.',
+    );
     return RoutinePlan._(canonicalJson(content));
   }
 
@@ -79,6 +98,7 @@ class RoutinePlan {
 }
 
 class SavedRoutine {
+  final String ownerId;
   final String id;
   final String templateId;
 
@@ -86,6 +106,7 @@ class SavedRoutine {
   final int localRevision;
   final RoutinePlan plan;
   const SavedRoutine({
+    required this.ownerId,
     required this.id,
     required this.templateId,
     required this.localRevision,

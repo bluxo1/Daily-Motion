@@ -249,7 +249,9 @@ void main() {
           findsOneWidget,
         );
         expect(
-          find.textContaining('Saved only on this device'),
+          find.textContaining(
+            'Routine cloud sync is unavailable in this build',
+          ),
           findsOneWidget,
         );
         await h.reveal(find.widgetWithText(FilledButton, 'Create routine'));

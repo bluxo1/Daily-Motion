@@ -1,5 +1,6 @@
 """Run the actual Flutter HTTP client against verified JWTs and restricted PostgreSQL."""
 
+import hashlib
 import io
 import json
 import os
@@ -8,8 +9,10 @@ import socket
 import subprocess
 import threading
 import time
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Annotated
 from uuid import UUID, uuid4
 
 import jwt
@@ -17,8 +20,10 @@ import pytest
 import uvicorn
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
+from fastapi import Depends, FastAPI
 
 from daily_motion import accounts
+from daily_motion.auth import verified_owner
 from daily_motion.config import settings
 from daily_motion.main import app
 
@@ -500,6 +505,27 @@ def test_connected_process_requires_exit_and_report_success(
 def test_flutter_http_with_real_postgres(
     owner: UUID, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
+    run_flutter_http(
+        owner,
+        monkeypatch,
+        tmp_path,
+        test_file="connected_http_test.dart",
+        validate_result=assert_connected_result,
+        case_count=9,
+    )
+
+
+def run_flutter_http(
+    owner: UUID,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    *,
+    test_file: str,
+    validate_result: Callable[[subprocess.CompletedProcess[str]], None],
+    case_count: int,
+    timeout: int = 180,
+    with_retirement_control: bool = False,
+) -> None:
     if os.environ.get("DM_RUN_CONNECTED") != "1":
         pytest.skip("Set DM_RUN_CONNECTED=1 to run the Flutter ↔ HTTP ↔ PostgreSQL suite")
     root = Path(__file__).parents[3]
@@ -534,6 +560,8 @@ def test_flutter_http_with_real_postgres(
     token = jwt.encode(claims, key, algorithm="ES256")
     other_owner = uuid4()
     other_token = jwt.encode(dict(claims, sub=str(other_owner)), key, algorithm="ES256")
+    retirement_owner = uuid4()
+    retirement_token = jwt.encode(dict(claims, sub=str(retirement_owner)), key, algorithm="ES256")
 
     # The hosted provider boundary is simulated. JWT verification and API/DB
     # account initialization are real; this does not qualify email delivery.
@@ -569,7 +597,20 @@ def test_flutter_http_with_real_postgres(
     sock = socket.socket()
     sock.bind(("127.0.0.1", 0))
     port = sock.getsockname()[1]
-    server = uvicorn.Server(uvicorn.Config(app, log_level="error", access_log=False))
+    http_app = app
+    if with_retirement_control:
+        # A loopback-only test driver, never installed on the production app.
+        # It uses the real JWT subject and actual retirement primitive. A
+        # dedicated third owner keeps test order independent of A/B journeys.
+        http_app = FastAPI(openapi_url=None, docs_url=None, redoc_url=None)
+
+        @http_app.post("/__test__/retire")
+        def retire_test_owner(subject: Annotated[UUID, Depends(verified_owner)]) -> dict[str, bool]:
+            accounts.mark_account_retired(subject)
+            return {"retired": True}
+
+        http_app.mount("/", app)
+    server = uvicorn.Server(uvicorn.Config(http_app, log_level="error", access_log=False))
     thread = threading.Thread(target=server.run, kwargs={"sockets": [sock]}, daemon=True)
     thread.start()
     try:
@@ -586,19 +627,60 @@ def test_flutter_http_with_real_postgres(
             DM_SYNC_OWNER=str(owner),
             DM_SYNC_OWNER_B=str(other_owner),
             DM_SYNC_TOKEN_B=other_token,
+            DM_SYNC_OWNER_RETIRE=str(retirement_owner),
+            DM_SYNC_TOKEN_RETIRE=retirement_token,
         )
         result = subprocess.run(
-            [flutter, "test", "test/connected_http_test.dart", "--machine"],
+            [flutter, "test", "test/" + test_file, "--machine"],
             cwd=root / "apps/mobile",
             env=env,
             capture_output=True,
             text=True,
             encoding="utf-8",
             errors="replace",
-            timeout=180,
+            timeout=timeout,
         )
-        assert_connected_result(result)
-        print("Connected Flutter HTTP/PostgreSQL: 9 passed, zero skipped")
+        evidence = root / ".tools" / "connected-http-results" / uuid4().hex
+        evidence.mkdir(parents=True, exist_ok=False)
+        (evidence / "flutter.log").write_text(
+            result.stdout + "\n" + result.stderr, encoding="utf-8"
+        )
+        sources = [
+            "apps/mobile/test/" + test_file,
+            "apps/mobile/lib/sync/coordinator.dart",
+            "apps/mobile/lib/sync/transport.dart",
+            "apps/mobile/lib/data/sync_repository.dart",
+            "apps/mobile/lib/data/routine_sync_repository.dart",
+            "services/api/src/daily_motion/sync.py",
+            "services/api/src/daily_motion/routines.py",
+            "contracts/openapi.json",
+        ]
+        (evidence / "execution.json").write_text(
+            json.dumps(
+                {
+                    "command": [flutter, "test", "test/" + test_file, "--machine"],
+                    "cwd": str(root / "apps/mobile"),
+                    "exit_status": result.returncode,
+                    "finished_at": datetime.now(UTC).isoformat(),
+                    "expected_cases": case_count,
+                    "source_sha256": {
+                        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+                        for name in sources
+                    },
+                    "limits": (
+                        "Synthetic signed JWT and provider identity; "
+                        "actual HTTP, SQLite and PostgreSQL. "
+                        "No hosted/device qualification."
+                    ),
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        print("Connected raw output: " + str(evidence / "flutter.log"))
+        validate_result(result)
+        print(f"Connected Flutter HTTP/PostgreSQL: {case_count} passed, zero skipped")
     finally:
         server.should_exit = True
         thread.join(timeout=10)

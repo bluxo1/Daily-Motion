@@ -65,7 +65,7 @@ def database_readiness() -> None:
         session.execute(text("SELECT set_config('app.owner_id', '', true)"))
         assert_runtime_role(session)
         if session.scalars(text("SELECT version_num FROM public.alembic_version")).all() != [
-            "0004"
+            "0005"
         ]:
             raise HTTPException(503, detail={"code": "service_not_configured"})
         expected = {table.name for table in Base.metadata.tables.values()} | {
@@ -98,6 +98,9 @@ def tenant_transaction(owner: UUID, isolation: str | None = None) -> Iterator[Se
         shared_fence(session)
         assert_runtime_role(session)
         deny_unverified_recovery(session)
+        # Trusted server code capability, not client negotiation or DRP/2
+        # provenance. Older API binaries cannot publish routine-filtered state.
+        session.execute(text("SELECT set_config('app.server_sync_contract', '3', true)"))
         session.execute(
             text("SELECT set_config('app.owner_id', :owner, true)"), {"owner": str(owner)}
         )

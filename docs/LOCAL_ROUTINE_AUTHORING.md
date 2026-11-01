@@ -36,7 +36,10 @@ do not treat a UTC choice as the user's local timezone or invent a numeric offse
 The same debug flag can expose the screen inside an already configured, verified
 owner application. It does not bypass authentication, create a guest account or
 require a working cloud token for local editing. No hosted setup is part of this
-experiment. Routines are saved only on this device, as the screen states.
+experiment. Saves complete locally. The internal
+[routine synchronization extension](ROUTINE_CLOUD_SYNC.md) adds optional cloud
+delivery through the existing verified-owner coordinator; the screen reports
+authoritative delivery separately from local save.
 
 ## Architecture and invariants
 
@@ -60,9 +63,9 @@ experiment. Routines are saved only on this device, as the screen states.
 - All reads/writes use the existing local-owner lock/disable guard. Composite
   owner-aware keys bind roots, templates and start records. Sign-out retains and
   locks plans; authoritative account disable erases their private payloads too.
-- Only workout commands enter the accepted synchronization protocol. Routine
-  edits do not invent a wire aggregate, upload path, provider or server receipt.
-  Started sessions remain self-contained and use the existing outbox/recovery.
+- Routine commands use their own contract-3 journal and server aggregate.
+  Started sessions remain self-contained and use the existing workout outbox;
+  a conflicted routine does not prevent independent workout delivery.
 
 ## Migration and rollback boundary
 
@@ -113,12 +116,13 @@ These are desktop fault controls, not physical-device durability qualification.
 The first connected acceptance case starts from a saved routine through real
 Flutter HTTP/PostgreSQL and restores its unchanged prescription on another
 device after later routine edits. All nine connected case names and the accepted
-PR #13 report parser remain unchanged. Routine content itself is not transferred.
+PR #13 report parser remain unchanged. Separate routine connected controls now
+exercise actual definition transfer; see [routine synchronization](ROUTINE_CLOUD_SYNC.md).
 Raw dated commands/results, failures, hashes and the review patch belong in the
 task-owned `OVERNIGHT_HANDOFF.md`; historical Phase 0 receipts are not rewritten.
 
-Not implemented: routine cloud sync/backup/conflict resolution, routine export,
-archive/delete UI, a curated catalog/custom catalog synchronization, supersets,
+Not implemented: routine conflict resolution, routine export,
+archive/delete UI, custom catalog synchronization, supersets,
 rep ranges, effort targets, duration/distance or source IDs in the wire contract.
 The current foundation supports a single rep target, optional load and rest.
 Unsaved routine forms remain in memory; only an acknowledged Save is durable.

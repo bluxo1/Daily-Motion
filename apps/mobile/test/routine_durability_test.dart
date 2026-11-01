@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
+
 import 'package:daily_motion/data/database.dart';
 import 'package:daily_motion/data/workout_repository.dart';
 import 'package:daily_motion/domain/routine.dart';
@@ -13,7 +15,7 @@ import 'repository_test.dart' show owner;
 import 'support/owned_fixture.dart';
 
 void main() {
-  for (final action in ['edit', 'start']) {
+  for (final action in ['edit', 'start', 'freeze']) {
     for (final stage in ['before', 'during', 'after']) {
       test(
         'hard process kill $stage routine $action preserves exactly one atomic outcome',
@@ -120,6 +122,43 @@ Future<void> killRoutineWorker(String action, String stage) async {
                   .customSelect('SELECT count(*) AS n FROM $table')
                   .getSingle())
               .read<int>('n');
+      expect(await count('routine_cloud_templates'), 0);
+      final state = await db
+          .customSelect('SELECT * FROM routine_sync_state')
+          .getSingle();
+      expect(state.read<int>('server_revision'), 0);
+      expect(state.readNullable<String>('server_shadow'), isNull);
+      expect(
+        state.read<int>('local_sequence'),
+        action == 'edit' && stage == 'after' ? 2 : 1,
+      );
+      expect(
+        await count('routine_mutations'),
+        action == 'edit' && stage == 'after' ? 2 : 1,
+      );
+      final journal = await db
+          .customSelect(
+            'SELECT * FROM routine_mutations ORDER BY local_sequence',
+          )
+          .get();
+      expect(
+        journal.first.read<String>('mutation_id'),
+        seeded!['routine_mutation'],
+      );
+      expect(
+        journal.every((row) => row.read<String>('state') == 'pending'),
+        isTrue,
+      );
+      if (action != 'freeze' || stage != 'after') {
+        expect(
+          journal.every(
+            (row) =>
+                row.readNullable<String>('frozen_body') == null &&
+                row.readNullable<String>('request_digest') == null,
+          ),
+          isTrue,
+        );
+      }
       if (action == 'edit') {
         expect(saved.localRevision, stage == 'after' ? 2 : 1);
         expect(
@@ -142,7 +181,8 @@ Future<void> killRoutineWorker(String action, String stage) async {
           2,
           reason: 'Retry must not publish a duplicate template after response loss.',
         );
-      } else {
+        expect(await count('routine_mutations'), 2);
+      } else if (action == 'start') {
         for (final table in ['sessions', 'outbox', 'routine_starts']) {
           expect(await count(table), stage == 'after' ? 1 : 0, reason: table);
         }
@@ -173,6 +213,25 @@ Future<void> killRoutineWorker(String action, String stage) async {
           expect(id, result!['session']);
           expect(await repo.prepareHead(id), result!['frozen']);
         }
+      } else {
+        expect(await repo.workouts(), isEmpty);
+        expect(await repo.pendingCount(), 0);
+        if (stage == 'after') {
+          final bytes = result!['routine_frozen'] as String;
+          expect(journal.single.read<String>('frozen_body'), bytes);
+          expect(
+            journal.single.read<String>('request_digest'),
+            sha256.convert(utf8.encode(bytes)).toString(),
+          );
+        }
+        final frozen = (await repo.prepareRoutineHead(saved.id))!;
+        final operation = jsonDecode(frozen) as Json;
+        expect(operation['mutation_id'], seeded!['routine_mutation']);
+        expect(operation['payload']['template_id'], seeded!['template']);
+        expect(operation['expected_revision'], 0);
+        if (stage == 'after') expect(frozen, result!['routine_frozen']);
+        expect(await repo.prepareRoutineHead(saved.id), frozen);
+        expect(await count('routine_mutations'), 1);
       }
       expect(
         (await db.customSelect('PRAGMA integrity_check').getSingle())

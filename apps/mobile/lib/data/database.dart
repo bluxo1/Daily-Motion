@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:uuid/uuid.dart';
 
 part 'database.g.dart';
 
@@ -21,7 +22,7 @@ class TrainingDatabase extends _$TrainingDatabase {
   );
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -96,6 +97,28 @@ class TrainingDatabase extends _$TrainingDatabase {
       if (from < 6) {
         await migrator.createTable(customExerciseDefinitions);
       }
+      if (from < 7) {
+        await migrator.createTable(routineSyncState);
+        await migrator.createTable(routineMutations);
+        await migrator.createTable(routineCloudTemplates);
+        await customStatement(
+          'INSERT INTO routine_sync_state(owner_id,routine_id) '
+          'SELECT owner_id,id FROM routines',
+        );
+        // Preserve every immutable version and its original identity. Delivery
+        // sequence is assigned independently from the device editor CAS token.
+        final templates = await customSelect(
+          'SELECT owner_id,routine_id,id FROM workout_templates '
+          'ORDER BY owner_id,routine_id,local_revision',
+        ).get();
+        for (final template in templates) {
+          await _journalRoutineTemplate(
+            template.read<String>('owner_id'),
+            template.read<String>('routine_id'),
+            template.read<String>('id'),
+          );
+        }
+      }
       // Drift updates its version after the callback. Persist it with the DDL
       // too, so process loss after commit cannot retry an already-applied ALTER.
       await customStatement('PRAGMA user_version=$to');
@@ -104,4 +127,37 @@ class TrainingDatabase extends _$TrainingDatabase {
       await customStatement('PRAGMA foreign_keys=ON;');
     },
   );
+
+  /// Called only within the schema upgrade or routine save transaction. This
+  /// journal has no upload path until a routine-capable contract is negotiated.
+  Future<void> _journalRoutineTemplate(
+    String owner,
+    String routine,
+    String template,
+  ) async {
+    await customStatement(
+      'INSERT OR IGNORE INTO routine_sync_state(owner_id,routine_id) VALUES(?,?)',
+      [owner, routine],
+    );
+    await customStatement(
+      'INSERT INTO routine_mutations(mutation_id,owner_id,routine_id,local_sequence,template_id,predecessor_id,origin_base,base_template_id) '
+      'SELECT ?, '
+      'owner_id,routine_id,local_sequence+1,?, '
+      '(SELECT mutation_id FROM routine_mutations m WHERE m.owner_id=s.owner_id '
+      "AND m.routine_id=s.routine_id AND m.local_sequence=s.local_sequence AND m.state!='acknowledged'), "
+      "s.server_revision,json_extract(s.server_shadow,'\$.current_template_id') "
+      'FROM routine_sync_state s WHERE owner_id=? AND routine_id=?',
+      [const Uuid().v4(), template, owner, routine],
+    );
+    await customStatement(
+      'UPDATE routine_sync_state SET local_sequence=local_sequence+1 WHERE owner_id=? AND routine_id=?',
+      [owner, routine],
+    );
+  }
+
+  Future<void> journalRoutineTemplate(
+    String owner,
+    String routine,
+    String template,
+  ) => transaction(() => _journalRoutineTemplate(owner, routine, template));
 }

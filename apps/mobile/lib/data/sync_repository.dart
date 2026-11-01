@@ -111,8 +111,8 @@ extension SynchronizationRepository on WorkoutRepository {
     );
   });
 
-  void _ownerContext(Json response) {
-    if (response['schema_version'] != 1) {
+  void _ownerContext(Json response, {int contract = 1}) {
+    if (![1, 3].contains(contract) || response['schema_version'] != contract) {
       throw const ContractViolation('upgrade_required');
     }
     if (response['owner_id'] != ownerId) {
@@ -123,29 +123,49 @@ extension SynchronizationRepository on WorkoutRepository {
   Future<void> installAcknowledgements(
     PushResponseDto response,
     List<String> sent,
+  ) => _installAcknowledgements(response.json, sent, 1);
+
+  Future<void> installRoutineAcknowledgements(
+    PushResponse3Dto response,
+    List<String> sent,
+  ) => _installAcknowledgements(response.json, sent, 3);
+
+  Future<void> _installAcknowledgements(
+    Json response,
+    List<String> sent,
+    int contract,
   ) => db.transaction(() async {
     await _guard();
-    _ownerContext(response.json);
+    validateTransport(
+      contract == 3 ? 'PushResponse3' : 'PushResponse',
+      response,
+    );
+    _ownerContext(response, contract: contract);
     final metadata = await syncMetadata();
     if (metadata['generation'] != null &&
-        metadata['generation'] != response.generation) {
+        metadata['generation'] != response['generation']) {
       throw const ContractViolation('bootstrap_required');
     }
-    if (response.erasureEpoch != metadata['erasure_epoch']) {
+    if (response['erasure_epoch'] != metadata['erasure_epoch']) {
       throw const ContractViolation('bootstrap_required');
     }
-    final results = response.results.cast<Json>();
+    final results = (response['results'] as List).cast<Json>();
     if (results.length != sent.length ||
         results.map((r) => r['mutation_id']).toSet().length != sent.length ||
         results.any((r) => !sent.contains(r['mutation_id']))) {
       throw const ContractViolation();
     }
     for (final result in results) {
-      await _installAck(result);
+      if (contract == 3 &&
+          await _isRoutineMutation(result['mutation_id'] as String)) {
+        await _installRoutineAck(result);
+      } else {
+        await _installAck(result, routineAware: contract == 3);
+      }
     }
   });
 
-  Future<void> _installAck(Json result) async {
+  Future<void> _installAck(Json result, {bool routineAware = false}) async {
     await _requireLegacySync();
     final row = await db
         .customSelect(
@@ -241,7 +261,7 @@ extension SynchronizationRepository on WorkoutRepository {
       }
       final code = result['error']['code'] as String;
       if (code == 'retired_id') {
-        await _eraseRemote(id, []);
+        await _eraseRemote(id, [], routineAware: routineAware);
         return;
       }
       await db.customStatement(
@@ -255,7 +275,11 @@ extension SynchronizationRepository on WorkoutRepository {
     }
   }
 
-  Future<void> _eraseRemote(String id, List<String> wireIds) async {
+  Future<void> _eraseRemote(
+    String id,
+    List<String> wireIds, {
+    bool routineAware = false,
+  }) async {
     final ids = <String>{id, ...wireIds};
     final working = await _read(id);
     if (working != null) {
@@ -266,6 +290,7 @@ extension SynchronizationRepository on WorkoutRepository {
         );
       }
     }
+    if (routineAware) await _guardWorkoutRoutineIdentities(ids);
     for (final value in ids) {
       await db.customStatement(
         'INSERT OR IGNORE INTO retired_ids(id) VALUES(?)',
@@ -314,22 +339,35 @@ extension SynchronizationRepository on WorkoutRepository {
   Future<void> installPull(
     PullResponseDto page, {
     required String? requestedCursor,
-  }) => db.transaction(() async {
+  }) => _installPull(page.json, requestedCursor, 1);
+
+  Future<void> installRoutinePull(
+    PullResponse3Dto page, {
+    required String? requestedCursor,
+  }) => _installPull(page.json, requestedCursor, 3);
+
+  Future<void> _installPull(
+    Json page,
+    String? requestedCursor,
+    int contract,
+  ) => db.transaction(() async {
     await _guard();
     await _requireLegacySync();
-    _ownerContext(page.json);
+    validateTransport(contract == 3 ? 'PullResponse3' : 'PullResponse', page);
+    _ownerContext(page, contract: contract);
     final meta = await syncMetadata();
     if (meta['cursor'] != requestedCursor) {
       throw const ContractViolation('stale_page');
     }
-    if (meta['generation'] != null && meta['generation'] != page.generation) {
+    if (meta['generation'] != null &&
+        meta['generation'] != page['generation']) {
       throw const ContractViolation('bootstrap_required');
     }
-    if (meta['erasure_epoch'] != page.erasureEpoch) {
+    if (meta['erasure_epoch'] != page['erasure_epoch']) {
       throw const ContractViolation('bootstrap_required');
     }
     var position = meta['position'] as int;
-    for (final change in page.changes.cast<Json>()) {
+    for (final change in (page['changes'] as List).cast<Json>()) {
       final next = change['position'] as int;
       if (next <= position) throw const ContractViolation('non_monotonic_page');
       if (next != position + 1) {
@@ -339,76 +377,87 @@ extension SynchronizationRepository on WorkoutRepository {
         await _eraseRemote(
           change['aggregate_id'] as String,
           (change['retired_ids'] as List).cast<String>(),
+          routineAware: contract == 3,
         );
       } else {
         final op = change['operation'] as Json;
-        validateTransport('Operation', op);
-        final id = op['aggregate_id'] as String;
-        final revision = change['revision'] as int;
-        if (revision != op['expected_revision'] + 1) {
-          throw const ContractViolation();
-        }
-        final retired = await db
-            .customSelect(
-              'SELECT id FROM retired_ids WHERE id=?',
-              variables: [Variable(id)],
-            )
-            .getSingleOrNull();
-        if (retired == null) {
-          final own = await db
-              .customSelect(
-                'SELECT frozen_body FROM outbox WHERE mutation_id=?',
-                variables: [Variable(op['mutation_id'] as String)],
-              )
-              .getSingleOrNull();
-          if (own != null) {
-            if (own.readNullable<String>('frozen_body') != canonicalJson(op)) {
-              throw const ContractViolation('mutation_digest_mismatch');
-            }
-            await _installAck({
-              'mutation_id': op['mutation_id'],
-              'aggregate_id': id,
-              'status': 'accepted',
-              'accepted_revision': revision,
-            });
+        if (contract == 3 && op['aggregate_type'] == 'routine') {
+          await _installRoutineEcho(op, change['revision'] as int);
+        } else {
+          validateTransport('Operation', op);
+          final id = op['aggregate_id'] as String;
+          final revision = change['revision'] as int;
+          if (revision != op['expected_revision'] + 1) {
+            throw const ContractViolation();
           }
-          final shadow = await db
+          final retired = await db
               .customSelect(
-                'SELECT * FROM shadows WHERE session_id=?',
+                'SELECT id FROM retired_ids WHERE id=?',
                 variables: [Variable(id)],
               )
               .getSingleOrNull();
-          if (shadow == null || shadow.read<int>('revision') < revision) {
-            if ((shadow?.read<int>('revision') ?? 0) !=
-                op['expected_revision']) {
-              throw const ContractViolation('bootstrap_required');
+          if (retired == null) {
+            final own = await db
+                .customSelect(
+                  'SELECT frozen_body FROM outbox WHERE mutation_id=?',
+                  variables: [Variable(op['mutation_id'] as String)],
+                )
+                .getSingleOrNull();
+            if (own != null) {
+              if (own.readNullable<String>('frozen_body') !=
+                  canonicalJson(op)) {
+                throw const ContractViolation('mutation_digest_mismatch');
+              }
+              await _installAck({
+                'mutation_id': op['mutation_id'],
+                'aggregate_id': id,
+                'status': 'accepted',
+                'accepted_revision': revision,
+              }, routineAware: contract == 3);
             }
-            final before = shadow?.readNullable<String>('projection');
-            final projection = applyRemoteOperation(
-              before == null ? null : jsonDecode(before) as Json,
-              op,
-              transportSchemas,
-              revision: revision,
-            );
-            if (projection == null) {
-              await _eraseRemote(id, []);
-            } else {
-              await _installConnectedRemote(projection, external: own == null);
+            final shadow = await db
+                .customSelect(
+                  'SELECT * FROM shadows WHERE session_id=?',
+                  variables: [Variable(id)],
+                )
+                .getSingleOrNull();
+            if (shadow == null || shadow.read<int>('revision') < revision) {
+              if ((shadow?.read<int>('revision') ?? 0) !=
+                  op['expected_revision']) {
+                throw const ContractViolation('bootstrap_required');
+              }
+              final before = shadow?.readNullable<String>('projection');
+              final projection = applyRemoteOperation(
+                before == null ? null : jsonDecode(before) as Json,
+                op,
+                transportSchemas,
+                revision: revision,
+              );
+              if (projection == null) {
+                await _eraseRemote(id, [], routineAware: contract == 3);
+              } else {
+                await _installConnectedRemote(
+                  projection,
+                  external: own == null,
+                  routineAware: contract == 3,
+                );
+              }
             }
           }
         }
       }
       position = next;
     }
-    if (page.nextPosition != position || page.hasMore && page.changes.isEmpty) {
+    if (page['next_position'] != position ||
+        page['has_more'] && (page['changes'] as List).isEmpty) {
       throw const ContractViolation();
     }
     await db.customStatement('UPDATE local_identity SET cursor=?', [
-      page.nextCursor,
+      page['next_cursor'],
     ]);
     await db.customStatement(
       'UPDATE sync_metadata SET generation=?,position=?,erasure_epoch=?',
-      [page.generation, position, page.erasureEpoch],
+      [page['generation'], position, page['erasure_epoch']],
     );
   });
 
@@ -416,6 +465,7 @@ extension SynchronizationRepository on WorkoutRepository {
     Json projection, {
     required bool external,
     bool generationChanged = false,
+    bool routineAware = false,
   }) async {
     validateTransport('RootProjection', projection);
     projection = contractDefaults(
@@ -524,6 +574,7 @@ extension SynchronizationRepository on WorkoutRepository {
         throw const ContractViolation('identity_collision');
       }
     }
+    if (routineAware) await _guardWorkoutRoutineIdentities(unique);
     final shadow = await db
         .customSelect(
           'SELECT revision,projection FROM shadows WHERE session_id=?',
@@ -636,17 +687,44 @@ extension SynchronizationRepository on WorkoutRepository {
     return canonicalJson(normalized);
   }
 
-  Future<BootstrapManifestDto?> stagedBootstrap() => db.transaction(() async {
+  Future<Json?> _stagedManifest(int contract) => db.transaction(() async {
     await _guard();
     final row = await db
         .customSelect('SELECT manifest FROM bootstrap_stage')
         .getSingleOrNull();
-    return row == null
-        ? null
-        : BootstrapManifestDto.fromJson(
-            jsonDecode(row.read<String>('manifest')) as Json,
-          );
+    if (row == null) return null;
+    final raw = jsonDecode(row.read<String>('manifest')) as Json;
+    if (![1, 3].contains(raw['schema_version'])) {
+      throw const ContractViolation('upgrade_required');
+    }
+    if (raw['schema_version'] != contract) {
+      await discardBootstrap();
+      return null;
+    }
+    _manifestView(raw, contract);
+    return raw;
   });
+
+  BootstrapManifestDto _manifestView(Json raw, int contract) {
+    validateTransport(
+      contract == 3 ? 'BootstrapManifest3' : 'BootstrapManifest',
+      raw,
+    );
+    _ownerContext(raw, contract: contract);
+    // Context-only view of identical common fields. Stored manifest/pages and
+    // all frozen operations retain their exact original version and content.
+    return BootstrapManifestDto.fromJson({...raw, 'schema_version': 1});
+  }
+
+  Future<BootstrapManifestDto?> stagedBootstrap() async {
+    final raw = await _stagedManifest(1);
+    return raw == null ? null : BootstrapManifestDto.fromJson(raw);
+  }
+
+  Future<BootstrapManifest3Dto?> stagedRoutineBootstrap() async {
+    final raw = await _stagedManifest(3);
+    return raw == null ? null : BootstrapManifest3Dto.fromJson(raw);
+  }
 
   Future<void> discardBootstrap() => db.transaction(() async {
     await _guard();
@@ -655,10 +733,15 @@ extension SynchronizationRepository on WorkoutRepository {
   });
 
   Future<void> stageBootstrap(BootstrapManifestDto manifest) =>
+      _stageBootstrap(manifest.json, 1);
+  Future<void> stageRoutineBootstrap(BootstrapManifest3Dto manifest) =>
+      _stageBootstrap(manifest.json, 3);
+
+  Future<void> _stageBootstrap(Json raw, int contract) =>
       db.transaction(() async {
         await _guard();
         await _requireLegacySync();
-        _ownerContext(manifest.json);
+        final manifest = _manifestView(raw, contract);
         final meta = await syncMetadata();
         if (manifest.installationId != meta['installation_id'] ||
             manifest.checksums.length != manifest.pageCount ||
@@ -668,7 +751,7 @@ extension SynchronizationRepository on WorkoutRepository {
         await discardBootstrap();
         await db.customStatement(
           'INSERT INTO bootstrap_stage(singleton,manifest) VALUES(1,?)',
-          [canonicalJson(manifest.json)],
+          [canonicalJson(raw)],
         );
       });
 
@@ -681,42 +764,64 @@ extension SynchronizationRepository on WorkoutRepository {
   };
 
   Future<void> stageBootstrapPage(int index, SnapshotPageDto page) =>
-      db.transaction(() async {
-        await _guard();
-        await _requireLegacySync();
-        final manifest = await stagedBootstrap();
-        if (manifest == null || index < 0 || index >= manifest.pageCount) {
-          throw const ContractViolation();
-        }
-        final bytes = utf8.encode(canonicalJson(page.json));
-        if (bytes.length > transportPageLimit ||
-            sha256.convert(bytes).toString() != manifest.checksums[index]) {
-          throw const ContractViolation('snapshot_checksum');
-        }
-        final otherBytes =
-            (await db
-                    .customSelect(
-                      'SELECT coalesce(sum(length(CAST(body AS BLOB))),0) AS size FROM bootstrap_pages WHERE page_index != ?',
-                      variables: [Variable(index)],
-                    )
-                    .getSingle())
-                .read<int>('size');
-        if (otherBytes + bytes.length > transportSnapshotLimit) {
-          throw const ContractViolation('snapshot_capacity');
-        }
-        await db.customStatement(
-          'INSERT INTO bootstrap_pages(page_index,body) VALUES(?,?) ON CONFLICT(page_index) DO UPDATE SET body=excluded.body',
-          [index, canonicalJson(page.json)],
-        );
-      });
+      _stageBootstrapPage(index, page.json, 1);
+  Future<void> stageRoutineBootstrapPage(int index, SnapshotPage3Dto page) =>
+      _stageBootstrapPage(index, page.json, 3);
 
-  Future<void> activateBootstrap(
-    MeResponseDto current,
+  Future<void> _stageBootstrapPage(
+    int index,
+    Json raw,
+    int contract,
   ) => db.transaction(() async {
     await _guard();
     await _requireLegacySync();
-    _ownerContext(current.json);
-    final manifest = await stagedBootstrap();
+    validateTransport(contract == 3 ? 'SnapshotPage3' : 'SnapshotPage', raw);
+    final staged = await _stagedManifest(contract);
+    final manifest = staged == null ? null : _manifestView(staged, contract);
+    if (manifest == null || index < 0 || index >= manifest.pageCount) {
+      throw const ContractViolation();
+    }
+    final bytes = utf8.encode(canonicalJson(raw));
+    if (bytes.length > transportPageLimit ||
+        sha256.convert(bytes).toString() != manifest.checksums[index]) {
+      throw const ContractViolation('snapshot_checksum');
+    }
+    final otherBytes =
+        (await db
+                .customSelect(
+                  'SELECT coalesce(sum(length(CAST(body AS BLOB))),0) AS size FROM bootstrap_pages WHERE page_index != ?',
+                  variables: [Variable(index)],
+                )
+                .getSingle())
+            .read<int>('size');
+    if (otherBytes + bytes.length > transportSnapshotLimit) {
+      throw const ContractViolation('snapshot_capacity');
+    }
+    await db.customStatement(
+      'INSERT INTO bootstrap_pages(page_index,body) VALUES(?,?) ON CONFLICT(page_index) DO UPDATE SET body=excluded.body',
+      [index, canonicalJson(raw)],
+    );
+  });
+
+  Future<void> activateBootstrap(MeResponseDto current) =>
+      _activateBootstrap(current.json, 1);
+  Future<void> activateRoutineBootstrap(MeResponse3Dto current) =>
+      _activateBootstrap(current.json, 3);
+
+  Future<void> _activateBootstrap(
+    Json rawCurrent,
+    int contract,
+  ) => db.transaction(() async {
+    await _guard();
+    await _requireLegacySync();
+    validateTransport(contract == 3 ? 'MeResponse3' : 'MeResponse', rawCurrent);
+    _ownerContext(rawCurrent, contract: contract);
+    final current = MeResponseDto.fromJson({
+      ...rawCurrent,
+      'schema_version': 1,
+    });
+    final staged = await _stagedManifest(contract);
+    final manifest = staged == null ? null : _manifestView(staged, contract);
     final meta = await syncMetadata();
     final generationChanged =
         meta['generation'] != null &&
@@ -732,6 +837,13 @@ extension SynchronizationRepository on WorkoutRepository {
         !DateTime.parse(manifest.expiresAt).isAfter(now().toUtc())) {
       throw const ContractViolation('snapshot_expired');
     }
+    if (contract == 3 &&
+        !generationChanged &&
+        manifest.position < (meta['position'] as int)) {
+      // A completed newer pull has already installed authoritative state. A
+      // previously downloaded snapshot cannot rewind that account cursor.
+      throw const ContractViolation('stale_page');
+    }
     final rows = await db
         .customSelect('SELECT * FROM bootstrap_pages ORDER BY page_index')
         .get();
@@ -739,24 +851,28 @@ extension SynchronizationRepository on WorkoutRepository {
       throw const ContractViolation('snapshot_incomplete');
     }
     final roots = <Json>[];
+    final routineFragments = <Json>[];
     final retired = <String>{};
     var size = 0;
     for (var i = 0; i < rows.length; i++) {
       if (rows[i].read<int>('page_index') != i) throw const ContractViolation();
-      final page = SnapshotPageDto.fromJson(
-        jsonDecode(rows[i].read<String>('body')) as Json,
-      );
-      final bytes = utf8.encode(canonicalJson(page.json));
+      final page = jsonDecode(rows[i].read<String>('body')) as Json;
+      validateTransport(contract == 3 ? 'SnapshotPage3' : 'SnapshotPage', page);
+      final bytes = utf8.encode(canonicalJson(page));
       if (sha256.convert(bytes).toString() != manifest.checksums[i]) {
         throw const ContractViolation('snapshot_checksum');
       }
       size += bytes.length;
-      roots.addAll(page.roots.cast<Json>());
-      retired.addAll(page.retiredIds.cast<String>());
+      roots.addAll((page['roots'] as List).cast<Json>());
+      if (contract == 3) {
+        routineFragments.addAll((page['routines'] as List).cast<Json>());
+      }
+      retired.addAll((page['retired_ids'] as List).cast<String>());
     }
     if (size > transportSnapshotLimit) {
       throw const ContractViolation('snapshot_capacity');
     }
+    final routineRoots = _assembleRoutineFragments(routineFragments);
     final seen = <String>{};
     final allIds = <String>{};
     for (final root in roots) {
@@ -775,6 +891,19 @@ extension SynchronizationRepository on WorkoutRepository {
         }
       }
     }
+    for (final root in routineRoots) {
+      final identifiers = [
+        root['aggregate_id'] as String,
+        for (final template in (root['templates'] as List).cast<Json>())
+          template['template_id'] as String,
+      ];
+      for (final id in identifiers) {
+        if (!allIds.add(id) || retired.contains(id)) {
+          throw const ContractViolation('identity_collision');
+        }
+      }
+    }
+    if (contract == 3) await _guardWorkoutRoutineIdentities(retired);
     // Find a local root even when the server retires one of its child identities.
     for (final row in await db.customSelect('SELECT id FROM sessions').get()) {
       final id = row.read<String>('id');
@@ -785,7 +914,9 @@ extension SynchronizationRepository on WorkoutRepository {
           e['session_exercise_id'] as String,
         for (final s in allSets(state)) s['set_id'] as String,
       };
-      if (ids.any(retired.contains)) await _eraseRemote(id, retired.toList());
+      if (ids.any(retired.contains)) {
+        await _eraseRemote(id, retired.toList(), routineAware: contract == 3);
+      }
     }
     for (final id in retired) {
       await db.customStatement(
@@ -798,6 +929,7 @@ extension SynchronizationRepository on WorkoutRepository {
         root,
         external: true,
         generationChanged: generationChanged,
+        routineAware: contract == 3,
       );
     }
     for (final row
@@ -820,6 +952,14 @@ extension SynchronizationRepository on WorkoutRepository {
         await db.customStatement('DELETE FROM sessions WHERE id=?', [id]);
       }
       await db.customStatement('DELETE FROM shadows WHERE session_id=?', [id]);
+    }
+    if (contract == 3) {
+      for (final root in routineRoots) {
+        await _installRoutineShadow(root, generationChanged: generationChanged);
+      }
+      await _installMissingRoutines({
+        for (final root in routineRoots) root['aggregate_id'] as String,
+      }, generationChanged);
     }
     await db.customStatement('UPDATE local_identity SET cursor=?', [
       manifest.cursor,

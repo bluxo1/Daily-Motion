@@ -17,7 +17,7 @@ from daily_motion.config import validate_database_transport
 from daily_motion.db import assert_runtime_role
 
 ROLE = "dm_staging_runtime"
-HEAD = "0004"
+HEAD = "0005"
 
 
 def validate_admin_url(value: str, project_ref: str) -> None:
@@ -192,7 +192,7 @@ def verify_isolation(runtime: Engine) -> dict[str, object]:
                 WHERE n.nspname='training' AND c.relkind IN ('r','p')
             """)
             ).one()
-            if tables[0] != 13 or tables[1] is not True:
+            if tables[0] != 15 or tables[1] is not True:
                 raise ValueError("Expected training schema/forced RLS is missing")
         except HTTPException:
             raise ValueError("Runtime role is unsafe") from None
@@ -206,7 +206,7 @@ def verify_isolation(runtime: Engine) -> dict[str, object]:
             raise ValueError("Pooled owner context leaked")
     return {
         "migration_revision": revisions[0],
-        "training_tables": 13,
+        "training_tables": 15,
         "forced_rls": True,
         "owner_isolation": True,
         "probe_rolled_back": True,

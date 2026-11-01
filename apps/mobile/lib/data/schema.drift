@@ -102,7 +102,8 @@ CREATE TABLE historical_receipts (
   evidence TEXT NOT NULL
 );
 
--- Local-only planning. These rows never enter the workout transport outbox.
+-- Device planning representation. Cloud delivery uses the separate routine journal;
+-- these rows never enter the workout transport outbox.
 CREATE UNIQUE INDEX local_identity_owner ON local_identity(owner_id);
 CREATE TABLE routines (
   id TEXT NOT NULL PRIMARY KEY,
@@ -141,4 +142,49 @@ CREATE TABLE custom_exercise_definitions (
   definition_revision INTEGER NOT NULL CHECK(definition_revision > 0),
   definition TEXT NOT NULL,
   PRIMARY KEY(owner_id, variant_id, definition_revision)
+);
+
+-- Routine editor revisions are independent of cloud revisions and delivery order.
+CREATE TABLE routine_sync_state (
+  owner_id TEXT NOT NULL,
+  routine_id TEXT NOT NULL,
+  server_revision INTEGER NOT NULL DEFAULT 0 CHECK(server_revision >= 0),
+  local_sequence INTEGER NOT NULL DEFAULT 0 CHECK(local_sequence >= 0),
+  server_shadow TEXT,
+  has_conflict INTEGER NOT NULL DEFAULT 0 CHECK(has_conflict IN (0,1)),
+  PRIMARY KEY(owner_id, routine_id),
+  FOREIGN KEY(owner_id, routine_id) REFERENCES routines(owner_id, id) ON DELETE CASCADE
+);
+CREATE TABLE routine_mutations (
+  mutation_id TEXT NOT NULL PRIMARY KEY,
+  owner_id TEXT NOT NULL,
+  routine_id TEXT NOT NULL,
+  local_sequence INTEGER NOT NULL CHECK(local_sequence > 0),
+  template_id TEXT NOT NULL,
+  predecessor_id TEXT,
+  origin_base INTEGER NOT NULL DEFAULT 0 CHECK(origin_base >= 0),
+  base_template_id TEXT,
+  enqueued_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  frozen_body TEXT,
+  request_digest TEXT,
+  accepted_revision INTEGER CHECK(accepted_revision > 0),
+  state TEXT NOT NULL DEFAULT 'pending' CHECK(state IN ('pending','acknowledged','conflict','rejected')),
+  attempt_count INTEGER NOT NULL DEFAULT 0 CHECK(attempt_count >= 0),
+  last_error TEXT,
+  UNIQUE(owner_id, routine_id, local_sequence),
+  UNIQUE(owner_id, routine_id, mutation_id),
+  UNIQUE(owner_id, routine_id, template_id),
+  FOREIGN KEY(owner_id, routine_id) REFERENCES routine_sync_state(owner_id, routine_id) ON DELETE CASCADE,
+  FOREIGN KEY(owner_id, routine_id, template_id) REFERENCES workout_templates(owner_id, routine_id, id),
+  FOREIGN KEY(owner_id, routine_id, predecessor_id) REFERENCES routine_mutations(owner_id, routine_id, mutation_id),
+  CHECK((frozen_body IS NULL) = (request_digest IS NULL))
+);
+CREATE TABLE routine_cloud_templates (
+  owner_id TEXT NOT NULL,
+  routine_id TEXT NOT NULL,
+  template_id TEXT NOT NULL,
+  template_json TEXT NOT NULL,
+  PRIMARY KEY(owner_id,routine_id,template_id),
+  UNIQUE(owner_id,template_id),
+  FOREIGN KEY(owner_id,routine_id) REFERENCES routines(owner_id,id) ON DELETE CASCADE
 );

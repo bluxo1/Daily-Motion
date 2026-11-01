@@ -21,6 +21,7 @@ extension LocalRoutines on WorkoutRepository {
       'The saved routine could not be read safely. Its data has been retained.',
     );
     return SavedRoutine(
+      ownerId: ownerId,
       id: row.read<String>('id'),
       templateId: row.read<String>('current_template_id'),
       localRevision: row.read<int>('local_revision'),
@@ -60,42 +61,54 @@ extension LocalRoutines on WorkoutRepository {
     required String id,
     required int expectedRevision,
     required RoutinePlan plan,
-  }) => db.transaction(() async {
-    await _guard();
-    require(_isRoutineUuid(id), 'Use a stable lowercase routine UUID.');
-    require(expectedRevision >= 0, 'Invalid local routine revision.');
-    final current = await _routine(id);
-    final encoded = canonicalJson(plan.json);
-    // An unchanged save and a response-loss retry do not publish new versions.
-    if (current != null &&
-        canonicalJson(current.plan.json) == encoded &&
-        (current.localRevision == expectedRevision ||
-            current.localRevision == expectedRevision + 1)) {
-      return current;
-    }
-    require(
-      (current?.localRevision ?? 0) == expectedRevision,
-      'This routine changed in another editor. Reload before saving; your draft is retained.',
-    );
-    if (current == null) {
-      await db.customStatement(
-        'INSERT INTO routines(id,owner_id,local_revision) VALUES(?,?,0)',
-        [id, ownerId],
+  }) async {
+    final watch = Stopwatch()..start();
+    var changed = false;
+    final saved = await db.transaction(() async {
+      await _guard();
+      require(_isRoutineUuid(id), 'Use a stable lowercase routine UUID.');
+      require(expectedRevision >= 0, 'Invalid local routine revision.');
+      final current = await _routine(id);
+      final encoded = canonicalJson(plan.json);
+      // An unchanged save and a response-loss retry do not publish new versions.
+      if (current != null &&
+          canonicalJson(current.plan.json) == encoded &&
+          (current.localRevision == expectedRevision ||
+              current.localRevision == expectedRevision + 1)) {
+        return current;
+      }
+      require(
+        (current?.localRevision ?? 0) == expectedRevision,
+        'This routine changed in another editor. Reload before saving; your draft is retained.',
       );
-    }
-    final revision = expectedRevision + 1;
-    final template = newId();
-    require(_isRoutineUuid(template), 'Use a stable lowercase template UUID.');
-    await db.customStatement(
-      'INSERT INTO workout_templates(id,owner_id,routine_id,local_revision,prescription) VALUES(?,?,?,?,?)',
-      [template, ownerId, id, revision, encoded],
-    );
-    await db.customStatement(
-      'UPDATE routines SET current_template_id=?,local_revision=? WHERE owner_id=? AND id=?',
-      [template, revision, ownerId, id],
-    );
-    return (await _routine(id))!;
-  });
+      if (current == null) {
+        await db.customStatement(
+          'INSERT INTO routines(id,owner_id,local_revision) VALUES(?,?,0)',
+          [id, ownerId],
+        );
+      }
+      final revision = expectedRevision + 1;
+      final template = newId();
+      require(
+        _isRoutineUuid(template),
+        'Use a stable lowercase template UUID.',
+      );
+      await db.customStatement(
+        'INSERT INTO workout_templates(id,owner_id,routine_id,local_revision,prescription) VALUES(?,?,?,?,?)',
+        [template, ownerId, id, revision, encoded],
+      );
+      await db.customStatement(
+        'UPDATE routines SET current_template_id=?,local_revision=? WHERE owner_id=? AND id=?',
+        [template, revision, ownerId, id],
+      );
+      await db.journalRoutineTemplate(ownerId, id, template);
+      changed = true;
+      return (await _routine(id))!;
+    });
+    watch.stop();
+    if (changed) _signalCommit(watch.elapsed);
+    return saved;
+  }
 
   /// Caller retains the same attempt UUID until its result is known. The
   /// durable binding survives restart, routine edits and session completion.

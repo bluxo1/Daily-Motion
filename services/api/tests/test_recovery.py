@@ -33,6 +33,7 @@ from daily_motion.main import app
 from daily_motion.models import Base, Change, Receipt, Workout
 from daily_motion.sync import accept, bootstrap, next_transaction, pull, snapshot_page
 from tests.recovery_lab import NativeRecoveryLab, RecoveryLab, fingerprint, migrate
+from tests.test_routines import publication, routine_command
 from tests.test_sync import command, record
 
 pytestmark = pytest.mark.skipif(
@@ -71,9 +72,18 @@ def lab() -> Iterator[RecoveryLab]:
         value.cleanup()
         if hasattr(value, "evidence"):
             value.evidence["cleanup_confirmed"] = True
-            output = Path(__file__).parents[3] / ".tools" / "recovery-observation.json"
-            output.parent.mkdir(parents=True, exist_ok=True)
-            output.write_text(json.dumps(value.evidence, indent=2) + "\n", encoding="utf-8")
+            tools = (Path(__file__).parents[3] / ".tools").resolve()
+            output_directory = Path(
+                os.environ.get(
+                    "DM_RECOVERY_EVIDENCE_DIRECTORY", str(tools / "recovery-observations")
+                )
+            ).resolve()
+            if not output_directory.is_relative_to(tools):
+                raise RuntimeError("Recovery evidence must stay in the task-owned tools directory")
+            output_directory.mkdir(parents=True, exist_ok=True)
+            output = output_directory / f"recovery-observation-{uuid4().hex}.json"
+            with output.open("x", encoding="utf-8") as receipt:
+                receipt.write(json.dumps(value.evidence, indent=2) + "\n")
 
 
 @pytest.fixture(scope="module")
@@ -85,7 +95,8 @@ def backup(lab: RecoveryLab) -> dict[str, Any]:
         with pytest.MonkeyPatch.context() as patch:
             bind(runtime, patch)
             owner_a, owner_b, retired_owner = uuid4(), uuid4(), uuid4()
-            for owner in (owner_a, owner_b, retired_owner):
+            routine_owner = uuid4()
+            for owner in (owner_a, owner_b, retired_owner, routine_owner):
                 initialize_account(owner)
             body = new_body()
             assert accept(owner_a, Operation.model_validate(body))["accepted_revision"] == 1
@@ -110,11 +121,17 @@ def backup(lab: RecoveryLab) -> dict[str, Any]:
             assert accept(owner_a, record(deleted))["status"] == "accepted"
             assert accept(owner_a, command(deleted, "delete_session", 2))["status"] == "accepted"
             mark_account_retired(retired_owner)
+            routine = routine_command(new_body())
+            assert accept(routine_owner, routine, 3)["accepted_revision"] == 1
+            for revision in (1, 2):
+                routine = publication(routine, revision)
+                assert accept(routine_owner, routine, 3)["accepted_revision"] == revision + 1
+            bootstrap(routine_owner, contract=3)
             snapshot = bootstrap(owner_a)
             bootstrap(owner_b)
             baseline = fingerprint(admin)
-            assert baseline["revision"] == "0004"
-            assert len(baseline["rows"]) == 13
+            assert baseline["revision"] == "0005"
+            assert len(baseline["rows"]) == 15
             # Legacy recovery still covers all 11 original tables nonempty.
             # V2 attempts/holds have separate explicit admission tests.
             assert all(
@@ -211,7 +228,7 @@ def test_recovery_and_retirement_downgrade_is_refused_without_data_loss(
     root = Path(__file__).parents[1]
     config = Config(str(root / "alembic.ini"))
     config.set_main_option("script_location", str(root / "migrations"))
-    with pytest.raises(RuntimeError, match="Recovery provenance and publication holds"):
+    with pytest.raises(RuntimeError, match="Routine planning data requires a forward fix"):
         with admin.begin() as connection:
             config.attributes["connection"] = connection
             alembic_command.downgrade(config, "0002")

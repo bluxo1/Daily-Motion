@@ -66,6 +66,7 @@ def main() -> int:
     environment.update(
         DM_RUN_RECOVERY_V2="1",
         DM_RECOVERY_PG_BIN=str(binary),
+        DM_RECOVERY_EVIDENCE_DIRECTORY=str(attempt),
         TEMP=str(temporary),
         TMP=str(temporary),
         PYTHONUTF8="1",

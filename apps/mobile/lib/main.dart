@@ -14,6 +14,7 @@ import 'design/theme.dart';
 import 'features/home_screen.dart';
 import 'features/workout_controller.dart';
 import 'features/sync_provider.dart';
+import 'features/internal_routine_access.dart';
 import 'sync/coordinator.dart';
 import 'sync/transport.dart';
 import 'auth/account_controller.dart';
@@ -69,6 +70,9 @@ Future<void> main() async {
           configuration.api,
           token,
           allowLoopbackHttp: configuration.development,
+          routineSyncEnabled: internalRoutineAccess(
+            const bool.fromEnvironment('DM_LOCAL_ROUTINES'),
+          ),
         ),
       );
       runApp(AccountApplication(controller: controller));
@@ -120,6 +124,9 @@ Future<void> main() async {
               Uri.parse(apiUrl),
               () async => token.isEmpty ? null : token,
               allowLoopbackHttp: !kReleaseMode,
+              routineSyncEnabled: internalRoutineAccess(
+                const bool.fromEnvironment('DM_LOCAL_ROUTINES'),
+              ),
             ),
             onInstalled: () async {
               await container.read(workoutsProvider.notifier).refresh();

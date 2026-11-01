@@ -6774,6 +6774,1712 @@ class CustomExerciseDefinitionsCompanion
   }
 }
 
+class RoutineSyncState extends Table
+    with TableInfo<RoutineSyncState, RoutineSyncStateData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  RoutineSyncState(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _routineIdMeta = const VerificationMeta(
+    'routineId',
+  );
+  late final GeneratedColumn<String> routineId = GeneratedColumn<String>(
+    'routine_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _serverRevisionMeta = const VerificationMeta(
+    'serverRevision',
+  );
+  late final GeneratedColumn<int> serverRevision = GeneratedColumn<int>(
+    'server_revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 0 CHECK (server_revision >= 0)',
+    defaultValue: const CustomExpression('0'),
+  );
+  static const VerificationMeta _localSequenceMeta = const VerificationMeta(
+    'localSequence',
+  );
+  late final GeneratedColumn<int> localSequence = GeneratedColumn<int>(
+    'local_sequence',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 0 CHECK (local_sequence >= 0)',
+    defaultValue: const CustomExpression('0'),
+  );
+  static const VerificationMeta _serverShadowMeta = const VerificationMeta(
+    'serverShadow',
+  );
+  late final GeneratedColumn<String> serverShadow = GeneratedColumn<String>(
+    'server_shadow',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _hasConflictMeta = const VerificationMeta(
+    'hasConflict',
+  );
+  late final GeneratedColumn<int> hasConflict = GeneratedColumn<int>(
+    'has_conflict',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 0 CHECK (has_conflict IN (0, 1))',
+    defaultValue: const CustomExpression('0'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    ownerId,
+    routineId,
+    serverRevision,
+    localSequence,
+    serverShadow,
+    hasConflict,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'routine_sync_state';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RoutineSyncStateData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerIdMeta);
+    }
+    if (data.containsKey('routine_id')) {
+      context.handle(
+        _routineIdMeta,
+        routineId.isAcceptableOrUnknown(data['routine_id']!, _routineIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_routineIdMeta);
+    }
+    if (data.containsKey('server_revision')) {
+      context.handle(
+        _serverRevisionMeta,
+        serverRevision.isAcceptableOrUnknown(
+          data['server_revision']!,
+          _serverRevisionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('local_sequence')) {
+      context.handle(
+        _localSequenceMeta,
+        localSequence.isAcceptableOrUnknown(
+          data['local_sequence']!,
+          _localSequenceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('server_shadow')) {
+      context.handle(
+        _serverShadowMeta,
+        serverShadow.isAcceptableOrUnknown(
+          data['server_shadow']!,
+          _serverShadowMeta,
+        ),
+      );
+    }
+    if (data.containsKey('has_conflict')) {
+      context.handle(
+        _hasConflictMeta,
+        hasConflict.isAcceptableOrUnknown(
+          data['has_conflict']!,
+          _hasConflictMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {ownerId, routineId};
+  @override
+  RoutineSyncStateData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RoutineSyncStateData(
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
+      )!,
+      routineId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}routine_id'],
+      )!,
+      serverRevision: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}server_revision'],
+      )!,
+      localSequence: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}local_sequence'],
+      )!,
+      serverShadow: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}server_shadow'],
+      ),
+      hasConflict: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}has_conflict'],
+      )!,
+    );
+  }
+
+  @override
+  RoutineSyncState createAlias(String alias) {
+    return RoutineSyncState(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'PRIMARY KEY(owner_id, routine_id)',
+    'FOREIGN KEY(owner_id, routine_id)REFERENCES routines(owner_id, id)ON DELETE CASCADE',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class RoutineSyncStateData extends DataClass
+    implements Insertable<RoutineSyncStateData> {
+  final String ownerId;
+  final String routineId;
+  final int serverRevision;
+  final int localSequence;
+  final String? serverShadow;
+  final int hasConflict;
+  const RoutineSyncStateData({
+    required this.ownerId,
+    required this.routineId,
+    required this.serverRevision,
+    required this.localSequence,
+    this.serverShadow,
+    required this.hasConflict,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['owner_id'] = Variable<String>(ownerId);
+    map['routine_id'] = Variable<String>(routineId);
+    map['server_revision'] = Variable<int>(serverRevision);
+    map['local_sequence'] = Variable<int>(localSequence);
+    if (!nullToAbsent || serverShadow != null) {
+      map['server_shadow'] = Variable<String>(serverShadow);
+    }
+    map['has_conflict'] = Variable<int>(hasConflict);
+    return map;
+  }
+
+  RoutineSyncStateCompanion toCompanion(bool nullToAbsent) {
+    return RoutineSyncStateCompanion(
+      ownerId: Value(ownerId),
+      routineId: Value(routineId),
+      serverRevision: Value(serverRevision),
+      localSequence: Value(localSequence),
+      serverShadow: serverShadow == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverShadow),
+      hasConflict: Value(hasConflict),
+    );
+  }
+
+  factory RoutineSyncStateData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RoutineSyncStateData(
+      ownerId: serializer.fromJson<String>(json['owner_id']),
+      routineId: serializer.fromJson<String>(json['routine_id']),
+      serverRevision: serializer.fromJson<int>(json['server_revision']),
+      localSequence: serializer.fromJson<int>(json['local_sequence']),
+      serverShadow: serializer.fromJson<String?>(json['server_shadow']),
+      hasConflict: serializer.fromJson<int>(json['has_conflict']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'owner_id': serializer.toJson<String>(ownerId),
+      'routine_id': serializer.toJson<String>(routineId),
+      'server_revision': serializer.toJson<int>(serverRevision),
+      'local_sequence': serializer.toJson<int>(localSequence),
+      'server_shadow': serializer.toJson<String?>(serverShadow),
+      'has_conflict': serializer.toJson<int>(hasConflict),
+    };
+  }
+
+  RoutineSyncStateData copyWith({
+    String? ownerId,
+    String? routineId,
+    int? serverRevision,
+    int? localSequence,
+    Value<String?> serverShadow = const Value.absent(),
+    int? hasConflict,
+  }) => RoutineSyncStateData(
+    ownerId: ownerId ?? this.ownerId,
+    routineId: routineId ?? this.routineId,
+    serverRevision: serverRevision ?? this.serverRevision,
+    localSequence: localSequence ?? this.localSequence,
+    serverShadow: serverShadow.present ? serverShadow.value : this.serverShadow,
+    hasConflict: hasConflict ?? this.hasConflict,
+  );
+  RoutineSyncStateData copyWithCompanion(RoutineSyncStateCompanion data) {
+    return RoutineSyncStateData(
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      routineId: data.routineId.present ? data.routineId.value : this.routineId,
+      serverRevision: data.serverRevision.present
+          ? data.serverRevision.value
+          : this.serverRevision,
+      localSequence: data.localSequence.present
+          ? data.localSequence.value
+          : this.localSequence,
+      serverShadow: data.serverShadow.present
+          ? data.serverShadow.value
+          : this.serverShadow,
+      hasConflict: data.hasConflict.present
+          ? data.hasConflict.value
+          : this.hasConflict,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoutineSyncStateData(')
+          ..write('ownerId: $ownerId, ')
+          ..write('routineId: $routineId, ')
+          ..write('serverRevision: $serverRevision, ')
+          ..write('localSequence: $localSequence, ')
+          ..write('serverShadow: $serverShadow, ')
+          ..write('hasConflict: $hasConflict')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    ownerId,
+    routineId,
+    serverRevision,
+    localSequence,
+    serverShadow,
+    hasConflict,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RoutineSyncStateData &&
+          other.ownerId == this.ownerId &&
+          other.routineId == this.routineId &&
+          other.serverRevision == this.serverRevision &&
+          other.localSequence == this.localSequence &&
+          other.serverShadow == this.serverShadow &&
+          other.hasConflict == this.hasConflict);
+}
+
+class RoutineSyncStateCompanion extends UpdateCompanion<RoutineSyncStateData> {
+  final Value<String> ownerId;
+  final Value<String> routineId;
+  final Value<int> serverRevision;
+  final Value<int> localSequence;
+  final Value<String?> serverShadow;
+  final Value<int> hasConflict;
+  final Value<int> rowid;
+  const RoutineSyncStateCompanion({
+    this.ownerId = const Value.absent(),
+    this.routineId = const Value.absent(),
+    this.serverRevision = const Value.absent(),
+    this.localSequence = const Value.absent(),
+    this.serverShadow = const Value.absent(),
+    this.hasConflict = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RoutineSyncStateCompanion.insert({
+    required String ownerId,
+    required String routineId,
+    this.serverRevision = const Value.absent(),
+    this.localSequence = const Value.absent(),
+    this.serverShadow = const Value.absent(),
+    this.hasConflict = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : ownerId = Value(ownerId),
+       routineId = Value(routineId);
+  static Insertable<RoutineSyncStateData> custom({
+    Expression<String>? ownerId,
+    Expression<String>? routineId,
+    Expression<int>? serverRevision,
+    Expression<int>? localSequence,
+    Expression<String>? serverShadow,
+    Expression<int>? hasConflict,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (ownerId != null) 'owner_id': ownerId,
+      if (routineId != null) 'routine_id': routineId,
+      if (serverRevision != null) 'server_revision': serverRevision,
+      if (localSequence != null) 'local_sequence': localSequence,
+      if (serverShadow != null) 'server_shadow': serverShadow,
+      if (hasConflict != null) 'has_conflict': hasConflict,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RoutineSyncStateCompanion copyWith({
+    Value<String>? ownerId,
+    Value<String>? routineId,
+    Value<int>? serverRevision,
+    Value<int>? localSequence,
+    Value<String?>? serverShadow,
+    Value<int>? hasConflict,
+    Value<int>? rowid,
+  }) {
+    return RoutineSyncStateCompanion(
+      ownerId: ownerId ?? this.ownerId,
+      routineId: routineId ?? this.routineId,
+      serverRevision: serverRevision ?? this.serverRevision,
+      localSequence: localSequence ?? this.localSequence,
+      serverShadow: serverShadow ?? this.serverShadow,
+      hasConflict: hasConflict ?? this.hasConflict,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
+    if (routineId.present) {
+      map['routine_id'] = Variable<String>(routineId.value);
+    }
+    if (serverRevision.present) {
+      map['server_revision'] = Variable<int>(serverRevision.value);
+    }
+    if (localSequence.present) {
+      map['local_sequence'] = Variable<int>(localSequence.value);
+    }
+    if (serverShadow.present) {
+      map['server_shadow'] = Variable<String>(serverShadow.value);
+    }
+    if (hasConflict.present) {
+      map['has_conflict'] = Variable<int>(hasConflict.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoutineSyncStateCompanion(')
+          ..write('ownerId: $ownerId, ')
+          ..write('routineId: $routineId, ')
+          ..write('serverRevision: $serverRevision, ')
+          ..write('localSequence: $localSequence, ')
+          ..write('serverShadow: $serverShadow, ')
+          ..write('hasConflict: $hasConflict, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class RoutineMutations extends Table
+    with TableInfo<RoutineMutations, RoutineMutation> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  RoutineMutations(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _mutationIdMeta = const VerificationMeta(
+    'mutationId',
+  );
+  late final GeneratedColumn<String> mutationId = GeneratedColumn<String>(
+    'mutation_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _routineIdMeta = const VerificationMeta(
+    'routineId',
+  );
+  late final GeneratedColumn<String> routineId = GeneratedColumn<String>(
+    'routine_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _localSequenceMeta = const VerificationMeta(
+    'localSequence',
+  );
+  late final GeneratedColumn<int> localSequence = GeneratedColumn<int>(
+    'local_sequence',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (local_sequence > 0)',
+  );
+  static const VerificationMeta _templateIdMeta = const VerificationMeta(
+    'templateId',
+  );
+  late final GeneratedColumn<String> templateId = GeneratedColumn<String>(
+    'template_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _predecessorIdMeta = const VerificationMeta(
+    'predecessorId',
+  );
+  late final GeneratedColumn<String> predecessorId = GeneratedColumn<String>(
+    'predecessor_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _originBaseMeta = const VerificationMeta(
+    'originBase',
+  );
+  late final GeneratedColumn<int> originBase = GeneratedColumn<int>(
+    'origin_base',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 0 CHECK (origin_base >= 0)',
+    defaultValue: const CustomExpression('0'),
+  );
+  static const VerificationMeta _baseTemplateIdMeta = const VerificationMeta(
+    'baseTemplateId',
+  );
+  late final GeneratedColumn<String> baseTemplateId = GeneratedColumn<String>(
+    'base_template_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _enqueuedAtMeta = const VerificationMeta(
+    'enqueuedAt',
+  );
+  late final GeneratedColumn<String> enqueuedAt = GeneratedColumn<String>(
+    'enqueued_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'NOT NULL DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', \'now\'))',
+    defaultValue: const CustomExpression(
+      'strftime(\'%Y-%m-%dT%H:%M:%fZ\', \'now\')',
+    ),
+  );
+  static const VerificationMeta _frozenBodyMeta = const VerificationMeta(
+    'frozenBody',
+  );
+  late final GeneratedColumn<String> frozenBody = GeneratedColumn<String>(
+    'frozen_body',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _requestDigestMeta = const VerificationMeta(
+    'requestDigest',
+  );
+  late final GeneratedColumn<String> requestDigest = GeneratedColumn<String>(
+    'request_digest',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _acceptedRevisionMeta = const VerificationMeta(
+    'acceptedRevision',
+  );
+  late final GeneratedColumn<int> acceptedRevision = GeneratedColumn<int>(
+    'accepted_revision',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'CHECK (accepted_revision > 0)',
+  );
+  static const VerificationMeta _stateMeta = const VerificationMeta('state');
+  late final GeneratedColumn<String> state = GeneratedColumn<String>(
+    'state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT \'pending\' CHECK (state IN (\'pending\', \'acknowledged\', \'conflict\', \'rejected\'))',
+    defaultValue: const CustomExpression('\'pending\''),
+  );
+  static const VerificationMeta _attemptCountMeta = const VerificationMeta(
+    'attemptCount',
+  );
+  late final GeneratedColumn<int> attemptCount = GeneratedColumn<int>(
+    'attempt_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 0 CHECK (attempt_count >= 0)',
+    defaultValue: const CustomExpression('0'),
+  );
+  static const VerificationMeta _lastErrorMeta = const VerificationMeta(
+    'lastError',
+  );
+  late final GeneratedColumn<String> lastError = GeneratedColumn<String>(
+    'last_error',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    mutationId,
+    ownerId,
+    routineId,
+    localSequence,
+    templateId,
+    predecessorId,
+    originBase,
+    baseTemplateId,
+    enqueuedAt,
+    frozenBody,
+    requestDigest,
+    acceptedRevision,
+    state,
+    attemptCount,
+    lastError,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'routine_mutations';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RoutineMutation> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('mutation_id')) {
+      context.handle(
+        _mutationIdMeta,
+        mutationId.isAcceptableOrUnknown(data['mutation_id']!, _mutationIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mutationIdMeta);
+    }
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerIdMeta);
+    }
+    if (data.containsKey('routine_id')) {
+      context.handle(
+        _routineIdMeta,
+        routineId.isAcceptableOrUnknown(data['routine_id']!, _routineIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_routineIdMeta);
+    }
+    if (data.containsKey('local_sequence')) {
+      context.handle(
+        _localSequenceMeta,
+        localSequence.isAcceptableOrUnknown(
+          data['local_sequence']!,
+          _localSequenceMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_localSequenceMeta);
+    }
+    if (data.containsKey('template_id')) {
+      context.handle(
+        _templateIdMeta,
+        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_templateIdMeta);
+    }
+    if (data.containsKey('predecessor_id')) {
+      context.handle(
+        _predecessorIdMeta,
+        predecessorId.isAcceptableOrUnknown(
+          data['predecessor_id']!,
+          _predecessorIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('origin_base')) {
+      context.handle(
+        _originBaseMeta,
+        originBase.isAcceptableOrUnknown(data['origin_base']!, _originBaseMeta),
+      );
+    }
+    if (data.containsKey('base_template_id')) {
+      context.handle(
+        _baseTemplateIdMeta,
+        baseTemplateId.isAcceptableOrUnknown(
+          data['base_template_id']!,
+          _baseTemplateIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('enqueued_at')) {
+      context.handle(
+        _enqueuedAtMeta,
+        enqueuedAt.isAcceptableOrUnknown(data['enqueued_at']!, _enqueuedAtMeta),
+      );
+    }
+    if (data.containsKey('frozen_body')) {
+      context.handle(
+        _frozenBodyMeta,
+        frozenBody.isAcceptableOrUnknown(data['frozen_body']!, _frozenBodyMeta),
+      );
+    }
+    if (data.containsKey('request_digest')) {
+      context.handle(
+        _requestDigestMeta,
+        requestDigest.isAcceptableOrUnknown(
+          data['request_digest']!,
+          _requestDigestMeta,
+        ),
+      );
+    }
+    if (data.containsKey('accepted_revision')) {
+      context.handle(
+        _acceptedRevisionMeta,
+        acceptedRevision.isAcceptableOrUnknown(
+          data['accepted_revision']!,
+          _acceptedRevisionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('state')) {
+      context.handle(
+        _stateMeta,
+        state.isAcceptableOrUnknown(data['state']!, _stateMeta),
+      );
+    }
+    if (data.containsKey('attempt_count')) {
+      context.handle(
+        _attemptCountMeta,
+        attemptCount.isAcceptableOrUnknown(
+          data['attempt_count']!,
+          _attemptCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_error')) {
+      context.handle(
+        _lastErrorMeta,
+        lastError.isAcceptableOrUnknown(data['last_error']!, _lastErrorMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {mutationId};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {ownerId, routineId, localSequence},
+    {ownerId, routineId, mutationId},
+    {ownerId, routineId, templateId},
+  ];
+  @override
+  RoutineMutation map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RoutineMutation(
+      mutationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mutation_id'],
+      )!,
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
+      )!,
+      routineId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}routine_id'],
+      )!,
+      localSequence: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}local_sequence'],
+      )!,
+      templateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_id'],
+      )!,
+      predecessorId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}predecessor_id'],
+      ),
+      originBase: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}origin_base'],
+      )!,
+      baseTemplateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}base_template_id'],
+      ),
+      enqueuedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}enqueued_at'],
+      )!,
+      frozenBody: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}frozen_body'],
+      ),
+      requestDigest: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}request_digest'],
+      ),
+      acceptedRevision: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}accepted_revision'],
+      ),
+      state: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}state'],
+      )!,
+      attemptCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}attempt_count'],
+      )!,
+      lastError: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_error'],
+      ),
+    );
+  }
+
+  @override
+  RoutineMutations createAlias(String alias) {
+    return RoutineMutations(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'UNIQUE(owner_id, routine_id, local_sequence)',
+    'UNIQUE(owner_id, routine_id, mutation_id)',
+    'UNIQUE(owner_id, routine_id, template_id)',
+    'FOREIGN KEY(owner_id, routine_id)REFERENCES routine_sync_state(owner_id, routine_id)ON DELETE CASCADE',
+    'FOREIGN KEY(owner_id, routine_id, template_id)REFERENCES workout_templates(owner_id, routine_id, id)',
+    'FOREIGN KEY(owner_id, routine_id, predecessor_id)REFERENCES routine_mutations(owner_id, routine_id, mutation_id)',
+    'CHECK((frozen_body IS NULL)=(request_digest IS NULL))',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class RoutineMutation extends DataClass implements Insertable<RoutineMutation> {
+  final String mutationId;
+  final String ownerId;
+  final String routineId;
+  final int localSequence;
+  final String templateId;
+  final String? predecessorId;
+  final int originBase;
+  final String? baseTemplateId;
+  final String enqueuedAt;
+  final String? frozenBody;
+  final String? requestDigest;
+  final int? acceptedRevision;
+  final String state;
+  final int attemptCount;
+  final String? lastError;
+  const RoutineMutation({
+    required this.mutationId,
+    required this.ownerId,
+    required this.routineId,
+    required this.localSequence,
+    required this.templateId,
+    this.predecessorId,
+    required this.originBase,
+    this.baseTemplateId,
+    required this.enqueuedAt,
+    this.frozenBody,
+    this.requestDigest,
+    this.acceptedRevision,
+    required this.state,
+    required this.attemptCount,
+    this.lastError,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['mutation_id'] = Variable<String>(mutationId);
+    map['owner_id'] = Variable<String>(ownerId);
+    map['routine_id'] = Variable<String>(routineId);
+    map['local_sequence'] = Variable<int>(localSequence);
+    map['template_id'] = Variable<String>(templateId);
+    if (!nullToAbsent || predecessorId != null) {
+      map['predecessor_id'] = Variable<String>(predecessorId);
+    }
+    map['origin_base'] = Variable<int>(originBase);
+    if (!nullToAbsent || baseTemplateId != null) {
+      map['base_template_id'] = Variable<String>(baseTemplateId);
+    }
+    map['enqueued_at'] = Variable<String>(enqueuedAt);
+    if (!nullToAbsent || frozenBody != null) {
+      map['frozen_body'] = Variable<String>(frozenBody);
+    }
+    if (!nullToAbsent || requestDigest != null) {
+      map['request_digest'] = Variable<String>(requestDigest);
+    }
+    if (!nullToAbsent || acceptedRevision != null) {
+      map['accepted_revision'] = Variable<int>(acceptedRevision);
+    }
+    map['state'] = Variable<String>(state);
+    map['attempt_count'] = Variable<int>(attemptCount);
+    if (!nullToAbsent || lastError != null) {
+      map['last_error'] = Variable<String>(lastError);
+    }
+    return map;
+  }
+
+  RoutineMutationsCompanion toCompanion(bool nullToAbsent) {
+    return RoutineMutationsCompanion(
+      mutationId: Value(mutationId),
+      ownerId: Value(ownerId),
+      routineId: Value(routineId),
+      localSequence: Value(localSequence),
+      templateId: Value(templateId),
+      predecessorId: predecessorId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(predecessorId),
+      originBase: Value(originBase),
+      baseTemplateId: baseTemplateId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(baseTemplateId),
+      enqueuedAt: Value(enqueuedAt),
+      frozenBody: frozenBody == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frozenBody),
+      requestDigest: requestDigest == null && nullToAbsent
+          ? const Value.absent()
+          : Value(requestDigest),
+      acceptedRevision: acceptedRevision == null && nullToAbsent
+          ? const Value.absent()
+          : Value(acceptedRevision),
+      state: Value(state),
+      attemptCount: Value(attemptCount),
+      lastError: lastError == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastError),
+    );
+  }
+
+  factory RoutineMutation.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RoutineMutation(
+      mutationId: serializer.fromJson<String>(json['mutation_id']),
+      ownerId: serializer.fromJson<String>(json['owner_id']),
+      routineId: serializer.fromJson<String>(json['routine_id']),
+      localSequence: serializer.fromJson<int>(json['local_sequence']),
+      templateId: serializer.fromJson<String>(json['template_id']),
+      predecessorId: serializer.fromJson<String?>(json['predecessor_id']),
+      originBase: serializer.fromJson<int>(json['origin_base']),
+      baseTemplateId: serializer.fromJson<String?>(json['base_template_id']),
+      enqueuedAt: serializer.fromJson<String>(json['enqueued_at']),
+      frozenBody: serializer.fromJson<String?>(json['frozen_body']),
+      requestDigest: serializer.fromJson<String?>(json['request_digest']),
+      acceptedRevision: serializer.fromJson<int?>(json['accepted_revision']),
+      state: serializer.fromJson<String>(json['state']),
+      attemptCount: serializer.fromJson<int>(json['attempt_count']),
+      lastError: serializer.fromJson<String?>(json['last_error']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'mutation_id': serializer.toJson<String>(mutationId),
+      'owner_id': serializer.toJson<String>(ownerId),
+      'routine_id': serializer.toJson<String>(routineId),
+      'local_sequence': serializer.toJson<int>(localSequence),
+      'template_id': serializer.toJson<String>(templateId),
+      'predecessor_id': serializer.toJson<String?>(predecessorId),
+      'origin_base': serializer.toJson<int>(originBase),
+      'base_template_id': serializer.toJson<String?>(baseTemplateId),
+      'enqueued_at': serializer.toJson<String>(enqueuedAt),
+      'frozen_body': serializer.toJson<String?>(frozenBody),
+      'request_digest': serializer.toJson<String?>(requestDigest),
+      'accepted_revision': serializer.toJson<int?>(acceptedRevision),
+      'state': serializer.toJson<String>(state),
+      'attempt_count': serializer.toJson<int>(attemptCount),
+      'last_error': serializer.toJson<String?>(lastError),
+    };
+  }
+
+  RoutineMutation copyWith({
+    String? mutationId,
+    String? ownerId,
+    String? routineId,
+    int? localSequence,
+    String? templateId,
+    Value<String?> predecessorId = const Value.absent(),
+    int? originBase,
+    Value<String?> baseTemplateId = const Value.absent(),
+    String? enqueuedAt,
+    Value<String?> frozenBody = const Value.absent(),
+    Value<String?> requestDigest = const Value.absent(),
+    Value<int?> acceptedRevision = const Value.absent(),
+    String? state,
+    int? attemptCount,
+    Value<String?> lastError = const Value.absent(),
+  }) => RoutineMutation(
+    mutationId: mutationId ?? this.mutationId,
+    ownerId: ownerId ?? this.ownerId,
+    routineId: routineId ?? this.routineId,
+    localSequence: localSequence ?? this.localSequence,
+    templateId: templateId ?? this.templateId,
+    predecessorId: predecessorId.present
+        ? predecessorId.value
+        : this.predecessorId,
+    originBase: originBase ?? this.originBase,
+    baseTemplateId: baseTemplateId.present
+        ? baseTemplateId.value
+        : this.baseTemplateId,
+    enqueuedAt: enqueuedAt ?? this.enqueuedAt,
+    frozenBody: frozenBody.present ? frozenBody.value : this.frozenBody,
+    requestDigest: requestDigest.present
+        ? requestDigest.value
+        : this.requestDigest,
+    acceptedRevision: acceptedRevision.present
+        ? acceptedRevision.value
+        : this.acceptedRevision,
+    state: state ?? this.state,
+    attemptCount: attemptCount ?? this.attemptCount,
+    lastError: lastError.present ? lastError.value : this.lastError,
+  );
+  RoutineMutation copyWithCompanion(RoutineMutationsCompanion data) {
+    return RoutineMutation(
+      mutationId: data.mutationId.present
+          ? data.mutationId.value
+          : this.mutationId,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      routineId: data.routineId.present ? data.routineId.value : this.routineId,
+      localSequence: data.localSequence.present
+          ? data.localSequence.value
+          : this.localSequence,
+      templateId: data.templateId.present
+          ? data.templateId.value
+          : this.templateId,
+      predecessorId: data.predecessorId.present
+          ? data.predecessorId.value
+          : this.predecessorId,
+      originBase: data.originBase.present
+          ? data.originBase.value
+          : this.originBase,
+      baseTemplateId: data.baseTemplateId.present
+          ? data.baseTemplateId.value
+          : this.baseTemplateId,
+      enqueuedAt: data.enqueuedAt.present
+          ? data.enqueuedAt.value
+          : this.enqueuedAt,
+      frozenBody: data.frozenBody.present
+          ? data.frozenBody.value
+          : this.frozenBody,
+      requestDigest: data.requestDigest.present
+          ? data.requestDigest.value
+          : this.requestDigest,
+      acceptedRevision: data.acceptedRevision.present
+          ? data.acceptedRevision.value
+          : this.acceptedRevision,
+      state: data.state.present ? data.state.value : this.state,
+      attemptCount: data.attemptCount.present
+          ? data.attemptCount.value
+          : this.attemptCount,
+      lastError: data.lastError.present ? data.lastError.value : this.lastError,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoutineMutation(')
+          ..write('mutationId: $mutationId, ')
+          ..write('ownerId: $ownerId, ')
+          ..write('routineId: $routineId, ')
+          ..write('localSequence: $localSequence, ')
+          ..write('templateId: $templateId, ')
+          ..write('predecessorId: $predecessorId, ')
+          ..write('originBase: $originBase, ')
+          ..write('baseTemplateId: $baseTemplateId, ')
+          ..write('enqueuedAt: $enqueuedAt, ')
+          ..write('frozenBody: $frozenBody, ')
+          ..write('requestDigest: $requestDigest, ')
+          ..write('acceptedRevision: $acceptedRevision, ')
+          ..write('state: $state, ')
+          ..write('attemptCount: $attemptCount, ')
+          ..write('lastError: $lastError')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    mutationId,
+    ownerId,
+    routineId,
+    localSequence,
+    templateId,
+    predecessorId,
+    originBase,
+    baseTemplateId,
+    enqueuedAt,
+    frozenBody,
+    requestDigest,
+    acceptedRevision,
+    state,
+    attemptCount,
+    lastError,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RoutineMutation &&
+          other.mutationId == this.mutationId &&
+          other.ownerId == this.ownerId &&
+          other.routineId == this.routineId &&
+          other.localSequence == this.localSequence &&
+          other.templateId == this.templateId &&
+          other.predecessorId == this.predecessorId &&
+          other.originBase == this.originBase &&
+          other.baseTemplateId == this.baseTemplateId &&
+          other.enqueuedAt == this.enqueuedAt &&
+          other.frozenBody == this.frozenBody &&
+          other.requestDigest == this.requestDigest &&
+          other.acceptedRevision == this.acceptedRevision &&
+          other.state == this.state &&
+          other.attemptCount == this.attemptCount &&
+          other.lastError == this.lastError);
+}
+
+class RoutineMutationsCompanion extends UpdateCompanion<RoutineMutation> {
+  final Value<String> mutationId;
+  final Value<String> ownerId;
+  final Value<String> routineId;
+  final Value<int> localSequence;
+  final Value<String> templateId;
+  final Value<String?> predecessorId;
+  final Value<int> originBase;
+  final Value<String?> baseTemplateId;
+  final Value<String> enqueuedAt;
+  final Value<String?> frozenBody;
+  final Value<String?> requestDigest;
+  final Value<int?> acceptedRevision;
+  final Value<String> state;
+  final Value<int> attemptCount;
+  final Value<String?> lastError;
+  final Value<int> rowid;
+  const RoutineMutationsCompanion({
+    this.mutationId = const Value.absent(),
+    this.ownerId = const Value.absent(),
+    this.routineId = const Value.absent(),
+    this.localSequence = const Value.absent(),
+    this.templateId = const Value.absent(),
+    this.predecessorId = const Value.absent(),
+    this.originBase = const Value.absent(),
+    this.baseTemplateId = const Value.absent(),
+    this.enqueuedAt = const Value.absent(),
+    this.frozenBody = const Value.absent(),
+    this.requestDigest = const Value.absent(),
+    this.acceptedRevision = const Value.absent(),
+    this.state = const Value.absent(),
+    this.attemptCount = const Value.absent(),
+    this.lastError = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RoutineMutationsCompanion.insert({
+    required String mutationId,
+    required String ownerId,
+    required String routineId,
+    required int localSequence,
+    required String templateId,
+    this.predecessorId = const Value.absent(),
+    this.originBase = const Value.absent(),
+    this.baseTemplateId = const Value.absent(),
+    this.enqueuedAt = const Value.absent(),
+    this.frozenBody = const Value.absent(),
+    this.requestDigest = const Value.absent(),
+    this.acceptedRevision = const Value.absent(),
+    this.state = const Value.absent(),
+    this.attemptCount = const Value.absent(),
+    this.lastError = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : mutationId = Value(mutationId),
+       ownerId = Value(ownerId),
+       routineId = Value(routineId),
+       localSequence = Value(localSequence),
+       templateId = Value(templateId);
+  static Insertable<RoutineMutation> custom({
+    Expression<String>? mutationId,
+    Expression<String>? ownerId,
+    Expression<String>? routineId,
+    Expression<int>? localSequence,
+    Expression<String>? templateId,
+    Expression<String>? predecessorId,
+    Expression<int>? originBase,
+    Expression<String>? baseTemplateId,
+    Expression<String>? enqueuedAt,
+    Expression<String>? frozenBody,
+    Expression<String>? requestDigest,
+    Expression<int>? acceptedRevision,
+    Expression<String>? state,
+    Expression<int>? attemptCount,
+    Expression<String>? lastError,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (mutationId != null) 'mutation_id': mutationId,
+      if (ownerId != null) 'owner_id': ownerId,
+      if (routineId != null) 'routine_id': routineId,
+      if (localSequence != null) 'local_sequence': localSequence,
+      if (templateId != null) 'template_id': templateId,
+      if (predecessorId != null) 'predecessor_id': predecessorId,
+      if (originBase != null) 'origin_base': originBase,
+      if (baseTemplateId != null) 'base_template_id': baseTemplateId,
+      if (enqueuedAt != null) 'enqueued_at': enqueuedAt,
+      if (frozenBody != null) 'frozen_body': frozenBody,
+      if (requestDigest != null) 'request_digest': requestDigest,
+      if (acceptedRevision != null) 'accepted_revision': acceptedRevision,
+      if (state != null) 'state': state,
+      if (attemptCount != null) 'attempt_count': attemptCount,
+      if (lastError != null) 'last_error': lastError,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RoutineMutationsCompanion copyWith({
+    Value<String>? mutationId,
+    Value<String>? ownerId,
+    Value<String>? routineId,
+    Value<int>? localSequence,
+    Value<String>? templateId,
+    Value<String?>? predecessorId,
+    Value<int>? originBase,
+    Value<String?>? baseTemplateId,
+    Value<String>? enqueuedAt,
+    Value<String?>? frozenBody,
+    Value<String?>? requestDigest,
+    Value<int?>? acceptedRevision,
+    Value<String>? state,
+    Value<int>? attemptCount,
+    Value<String?>? lastError,
+    Value<int>? rowid,
+  }) {
+    return RoutineMutationsCompanion(
+      mutationId: mutationId ?? this.mutationId,
+      ownerId: ownerId ?? this.ownerId,
+      routineId: routineId ?? this.routineId,
+      localSequence: localSequence ?? this.localSequence,
+      templateId: templateId ?? this.templateId,
+      predecessorId: predecessorId ?? this.predecessorId,
+      originBase: originBase ?? this.originBase,
+      baseTemplateId: baseTemplateId ?? this.baseTemplateId,
+      enqueuedAt: enqueuedAt ?? this.enqueuedAt,
+      frozenBody: frozenBody ?? this.frozenBody,
+      requestDigest: requestDigest ?? this.requestDigest,
+      acceptedRevision: acceptedRevision ?? this.acceptedRevision,
+      state: state ?? this.state,
+      attemptCount: attemptCount ?? this.attemptCount,
+      lastError: lastError ?? this.lastError,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (mutationId.present) {
+      map['mutation_id'] = Variable<String>(mutationId.value);
+    }
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
+    if (routineId.present) {
+      map['routine_id'] = Variable<String>(routineId.value);
+    }
+    if (localSequence.present) {
+      map['local_sequence'] = Variable<int>(localSequence.value);
+    }
+    if (templateId.present) {
+      map['template_id'] = Variable<String>(templateId.value);
+    }
+    if (predecessorId.present) {
+      map['predecessor_id'] = Variable<String>(predecessorId.value);
+    }
+    if (originBase.present) {
+      map['origin_base'] = Variable<int>(originBase.value);
+    }
+    if (baseTemplateId.present) {
+      map['base_template_id'] = Variable<String>(baseTemplateId.value);
+    }
+    if (enqueuedAt.present) {
+      map['enqueued_at'] = Variable<String>(enqueuedAt.value);
+    }
+    if (frozenBody.present) {
+      map['frozen_body'] = Variable<String>(frozenBody.value);
+    }
+    if (requestDigest.present) {
+      map['request_digest'] = Variable<String>(requestDigest.value);
+    }
+    if (acceptedRevision.present) {
+      map['accepted_revision'] = Variable<int>(acceptedRevision.value);
+    }
+    if (state.present) {
+      map['state'] = Variable<String>(state.value);
+    }
+    if (attemptCount.present) {
+      map['attempt_count'] = Variable<int>(attemptCount.value);
+    }
+    if (lastError.present) {
+      map['last_error'] = Variable<String>(lastError.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoutineMutationsCompanion(')
+          ..write('mutationId: $mutationId, ')
+          ..write('ownerId: $ownerId, ')
+          ..write('routineId: $routineId, ')
+          ..write('localSequence: $localSequence, ')
+          ..write('templateId: $templateId, ')
+          ..write('predecessorId: $predecessorId, ')
+          ..write('originBase: $originBase, ')
+          ..write('baseTemplateId: $baseTemplateId, ')
+          ..write('enqueuedAt: $enqueuedAt, ')
+          ..write('frozenBody: $frozenBody, ')
+          ..write('requestDigest: $requestDigest, ')
+          ..write('acceptedRevision: $acceptedRevision, ')
+          ..write('state: $state, ')
+          ..write('attemptCount: $attemptCount, ')
+          ..write('lastError: $lastError, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class RoutineCloudTemplates extends Table
+    with TableInfo<RoutineCloudTemplates, RoutineCloudTemplate> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  RoutineCloudTemplates(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _routineIdMeta = const VerificationMeta(
+    'routineId',
+  );
+  late final GeneratedColumn<String> routineId = GeneratedColumn<String>(
+    'routine_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _templateIdMeta = const VerificationMeta(
+    'templateId',
+  );
+  late final GeneratedColumn<String> templateId = GeneratedColumn<String>(
+    'template_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _templateJsonMeta = const VerificationMeta(
+    'templateJson',
+  );
+  late final GeneratedColumn<String> templateJson = GeneratedColumn<String>(
+    'template_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    ownerId,
+    routineId,
+    templateId,
+    templateJson,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'routine_cloud_templates';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RoutineCloudTemplate> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerIdMeta);
+    }
+    if (data.containsKey('routine_id')) {
+      context.handle(
+        _routineIdMeta,
+        routineId.isAcceptableOrUnknown(data['routine_id']!, _routineIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_routineIdMeta);
+    }
+    if (data.containsKey('template_id')) {
+      context.handle(
+        _templateIdMeta,
+        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_templateIdMeta);
+    }
+    if (data.containsKey('template_json')) {
+      context.handle(
+        _templateJsonMeta,
+        templateJson.isAcceptableOrUnknown(
+          data['template_json']!,
+          _templateJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_templateJsonMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {ownerId, routineId, templateId};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {ownerId, templateId},
+  ];
+  @override
+  RoutineCloudTemplate map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RoutineCloudTemplate(
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
+      )!,
+      routineId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}routine_id'],
+      )!,
+      templateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_id'],
+      )!,
+      templateJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_json'],
+      )!,
+    );
+  }
+
+  @override
+  RoutineCloudTemplates createAlias(String alias) {
+    return RoutineCloudTemplates(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'PRIMARY KEY(owner_id, routine_id, template_id)',
+    'UNIQUE(owner_id, template_id)',
+    'FOREIGN KEY(owner_id, routine_id)REFERENCES routines(owner_id, id)ON DELETE CASCADE',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class RoutineCloudTemplate extends DataClass
+    implements Insertable<RoutineCloudTemplate> {
+  final String ownerId;
+  final String routineId;
+  final String templateId;
+  final String templateJson;
+  const RoutineCloudTemplate({
+    required this.ownerId,
+    required this.routineId,
+    required this.templateId,
+    required this.templateJson,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['owner_id'] = Variable<String>(ownerId);
+    map['routine_id'] = Variable<String>(routineId);
+    map['template_id'] = Variable<String>(templateId);
+    map['template_json'] = Variable<String>(templateJson);
+    return map;
+  }
+
+  RoutineCloudTemplatesCompanion toCompanion(bool nullToAbsent) {
+    return RoutineCloudTemplatesCompanion(
+      ownerId: Value(ownerId),
+      routineId: Value(routineId),
+      templateId: Value(templateId),
+      templateJson: Value(templateJson),
+    );
+  }
+
+  factory RoutineCloudTemplate.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RoutineCloudTemplate(
+      ownerId: serializer.fromJson<String>(json['owner_id']),
+      routineId: serializer.fromJson<String>(json['routine_id']),
+      templateId: serializer.fromJson<String>(json['template_id']),
+      templateJson: serializer.fromJson<String>(json['template_json']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'owner_id': serializer.toJson<String>(ownerId),
+      'routine_id': serializer.toJson<String>(routineId),
+      'template_id': serializer.toJson<String>(templateId),
+      'template_json': serializer.toJson<String>(templateJson),
+    };
+  }
+
+  RoutineCloudTemplate copyWith({
+    String? ownerId,
+    String? routineId,
+    String? templateId,
+    String? templateJson,
+  }) => RoutineCloudTemplate(
+    ownerId: ownerId ?? this.ownerId,
+    routineId: routineId ?? this.routineId,
+    templateId: templateId ?? this.templateId,
+    templateJson: templateJson ?? this.templateJson,
+  );
+  RoutineCloudTemplate copyWithCompanion(RoutineCloudTemplatesCompanion data) {
+    return RoutineCloudTemplate(
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      routineId: data.routineId.present ? data.routineId.value : this.routineId,
+      templateId: data.templateId.present
+          ? data.templateId.value
+          : this.templateId,
+      templateJson: data.templateJson.present
+          ? data.templateJson.value
+          : this.templateJson,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoutineCloudTemplate(')
+          ..write('ownerId: $ownerId, ')
+          ..write('routineId: $routineId, ')
+          ..write('templateId: $templateId, ')
+          ..write('templateJson: $templateJson')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(ownerId, routineId, templateId, templateJson);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RoutineCloudTemplate &&
+          other.ownerId == this.ownerId &&
+          other.routineId == this.routineId &&
+          other.templateId == this.templateId &&
+          other.templateJson == this.templateJson);
+}
+
+class RoutineCloudTemplatesCompanion
+    extends UpdateCompanion<RoutineCloudTemplate> {
+  final Value<String> ownerId;
+  final Value<String> routineId;
+  final Value<String> templateId;
+  final Value<String> templateJson;
+  final Value<int> rowid;
+  const RoutineCloudTemplatesCompanion({
+    this.ownerId = const Value.absent(),
+    this.routineId = const Value.absent(),
+    this.templateId = const Value.absent(),
+    this.templateJson = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RoutineCloudTemplatesCompanion.insert({
+    required String ownerId,
+    required String routineId,
+    required String templateId,
+    required String templateJson,
+    this.rowid = const Value.absent(),
+  }) : ownerId = Value(ownerId),
+       routineId = Value(routineId),
+       templateId = Value(templateId),
+       templateJson = Value(templateJson);
+  static Insertable<RoutineCloudTemplate> custom({
+    Expression<String>? ownerId,
+    Expression<String>? routineId,
+    Expression<String>? templateId,
+    Expression<String>? templateJson,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (ownerId != null) 'owner_id': ownerId,
+      if (routineId != null) 'routine_id': routineId,
+      if (templateId != null) 'template_id': templateId,
+      if (templateJson != null) 'template_json': templateJson,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RoutineCloudTemplatesCompanion copyWith({
+    Value<String>? ownerId,
+    Value<String>? routineId,
+    Value<String>? templateId,
+    Value<String>? templateJson,
+    Value<int>? rowid,
+  }) {
+    return RoutineCloudTemplatesCompanion(
+      ownerId: ownerId ?? this.ownerId,
+      routineId: routineId ?? this.routineId,
+      templateId: templateId ?? this.templateId,
+      templateJson: templateJson ?? this.templateJson,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
+    if (routineId.present) {
+      map['routine_id'] = Variable<String>(routineId.value);
+    }
+    if (templateId.present) {
+      map['template_id'] = Variable<String>(templateId.value);
+    }
+    if (templateJson.present) {
+      map['template_json'] = Variable<String>(templateJson.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoutineCloudTemplatesCompanion(')
+          ..write('ownerId: $ownerId, ')
+          ..write('routineId: $routineId, ')
+          ..write('templateId: $templateId, ')
+          ..write('templateJson: $templateJson, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$TrainingDatabase extends GeneratedDatabase {
   _$TrainingDatabase(QueryExecutor e) : super(e);
   $TrainingDatabaseManager get managers => $TrainingDatabaseManager(this);
@@ -6809,6 +8515,10 @@ abstract class _$TrainingDatabase extends GeneratedDatabase {
   late final RoutineStarts routineStarts = RoutineStarts(this);
   late final CustomExerciseDefinitions customExerciseDefinitions =
       CustomExerciseDefinitions(this);
+  late final RoutineSyncState routineSyncState = RoutineSyncState(this);
+  late final RoutineMutations routineMutations = RoutineMutations(this);
+  late final RoutineCloudTemplates routineCloudTemplates =
+      RoutineCloudTemplates(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6836,6 +8546,9 @@ abstract class _$TrainingDatabase extends GeneratedDatabase {
     routines,
     routineStarts,
     customExerciseDefinitions,
+    routineSyncState,
+    routineMutations,
+    routineCloudTemplates,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -6887,6 +8600,27 @@ abstract class _$TrainingDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('routine_starts', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'routines',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('routine_sync_state', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'routine_sync_state',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('routine_mutations', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'routines',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('routine_cloud_templates', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -12148,6 +13882,881 @@ typedef $CustomExerciseDefinitionsProcessedTableManager =
       CustomExerciseDefinition,
       PrefetchHooks Function({bool ownerId})
     >;
+typedef $RoutineSyncStateCreateCompanionBuilder =
+    RoutineSyncStateCompanion Function({
+      required String ownerId,
+      required String routineId,
+      Value<int> serverRevision,
+      Value<int> localSequence,
+      Value<String?> serverShadow,
+      Value<int> hasConflict,
+      Value<int> rowid,
+    });
+typedef $RoutineSyncStateUpdateCompanionBuilder =
+    RoutineSyncStateCompanion Function({
+      Value<String> ownerId,
+      Value<String> routineId,
+      Value<int> serverRevision,
+      Value<int> localSequence,
+      Value<String?> serverShadow,
+      Value<int> hasConflict,
+      Value<int> rowid,
+    });
+
+class $RoutineSyncStateFilterComposer
+    extends Composer<_$TrainingDatabase, RoutineSyncState> {
+  $RoutineSyncStateFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get serverRevision => $composableBuilder(
+    column: $table.serverRevision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get localSequence => $composableBuilder(
+    column: $table.localSequence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get serverShadow => $composableBuilder(
+    column: $table.serverShadow,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hasConflict => $composableBuilder(
+    column: $table.hasConflict,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $RoutineSyncStateOrderingComposer
+    extends Composer<_$TrainingDatabase, RoutineSyncState> {
+  $RoutineSyncStateOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get serverRevision => $composableBuilder(
+    column: $table.serverRevision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get localSequence => $composableBuilder(
+    column: $table.localSequence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get serverShadow => $composableBuilder(
+    column: $table.serverShadow,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hasConflict => $composableBuilder(
+    column: $table.hasConflict,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $RoutineSyncStateAnnotationComposer
+    extends Composer<_$TrainingDatabase, RoutineSyncState> {
+  $RoutineSyncStateAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get routineId =>
+      $composableBuilder(column: $table.routineId, builder: (column) => column);
+
+  GeneratedColumn<int> get serverRevision => $composableBuilder(
+    column: $table.serverRevision,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get localSequence => $composableBuilder(
+    column: $table.localSequence,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get serverShadow => $composableBuilder(
+    column: $table.serverShadow,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get hasConflict => $composableBuilder(
+    column: $table.hasConflict,
+    builder: (column) => column,
+  );
+}
+
+class $RoutineSyncStateTableManager
+    extends
+        RootTableManager<
+          _$TrainingDatabase,
+          RoutineSyncState,
+          RoutineSyncStateData,
+          $RoutineSyncStateFilterComposer,
+          $RoutineSyncStateOrderingComposer,
+          $RoutineSyncStateAnnotationComposer,
+          $RoutineSyncStateCreateCompanionBuilder,
+          $RoutineSyncStateUpdateCompanionBuilder,
+          (
+            RoutineSyncStateData,
+            BaseReferences<
+              _$TrainingDatabase,
+              RoutineSyncState,
+              RoutineSyncStateData
+            >,
+          ),
+          RoutineSyncStateData,
+          PrefetchHooks Function()
+        > {
+  $RoutineSyncStateTableManager(_$TrainingDatabase db, RoutineSyncState table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $RoutineSyncStateFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $RoutineSyncStateOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $RoutineSyncStateAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> ownerId = const Value.absent(),
+                Value<String> routineId = const Value.absent(),
+                Value<int> serverRevision = const Value.absent(),
+                Value<int> localSequence = const Value.absent(),
+                Value<String?> serverShadow = const Value.absent(),
+                Value<int> hasConflict = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RoutineSyncStateCompanion(
+                ownerId: ownerId,
+                routineId: routineId,
+                serverRevision: serverRevision,
+                localSequence: localSequence,
+                serverShadow: serverShadow,
+                hasConflict: hasConflict,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String ownerId,
+                required String routineId,
+                Value<int> serverRevision = const Value.absent(),
+                Value<int> localSequence = const Value.absent(),
+                Value<String?> serverShadow = const Value.absent(),
+                Value<int> hasConflict = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RoutineSyncStateCompanion.insert(
+                ownerId: ownerId,
+                routineId: routineId,
+                serverRevision: serverRevision,
+                localSequence: localSequence,
+                serverShadow: serverShadow,
+                hasConflict: hasConflict,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<RoutineSyncState, RoutineSyncStateData>(table),
+                  BaseReferences<
+                    _$TrainingDatabase,
+                    RoutineSyncState,
+                    RoutineSyncStateData
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $RoutineSyncStateProcessedTableManager =
+    ProcessedTableManager<
+      _$TrainingDatabase,
+      RoutineSyncState,
+      RoutineSyncStateData,
+      $RoutineSyncStateFilterComposer,
+      $RoutineSyncStateOrderingComposer,
+      $RoutineSyncStateAnnotationComposer,
+      $RoutineSyncStateCreateCompanionBuilder,
+      $RoutineSyncStateUpdateCompanionBuilder,
+      (
+        RoutineSyncStateData,
+        BaseReferences<
+          _$TrainingDatabase,
+          RoutineSyncState,
+          RoutineSyncStateData
+        >,
+      ),
+      RoutineSyncStateData,
+      PrefetchHooks Function()
+    >;
+typedef $RoutineMutationsCreateCompanionBuilder =
+    RoutineMutationsCompanion Function({
+      required String mutationId,
+      required String ownerId,
+      required String routineId,
+      required int localSequence,
+      required String templateId,
+      Value<String?> predecessorId,
+      Value<int> originBase,
+      Value<String?> baseTemplateId,
+      Value<String> enqueuedAt,
+      Value<String?> frozenBody,
+      Value<String?> requestDigest,
+      Value<int?> acceptedRevision,
+      Value<String> state,
+      Value<int> attemptCount,
+      Value<String?> lastError,
+      Value<int> rowid,
+    });
+typedef $RoutineMutationsUpdateCompanionBuilder =
+    RoutineMutationsCompanion Function({
+      Value<String> mutationId,
+      Value<String> ownerId,
+      Value<String> routineId,
+      Value<int> localSequence,
+      Value<String> templateId,
+      Value<String?> predecessorId,
+      Value<int> originBase,
+      Value<String?> baseTemplateId,
+      Value<String> enqueuedAt,
+      Value<String?> frozenBody,
+      Value<String?> requestDigest,
+      Value<int?> acceptedRevision,
+      Value<String> state,
+      Value<int> attemptCount,
+      Value<String?> lastError,
+      Value<int> rowid,
+    });
+
+class $RoutineMutationsFilterComposer
+    extends Composer<_$TrainingDatabase, RoutineMutations> {
+  $RoutineMutationsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get mutationId => $composableBuilder(
+    column: $table.mutationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get localSequence => $composableBuilder(
+    column: $table.localSequence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get predecessorId => $composableBuilder(
+    column: $table.predecessorId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get originBase => $composableBuilder(
+    column: $table.originBase,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get baseTemplateId => $composableBuilder(
+    column: $table.baseTemplateId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get enqueuedAt => $composableBuilder(
+    column: $table.enqueuedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get frozenBody => $composableBuilder(
+    column: $table.frozenBody,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get requestDigest => $composableBuilder(
+    column: $table.requestDigest,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get acceptedRevision => $composableBuilder(
+    column: $table.acceptedRevision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get attemptCount => $composableBuilder(
+    column: $table.attemptCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastError => $composableBuilder(
+    column: $table.lastError,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $RoutineMutationsOrderingComposer
+    extends Composer<_$TrainingDatabase, RoutineMutations> {
+  $RoutineMutationsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get mutationId => $composableBuilder(
+    column: $table.mutationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get localSequence => $composableBuilder(
+    column: $table.localSequence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get predecessorId => $composableBuilder(
+    column: $table.predecessorId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get originBase => $composableBuilder(
+    column: $table.originBase,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get baseTemplateId => $composableBuilder(
+    column: $table.baseTemplateId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get enqueuedAt => $composableBuilder(
+    column: $table.enqueuedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get frozenBody => $composableBuilder(
+    column: $table.frozenBody,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get requestDigest => $composableBuilder(
+    column: $table.requestDigest,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get acceptedRevision => $composableBuilder(
+    column: $table.acceptedRevision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get attemptCount => $composableBuilder(
+    column: $table.attemptCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastError => $composableBuilder(
+    column: $table.lastError,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $RoutineMutationsAnnotationComposer
+    extends Composer<_$TrainingDatabase, RoutineMutations> {
+  $RoutineMutationsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get mutationId => $composableBuilder(
+    column: $table.mutationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get routineId =>
+      $composableBuilder(column: $table.routineId, builder: (column) => column);
+
+  GeneratedColumn<int> get localSequence => $composableBuilder(
+    column: $table.localSequence,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get predecessorId => $composableBuilder(
+    column: $table.predecessorId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get originBase => $composableBuilder(
+    column: $table.originBase,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get baseTemplateId => $composableBuilder(
+    column: $table.baseTemplateId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get enqueuedAt => $composableBuilder(
+    column: $table.enqueuedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get frozenBody => $composableBuilder(
+    column: $table.frozenBody,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get requestDigest => $composableBuilder(
+    column: $table.requestDigest,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get acceptedRevision => $composableBuilder(
+    column: $table.acceptedRevision,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => column);
+
+  GeneratedColumn<int> get attemptCount => $composableBuilder(
+    column: $table.attemptCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastError =>
+      $composableBuilder(column: $table.lastError, builder: (column) => column);
+}
+
+class $RoutineMutationsTableManager
+    extends
+        RootTableManager<
+          _$TrainingDatabase,
+          RoutineMutations,
+          RoutineMutation,
+          $RoutineMutationsFilterComposer,
+          $RoutineMutationsOrderingComposer,
+          $RoutineMutationsAnnotationComposer,
+          $RoutineMutationsCreateCompanionBuilder,
+          $RoutineMutationsUpdateCompanionBuilder,
+          (
+            RoutineMutation,
+            BaseReferences<
+              _$TrainingDatabase,
+              RoutineMutations,
+              RoutineMutation
+            >,
+          ),
+          RoutineMutation,
+          PrefetchHooks Function()
+        > {
+  $RoutineMutationsTableManager(_$TrainingDatabase db, RoutineMutations table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $RoutineMutationsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $RoutineMutationsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $RoutineMutationsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> mutationId = const Value.absent(),
+                Value<String> ownerId = const Value.absent(),
+                Value<String> routineId = const Value.absent(),
+                Value<int> localSequence = const Value.absent(),
+                Value<String> templateId = const Value.absent(),
+                Value<String?> predecessorId = const Value.absent(),
+                Value<int> originBase = const Value.absent(),
+                Value<String?> baseTemplateId = const Value.absent(),
+                Value<String> enqueuedAt = const Value.absent(),
+                Value<String?> frozenBody = const Value.absent(),
+                Value<String?> requestDigest = const Value.absent(),
+                Value<int?> acceptedRevision = const Value.absent(),
+                Value<String> state = const Value.absent(),
+                Value<int> attemptCount = const Value.absent(),
+                Value<String?> lastError = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RoutineMutationsCompanion(
+                mutationId: mutationId,
+                ownerId: ownerId,
+                routineId: routineId,
+                localSequence: localSequence,
+                templateId: templateId,
+                predecessorId: predecessorId,
+                originBase: originBase,
+                baseTemplateId: baseTemplateId,
+                enqueuedAt: enqueuedAt,
+                frozenBody: frozenBody,
+                requestDigest: requestDigest,
+                acceptedRevision: acceptedRevision,
+                state: state,
+                attemptCount: attemptCount,
+                lastError: lastError,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String mutationId,
+                required String ownerId,
+                required String routineId,
+                required int localSequence,
+                required String templateId,
+                Value<String?> predecessorId = const Value.absent(),
+                Value<int> originBase = const Value.absent(),
+                Value<String?> baseTemplateId = const Value.absent(),
+                Value<String> enqueuedAt = const Value.absent(),
+                Value<String?> frozenBody = const Value.absent(),
+                Value<String?> requestDigest = const Value.absent(),
+                Value<int?> acceptedRevision = const Value.absent(),
+                Value<String> state = const Value.absent(),
+                Value<int> attemptCount = const Value.absent(),
+                Value<String?> lastError = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RoutineMutationsCompanion.insert(
+                mutationId: mutationId,
+                ownerId: ownerId,
+                routineId: routineId,
+                localSequence: localSequence,
+                templateId: templateId,
+                predecessorId: predecessorId,
+                originBase: originBase,
+                baseTemplateId: baseTemplateId,
+                enqueuedAt: enqueuedAt,
+                frozenBody: frozenBody,
+                requestDigest: requestDigest,
+                acceptedRevision: acceptedRevision,
+                state: state,
+                attemptCount: attemptCount,
+                lastError: lastError,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<RoutineMutations, RoutineMutation>(table),
+                  BaseReferences<
+                    _$TrainingDatabase,
+                    RoutineMutations,
+                    RoutineMutation
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $RoutineMutationsProcessedTableManager =
+    ProcessedTableManager<
+      _$TrainingDatabase,
+      RoutineMutations,
+      RoutineMutation,
+      $RoutineMutationsFilterComposer,
+      $RoutineMutationsOrderingComposer,
+      $RoutineMutationsAnnotationComposer,
+      $RoutineMutationsCreateCompanionBuilder,
+      $RoutineMutationsUpdateCompanionBuilder,
+      (
+        RoutineMutation,
+        BaseReferences<_$TrainingDatabase, RoutineMutations, RoutineMutation>,
+      ),
+      RoutineMutation,
+      PrefetchHooks Function()
+    >;
+typedef $RoutineCloudTemplatesCreateCompanionBuilder =
+    RoutineCloudTemplatesCompanion Function({
+      required String ownerId,
+      required String routineId,
+      required String templateId,
+      required String templateJson,
+      Value<int> rowid,
+    });
+typedef $RoutineCloudTemplatesUpdateCompanionBuilder =
+    RoutineCloudTemplatesCompanion Function({
+      Value<String> ownerId,
+      Value<String> routineId,
+      Value<String> templateId,
+      Value<String> templateJson,
+      Value<int> rowid,
+    });
+
+class $RoutineCloudTemplatesFilterComposer
+    extends Composer<_$TrainingDatabase, RoutineCloudTemplates> {
+  $RoutineCloudTemplatesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get templateJson => $composableBuilder(
+    column: $table.templateJson,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $RoutineCloudTemplatesOrderingComposer
+    extends Composer<_$TrainingDatabase, RoutineCloudTemplates> {
+  $RoutineCloudTemplatesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get templateJson => $composableBuilder(
+    column: $table.templateJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $RoutineCloudTemplatesAnnotationComposer
+    extends Composer<_$TrainingDatabase, RoutineCloudTemplates> {
+  $RoutineCloudTemplatesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get routineId =>
+      $composableBuilder(column: $table.routineId, builder: (column) => column);
+
+  GeneratedColumn<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get templateJson => $composableBuilder(
+    column: $table.templateJson,
+    builder: (column) => column,
+  );
+}
+
+class $RoutineCloudTemplatesTableManager
+    extends
+        RootTableManager<
+          _$TrainingDatabase,
+          RoutineCloudTemplates,
+          RoutineCloudTemplate,
+          $RoutineCloudTemplatesFilterComposer,
+          $RoutineCloudTemplatesOrderingComposer,
+          $RoutineCloudTemplatesAnnotationComposer,
+          $RoutineCloudTemplatesCreateCompanionBuilder,
+          $RoutineCloudTemplatesUpdateCompanionBuilder,
+          (
+            RoutineCloudTemplate,
+            BaseReferences<
+              _$TrainingDatabase,
+              RoutineCloudTemplates,
+              RoutineCloudTemplate
+            >,
+          ),
+          RoutineCloudTemplate,
+          PrefetchHooks Function()
+        > {
+  $RoutineCloudTemplatesTableManager(
+    _$TrainingDatabase db,
+    RoutineCloudTemplates table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $RoutineCloudTemplatesFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $RoutineCloudTemplatesOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $RoutineCloudTemplatesAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> ownerId = const Value.absent(),
+                Value<String> routineId = const Value.absent(),
+                Value<String> templateId = const Value.absent(),
+                Value<String> templateJson = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RoutineCloudTemplatesCompanion(
+                ownerId: ownerId,
+                routineId: routineId,
+                templateId: templateId,
+                templateJson: templateJson,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String ownerId,
+                required String routineId,
+                required String templateId,
+                required String templateJson,
+                Value<int> rowid = const Value.absent(),
+              }) => RoutineCloudTemplatesCompanion.insert(
+                ownerId: ownerId,
+                routineId: routineId,
+                templateId: templateId,
+                templateJson: templateJson,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<RoutineCloudTemplates, RoutineCloudTemplate>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$TrainingDatabase,
+                    RoutineCloudTemplates,
+                    RoutineCloudTemplate
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $RoutineCloudTemplatesProcessedTableManager =
+    ProcessedTableManager<
+      _$TrainingDatabase,
+      RoutineCloudTemplates,
+      RoutineCloudTemplate,
+      $RoutineCloudTemplatesFilterComposer,
+      $RoutineCloudTemplatesOrderingComposer,
+      $RoutineCloudTemplatesAnnotationComposer,
+      $RoutineCloudTemplatesCreateCompanionBuilder,
+      $RoutineCloudTemplatesUpdateCompanionBuilder,
+      (
+        RoutineCloudTemplate,
+        BaseReferences<
+          _$TrainingDatabase,
+          RoutineCloudTemplates,
+          RoutineCloudTemplate
+        >,
+      ),
+      RoutineCloudTemplate,
+      PrefetchHooks Function()
+    >;
 
 class $TrainingDatabaseManager {
   final _$TrainingDatabase _db;
@@ -12190,4 +14799,10 @@ class $TrainingDatabaseManager {
         _db,
         _db.customExerciseDefinitions,
       );
+  $RoutineSyncStateTableManager get routineSyncState =>
+      $RoutineSyncStateTableManager(_db, _db.routineSyncState);
+  $RoutineMutationsTableManager get routineMutations =>
+      $RoutineMutationsTableManager(_db, _db.routineMutations);
+  $RoutineCloudTemplatesTableManager get routineCloudTemplates =>
+      $RoutineCloudTemplatesTableManager(_db, _db.routineCloudTemplates);
 }

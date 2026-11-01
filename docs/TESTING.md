@@ -158,3 +158,26 @@ The crash-free-session target is 99.9%. Define numerator, denominator, observati
 GitHub Actions runs formatting/linting, scoped unit/widget/backend/database checks, contract validation, and migration tests. Android builds run on Linux; iOS builds/tests require macOS signing infrastructure. Release candidates cover the oldest supported and current OS families, a representative constrained Android phone, and a physical iPhone. Review privacy/store disclosures, in-app deletion, permission text, incident contacts, rollback compatibility, and restoration drills before rollout.
 
 Documentation changes run Markdown-only checks: required files, working relative links, closed fences, Mermaid syntax/render review, phase terminology, and consistency of API/data/sync/ML decisions. Current planning verification must be reported separately from future application checks, with no invented passing test suite.
+
+
+## Internal routine cloud extension controls
+
+[Routine cloud synchronization](ROUTINE_CLOUD_SYNC.md) has separate executable
+controls for its new aggregate and contract boundary. `routine_journal_test.dart`
+uses byte-frozen schema 6 and real SQLite rollback/reopen; new routine repository
+controls compare all durable tables around acknowledgement, pull and activation
+faults. `routine_transport_test.dart` supplies deliberately invalid HTTP responses
+and proves cursor/frozen-outbox retention. Widget controls cover factual root
+status, conflict review, owner replacement, disposal, keyboard retry and narrow
+scaled layouts. These are desktop controls, not phone accessibility evidence.
+
+The routine connected harness uses actual Flutter persistence/coordinator/HTTP,
+FastAPI, signed synthetic JWTs and disposable PostgreSQL with a separate strict
+case parser. Its test-only retirement driver is mounted solely in the loopback
+harness, never the production API. The established nine connected workout case
+names and parser stay intact. Run both wrappers in the complete database-enabled
+Python suite; do not count their nested Dart cases as additional independent
+Python executions. The internal verified-owner variant additionally runs Train,
+auth/account, catalog and measured-progress account tests with
+`--dart-define=DM_LOCAL_ROUTINES=true`. Qualification beyond local synthetic
+identity remains open.
