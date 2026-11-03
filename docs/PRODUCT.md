@@ -1,6 +1,6 @@
 # Daily Motion product specification
 
-Planning baseline: 2026-10-12. This document defines product intent; [ROADMAP.md](ROADMAP.md) defines release gates, [DATA_MODEL.md](DATA_MODEL.md) defines domain vocabulary, and [DECISIONS.md](DECISIONS.md) records architectural choices. No production application is implemented yet.
+Planning baseline: 2026-10-12. This document defines product intent; [ROADMAP.md](ROADMAP.md) defines release gates, [DATA_MODEL.md](DATA_MODEL.md) defines domain vocabulary, and [DECISIONS.md](DECISIONS.md) records architectural choices. Substantial core logger, account and synchronization code is implemented; the complete public MVP is not feature complete or release qualified. The [post-PR21 source audit](PROJECT_STATE_AFTER_PR21.md) and [requirement matrix](MVP_COMPLETION_MATRIX.md) distinguish implemented code, internal gates and remaining work.
 
 ## Vision and audience
 

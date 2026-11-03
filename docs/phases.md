@@ -1,8 +1,8 @@
 # Implementation phases
 
-Updated: 2026-10-22 (IST). This is the execution checklist for the accepted plan. [ROADMAP.md](ROADMAP.md) owns detailed objectives, scope, dependencies, exclusions and acceptance criteria; [TESTING.md](TESTING.md) owns qualification. Update these together if a phase changes.
+Updated: 2026-11-02 (IST). [ROADMAP.md](ROADMAP.md) owns scope and [TESTING.md](TESTING.md) owns qualification. The [post-PR21 audit](PROJECT_STATE_AFTER_PR21.md), [PRD matrix](MVP_COMPLETION_MATRIX.md) and [completion plan](MVP_EXECUTION_PLAN.md) now distinguish implemented internal code from public availability. Phase 0 remains open; no public Phase 1 entry or rollout is approved. This reconciles code status, not release acceptance.
 
-Protected main `3935d51` is PR #11's signed squash merge; its tree matches reviewed
+**Historical Oct22 checkpoint:** protected main `3935d51` was PR #11's signed squash merge; its tree matches reviewed
 `266e164`. The observation helper and desktop worker-lock correction are merged.
 [Main CI](https://github.com/bluxo1/Daily-Motion/actions/runs/39763668555) passes
 all three jobs: **536 Python / zero skips**, **215 Flutter / 12 explicit skips**
@@ -32,7 +32,7 @@ skips**, **242 Python / zero skips**, **14 PostgreSQL recovery cases** and
 stay open.** No hosted restore/provider operation or Phase 1 work is authorized.
 [Review, hook audit and remaining recovery limits](RECOVERY_INTEGRATION.md).
 
-**Current state:** Phase 0 is **in progress**. Connected synchronization/authentication, interaction prototypes, Windows fault tests, native qualification harnesses and internal Recovery V2 components are implemented. Recovery certification/publication and its trust decisions remain unfinished. [IMPLEMENTATION.md](IMPLEMENTATION.md) records current counts, historical qualification and earlier runner recovery. The [audited evidence matrix](PHASE0_EVIDENCE.md) separates foundation proof from external acceptance. Trusted-key/provider, managed recovery/operator review, signing, physical secure-storage/backup and device qualification remain open. Phase 1 and later phases are **not started**.
+**Current state:** verified remote main `852eedf04de74110c6cf001699094c4c16f00fc1` contains merged PRs15-21. Phase 0 is **in progress**. Internal routine authoring/catalog/sync and the routine-to-history journey exist alongside ordinary logging, source history and charts. Profile onboarding, empty/active session editing, time/distance, grouping, substitution/notes, explicit resolution and user-facing privacy remain incomplete. This candidate adds measured records only. [IMPLEMENTATION.md](IMPLEMENTATION.md) preserves dated results; the [matrix](MVP_COMPLETION_MATRIX.md) supplies source/test references. Recovery trust/publication, provider, managed recovery/operator, signing, physical storage/backup and device gates remain open. Substantial Phase 1 scope code exists; **public Phase 1 entry/rollout remains unauthorized**. Phase2-6 have not started.
 
 **Historical PR #7 pre-merge checkpoint:** PR #6 was marked merged, then main was reset and
 pushed back to healthy `8ba5a98`. [PR #7](https://github.com/bluxo1/Daily-Motion/pull/7)
@@ -162,14 +162,24 @@ No production prediction, conversational assistant, health permission, billing o
 
 ## Phase 1 — Deliver the useful MVP
 
-- [ ] Required email OTP signup, minimal profile/units and secure session storage.
-- [ ] Curated/custom exercise variants and reusable routines with immutable template content.
-- [ ] Start/resume/abandon/finish workouts; warm-up/working, top/back-off and simple supersets.
-- [ ] Fast actual set entry, optional RIR/RPE, corrections, substitutions, rest timers and basic holds/carries.
-- [ ] Comparable history/progress and measured records with explicit assistance semantics.
-- [ ] Complete workouts offline after signup, including expired cloud credentials and process restart.
-- [ ] Resolve sync conflicts; provide account export/deletion and permanent workout deletion.
-- [ ] Complete security, accessibility, store/privacy, restore and controlled beta qualification.
+Checkmarks identify scoped code/local evidence, not public availability, formal
+phase entry or hardware acceptance. The matrix retains every PRD's remaining gate.
+
+- [x] Implement OTP/account lifecycle, secure-storage adapters and cached-owner continuity; provider/device acceptance remains open.
+- [ ] Add owner-selected units/focus onboarding and editable preferences; default kg is not onboarding.
+- [x] Implement internally gated curated/private variants and immutable routine authoring (PR15/20).
+- [x] Implement internally gated routine cloud feed/bootstrap, receipts, preserved branches and schema7 migration (PR21); no public admission/resolution implied.
+- [x] Implement routine start/resume/abandon/finish and warm-up/working/purpose semantics; creation remains internal (PR15/16/18).
+- [ ] Add true empty workouts and active exercise insertion/reordering/skipping/substitution without rewriting completed originals.
+- [x] Implement deliberate prefilled repetition/load entry, optional RIR/RPE, durable drafts, corrections and restored timer state.
+- [ ] Complete duplication/undo, notes, simple supersets and duration/distance with compatible contracts.
+- [x] Implement comparable source history and measured load/repetition charts with original-unit/assistance semantics (PR17/19).
+- [ ] Review/merge this candidate's measured records; they were not part of merged PR19/21.
+- [x] Demonstrate the internal offline routine-to-history journey with expired credentials and restart (PR18/21 desktop/connected evidence).
+- [ ] Add versioned production admission, all-device upgrade/rollback policy and a verified-user release first-start path.
+- [ ] Add explicit sync-conflict resolution; inspection is insufficient.
+- [ ] Deliver account export/deletion and permanent workout deletion with qualified erasure-safe restoration.
+- [ ] Complete physical security/accessibility/performance, provider/operator, store/privacy, restore and controlled beta qualification.
 
 Launch free in India for English-speaking adults. Programs, historical import, health, predictions, AI and payments are excluded. An empty session is continued, abandoned or discarded rather than falsely completed.
 

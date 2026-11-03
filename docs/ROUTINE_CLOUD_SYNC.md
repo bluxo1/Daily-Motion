@@ -1,6 +1,9 @@
 # Internally gated routine synchronization
 
-Status: implementation under local review. Phase 0 remains in progress. This
+Status: merged in PR21 at `852eedf04de74110c6cf001699094c4c16f00fc1`.
+The [post-merge audit](PROJECT_STATE_AFTER_PR21.md) and
+[proposed admission design](MVP_RELEASE_READINESS.md#controlled-routine-admission-design-proposed)
+describe remaining production policy and qualification. Phase 0 remains open. This
 does not enable public builds, approve O3 recovery, qualify a hosted provider or
 establish phone durability, performance or accessibility.
 

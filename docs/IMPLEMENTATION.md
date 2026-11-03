@@ -2389,3 +2389,37 @@ Focused, ordinary, internal-feature and connected counts are separate. No hosted
 provider or physical-device qualification is inferred. No commit, publication,
 public enablement, O3 D1-D11 approval or G1/B4/B5 recovery change is authorized by
 this increment. Phase 0 remains in progress and Phase 1 has not started.
+
+
+## 2026-11-02 ? Post-PR21 source audit and measured-record candidate
+
+Verified main `852eedf04de74110c6cf001699094c4c16f00fc1` contains merged PRs15-21.
+The [project state](PROJECT_STATE_AFTER_PR21.md), [PRD01-18 matrix](MVP_COMPLETION_MATRIX.md),
+[reviewable completion plan](MVP_EXECUTION_PLAN.md) and [release readiness](MVP_RELEASE_READINESS.md)
+reconcile actual source with outdated execution checklists. The current main CI
+[41361445546](https://github.com/bluxo1/Daily-Motion/actions/runs/41361445546)
+subsequently completed all three jobs successfully; this is baseline CI, not CI
+for the uncommitted candidate or provider/device acceptance.
+
+The first isolated [candidate slice](FIRST_SLICE_IMPLEMENTATION_HANDOFF.md) adds
+exact original-unit positive-load and fixed-load repetition records from existing
+effective completed working sets. It preserves source IDs/current revision context,
+uses the existing selected-history worker/cache, bounds visible groups, and
+refreshes through existing correction/owner invalidation. Assistance is never a
+highest-load achievement; bodyweight does not invent mass. No estimated strength,
+new aggregate, schema/API, persisted record authority or public routine enablement.
+
+A missing-entry widget control failed before implementation. Initial focused
+fixture errors (expected fixture IDs and omitted workout status) and an offscreen
+account-test tap are retained in new ignored evidence, corrected without hiding
+warnings or weakening assertions. Focused pure/widget/file-backed account checks
+then passed. Final complete source-bound results, commands, failures, preservation,
+patch application and portable archive identity belong to this task's review
+bundle; the older PR21637/731 counts are not reused as new executions.
+
+Routine admission policy1 is a proposed later design, not an implemented service
+or an accepted rollout decision. Public first-start, profile, session editing,
+privacy and explicit resolution remain incomplete. Phase 0, provider/hardware,
+store/backup/erasure and operator gates stay open. No O3 design or implementation,
+credential/provider operation, commit/push/PR/merge/deployment/public activation
+is authorized by this local audit.

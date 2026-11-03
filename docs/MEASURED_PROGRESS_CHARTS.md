@@ -1,5 +1,11 @@
 # Source-backed measured progress charts
 
+The post-PR21 [measured-record candidate](FIRST_SLICE_IMPLEMENTATION_HANDOFF.md)
+adds a separate source-backed record view from the chart. The original PR19
+chart behavior and dated evidence below remain historical: it did not ship
+record summaries. Records use exact original-unit values and fixed-load rep
+groups, not approximate plot coordinates, predictions or combined-unit scores.
+
 This local implementation extends [exercise history](LOCAL_EXERCISE_HISTORY.md).
 Phase 0 remains in progress; this feature does not establish provider, hardware,
 recovery or public-release qualification. See [Phase 0 evidence](PHASE0_EVIDENCE.md).

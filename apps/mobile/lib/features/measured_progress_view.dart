@@ -7,6 +7,7 @@ import 'exercise_history_provider.dart';
 import 'measured_progress_provider.dart';
 import 'workout_presentation.dart';
 import 'workout_controller.dart';
+import 'measured_records_view.dart';
 
 class MeasuredProgressView extends ConsumerStatefulWidget {
   final ExerciseKey identity;
@@ -121,7 +122,18 @@ class _MeasuredProgressViewState extends ConsumerState<MeasuredProgressView> {
                             ),
                             Text('Variant ${widget.identity.variant}'),
                             const Text(
-                              'Only effective completed working sets from completed workouts. No predictions, records or rankings.',
+                              'Only effective completed working sets from completed workouts. No predictions or rankings.',
+                            ),
+                            OutlinedButton(
+                              onPressed: () => Navigator.of(context).push<void>(
+                                MaterialPageRoute(
+                                  builder: (_) => MeasuredRecordsScreen(
+                                    identity: widget.identity,
+                                    onOpenWorkout: widget.onOpenWorkout,
+                                  ),
+                                ),
+                              ),
+                              child: const Text('View measured records'),
                             ),
                             const SizedBox(height: 16),
                             DropdownButtonFormField<MeasuredMetric>(

@@ -12,11 +12,18 @@ lifecycle now connect verified identity to that local-first path. This is a
 development foundation, not a public MVP. See
 [implementation evidence](docs/IMPLEMENTATION.md) for tested behavior and open gates.
 
+The [post-PR21 project audit](docs/PROJECT_STATE_AFTER_PR21.md),
+[PRD completion matrix](docs/MVP_COMPLETION_MATRIX.md),
+[implementation plan](docs/MVP_EXECUTION_PLAN.md) and
+[release gates](docs/MVP_RELEASE_READINESS.md) now distinguish merged internal
+features from a usable release build. The current bounded completion candidate
+adds [source-backed measured records](docs/FIRST_SLICE_IMPLEMENTATION_HANDOFF.md).
+
 The first public release remains free, adult, English and India-first. Online
 email OTP is required before personal training. After verification, local training
 continues offline even when cloud credentials expire. Native secure-storage
-qualification and public onboarding remain open. Phase 1
-has not started.
+qualification and public onboarding remain open. Substantial Phase 1 scope code
+exists internally; public Phase 1 entry and rollout remain unauthorized.
 
 Windows qualification now includes Android debug/profile compilation and emulator
 startup, native clock/backup configuration, real SQLite capacity faults and hard
