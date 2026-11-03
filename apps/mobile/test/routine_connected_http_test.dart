@@ -454,6 +454,11 @@ void main() {
       instances[2]['session_exercise_id'],
     });
     expect(points.every((p) => p.load!.original == '12.5'), isTrue);
+    final record = progress.records.repetitionsAtLoad['kg']!
+        .where((r) => r.source.load!.original == '12.5')
+        .single;
+    expect(record.source.repetitions, 9);
+    expect(record.source.workoutId, workout);
     final correction = copyJson(allSets(received).first['observation'] as Json)
       ..remove('occurred_at')
       ..remove('recorded_at');
@@ -487,6 +492,18 @@ void main() {
       {11, 9},
     );
     final immutableWorkout = canonicalJson(corrected);
+    final correctedRecords = buildMeasuredProgress(
+      correctedHistory.byExercise[exerciseKey(instances.first)]!,
+    ).records;
+    expect(correctedRecords.highestLoads['kg']!.source.load!.original, '12.5');
+    expect(
+      correctedRecords.repetitionsAtLoad['kg']!.single.source.repetitions,
+      11,
+    );
+    expect(
+      correctedRecords.repetitionsAtLoad['kg']!.single.source.workoutId,
+      workout,
+    );
     final current = (await a.repo.routine(first.id))!;
     final changed = current.plan.json..['name'] = 'Later plan';
     changed['exercises'][0]['sets'][0]['planned']['reps'] = 14;
@@ -1384,9 +1401,16 @@ void main() {
           find.descendant(of: source, matching: find.textContaining('8 reps')),
           findsOneWidget,
         );
-        await tester.tap(
-          find.descendant(of: source, matching: find.byType(ListTile)),
+        final sourceAction = find.descendant(
+          of: source,
+          matching: find.byType(ListTile),
         );
+        // A keyed card can be partially visible above the fixed paging footer.
+        // Reveal the actual action and prove a pointer reaches it before tapping.
+        await tester.ensureVisible(sourceAction);
+        await tester.pumpAndSettle();
+        expect(sourceAction.hitTestable(), findsOneWidget);
+        await tester.tap(sourceAction);
         await tester.pumpAndSettle();
         stage('read-source-timer');
         await tester.runAsync(

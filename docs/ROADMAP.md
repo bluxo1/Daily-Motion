@@ -2,7 +2,7 @@
 
 Planning baseline: 2026-10-12. Phases are evidence gates, not calendar promises. The intended team is one to three engineers using managed infrastructure. The first public release is a free, adult, English, India-first strength/hypertrophy logger for iOS and Android. An account is required before the first workout. [PRODUCT.md](PRODUCT.md) defines scope; [TESTING.md](TESTING.md) defines detailed qualification.
 
-[phases.md](phases.md) provides the execution checklist. Phase 0 is in progress; later phases have not started. [IMPLEMENTATION.md](IMPLEMENTATION.md) records connected foreground synchronization, production-shaped authentication/account lifecycle and their desktop evidence. Hosted provider and physical-device release gates are not complete. This roadmap remains the detailed scope authority.
+[phases.md](phases.md) provides the execution checklist. Phase 0 is in progress; public Phase 1 entry/rollout is not authorized. PRs15-21 have implemented substantial Phase 1 scope internally; this is not evidence that those features are available in release builds. [IMPLEMENTATION.md](IMPLEMENTATION.md) preserves dated execution evidence. Hosted provider and physical-device gates remain open. This roadmap retains scope authority. The [matrix](MVP_COMPLETION_MATRIX.md), [completion plan](MVP_EXECUTION_PLAN.md) and [release readiness](MVP_RELEASE_READINESS.md) map remaining work without closing external gates.
 
 The [Phase 0 evidence audit](PHASE0_EVIDENCE.md) maps these requirements to actual
 code/tests and separates complete foundation work from external acceptance.

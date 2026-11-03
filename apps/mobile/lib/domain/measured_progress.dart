@@ -29,6 +29,8 @@ class MeasuredPoint {
   final MeasuredLoad? load;
   final String? correctionReason;
   final bool conflict;
+  final int? sourceRevision;
+  final int? localSequence;
 
   const MeasuredPoint({
     required this.identity,
@@ -47,6 +49,8 @@ class MeasuredPoint {
     required this.load,
     required this.correctionReason,
     required this.conflict,
+    this.sourceRevision,
+    this.localSequence,
   });
 
   (String, String, String) get source => (workoutId, exerciseId, setId);
@@ -64,6 +68,7 @@ class MeasuredProgress {
   final List<MeasuredPoint> repetitions;
   final Map<String, List<MeasuredPoint>> loads;
   final int unsupported;
+  late final MeasuredRecords records;
   MeasuredProgress(
     this.identity,
     Iterable<MeasuredPoint> points,
@@ -76,7 +81,11 @@ class MeasuredProgress {
              unit: List<MeasuredPoint>.unmodifiable(
                points.where((p) => p.load?.unit == unit),
              ),
-       });
+       }) {
+    // Eagerly derive alongside the selected history, including in its existing
+    // native worker. Rendering does not scan a large history or persist scores.
+    records = _buildMeasuredRecords(identity, repetitions);
+  }
 
   List<MeasuredPoint> series(MeasuredMetric metric, String? unit) =>
       metric == MeasuredMetric.repetitions
@@ -105,6 +114,93 @@ class MeasuredProgress {
       pages,
     );
   }
+}
+
+/// One effective source observation and the number of equally supporting sets.
+/// Equal values retain the earliest source in the model's deterministic order.
+class MeasuredRecord {
+  final MeasuredPoint source;
+  final int ties;
+  const MeasuredRecord(this.source, [this.ties = 1]);
+}
+
+/// Current saved observations, not estimated strength or cloud acknowledgements.
+class MeasuredRecords {
+  static const calculationVersion = 'measured-records-v1';
+  final Map<String, MeasuredRecord> highestLoads;
+  final Map<String, List<MeasuredRecord>> repetitionsAtLoad;
+  final MeasuredRecord? bodyweightRepetitions;
+  MeasuredRecords._(
+    Map<String, MeasuredRecord> loads,
+    Map<String, List<MeasuredRecord>> reps,
+    this.bodyweightRepetitions,
+  ) : highestLoads = Map.unmodifiable(loads),
+      repetitionsAtLoad = Map.unmodifiable({
+        for (final entry in reps.entries)
+          entry.key: List<MeasuredRecord>.unmodifiable(entry.value),
+      });
+}
+
+// Wire decimals have at most six fractional places. BigInt makes both grouping
+// and maxima exact, independently of the double coordinate used only for paint.
+BigInt _recordLoad(String value) {
+  final parts = value.split('.');
+  return BigInt.parse(parts.first) * BigInt.from(1000000) +
+      BigInt.parse((parts.length == 1 ? '' : parts.last).padRight(6, '0'));
+}
+
+MeasuredRecords _buildMeasuredRecords(
+  ExerciseKey identity,
+  List<MeasuredPoint> points,
+) {
+  final loads = <String, MeasuredRecord>{};
+  final groups = <String, Map<BigInt, MeasuredRecord>>{};
+  MeasuredRecord? bodyweight;
+  MeasuredRecord bestReps(MeasuredRecord? previous, MeasuredPoint next) {
+    if (previous == null || next.repetitions > previous.source.repetitions) {
+      return MeasuredRecord(next);
+    }
+    return next.repetitions == previous.source.repetitions
+        ? MeasuredRecord(previous.source, previous.ties + 1)
+        : previous;
+  }
+
+  final external = [
+    'total_external',
+    'per_implement',
+    'machine_stack',
+    'added_bodyweight',
+  ].contains(identity.basis);
+  for (final point in points) {
+    if (identity.basis == 'bodyweight_only') {
+      if (point.load == null) bodyweight = bestReps(bodyweight, point);
+      continue;
+    }
+    final load = point.load;
+    if (load == null || !['kg', 'lb'].contains(load.unit)) continue;
+    final value = _recordLoad(load.original);
+    final unitGroups = groups.putIfAbsent(load.unit, () => {});
+    unitGroups[value] = bestReps(unitGroups[value], point);
+    if (!external || value <= BigInt.zero) continue;
+    final previous = loads[load.unit];
+    final comparison = previous == null
+        ? 1
+        : value.compareTo(_recordLoad(previous.source.load!.original));
+    if (comparison > 0) {
+      loads[load.unit] = MeasuredRecord(point);
+    } else if (comparison == 0) {
+      loads[load.unit] = MeasuredRecord(previous!.source, previous.ties + 1);
+    }
+  }
+  return MeasuredRecords._(loads, {
+    for (final unit in ['kg', 'lb'])
+      if (groups.containsKey(unit))
+        unit: [
+          for (final value
+              in groups[unit]!.keys.toList()..sort((a, b) => b.compareTo(a)))
+            groups[unit]![value]!,
+        ],
+  }, bodyweight);
 }
 
 class MeasuredWindow {
@@ -244,6 +340,12 @@ MeasuredProgress buildMeasuredProgress(ExerciseHistory history) {
             correctionReason:
                 set['observation']['correction_reason'] as String?,
             conflict: visit.workout['conflict'] == true,
+            sourceRevision: visit.workout['revision'] is int
+                ? visit.workout['revision'] as int
+                : null,
+            localSequence: visit.workout['local_seq'] is int
+                ? visit.workout['local_seq'] as int
+                : null,
           ),
         );
       }

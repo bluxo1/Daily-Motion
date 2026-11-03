@@ -6,7 +6,7 @@ the existing foreground coordinator. Contract 3 preserves original workout
 envelopes and separates accepted cloud lineage from local editor CAS and pending
 branches. It does not activate the proposed recovery protocol or public builds.
 
-Planning baseline: 2026-10-12. This document describes the intended architecture; a scoped Phase 0 foundation now exists, with evidence in [IMPLEMENTATION.md](IMPLEMENTATION.md). No production application exists yet. Product scope is governed by [PRODUCT.md](PRODUCT.md), phases by [ROADMAP.md](ROADMAP.md), and detailed synchronization by [SYNC_PROTOCOL.md](SYNC_PROTOCOL.md).
+Planning baseline: 2026-10-12. This document combines implemented foundations and intended architecture; future interfaces below must not be assumed executable. Core account/logger/history/catalog/routine/sync code exists, with internal gates and open dependencies documented in the [post-PR21 audit](PROJECT_STATE_AFTER_PR21.md). The application is not a qualified public MVP. Product scope is governed by [PRODUCT.md](PRODUCT.md), phases by [ROADMAP.md](ROADMAP.md), and detailed synchronization by [SYNC_PROTOCOL.md](SYNC_PROTOCOL.md).
 
 ## Decisions and release boundaries
 
