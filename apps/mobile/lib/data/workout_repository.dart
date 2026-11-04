@@ -19,6 +19,7 @@ part 'recovery_repository.dart';
 part 'routine_repository.dart';
 part 'routine_sync_repository.dart';
 part 'catalog_repository.dart';
+part 'draft_copy_repository.dart';
 
 class WorkoutRepository {
   final TrainingDatabase db;

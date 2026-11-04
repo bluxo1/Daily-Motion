@@ -182,8 +182,16 @@ class Harness {
       await tester.pumpAndSettle();
       return;
     }
-    tester.state<ScrollableState>(scroll).position.jumpTo(0);
-    await tester.pump();
+    // Inserting the new rest card can correct the lazy-list scroll anchor after
+    // jumpTo. Observe the settled offset before beginning a forward scan, so a
+    // top item is not accidentally left behind the viewport.
+    final position = tester.state<ScrollableState>(scroll).position;
+    for (var attempt = 0; attempt < 5; attempt++) {
+      position.jumpTo(position.minScrollExtent);
+      await tester.pumpAndSettle();
+      if (position.pixels == position.minScrollExtent) break;
+    }
+    expect(position.pixels, position.minScrollExtent);
     await tester.scrollUntilVisible(
       target,
       350,

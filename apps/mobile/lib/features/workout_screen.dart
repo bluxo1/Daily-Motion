@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/workout.dart';
 import '../domain/rest_timer.dart';
+import '../data/workout_repository.dart';
 import 'workout_controller.dart';
 import 'sync_provider.dart';
 import 'workout_presentation.dart';
@@ -391,6 +392,9 @@ class _SetEditorState extends ConsumerState<SetEditor>
   var unit = 'kg';
   var ready = false;
   var saving = false;
+  var copying = false;
+  final pendingDrafts = <Future<void>>{};
+  var draftFailed = false;
   String? error;
 
   @override
@@ -456,22 +460,127 @@ class _SetEditorState extends ConsumerState<SetEditor>
 
   Future<void> preserve() async {
     if (widget.correction) return;
+    final repository = ref.read(repositoryProvider);
+    final write = repository.saveDraft(
+      widget.item['set_id'] as String,
+      entry(),
+    );
+    pendingDrafts.add(write);
     try {
-      await ref
-          .read(repositoryProvider)
-          .saveDraft(widget.item['set_id'] as String, entry());
+      await write;
     } catch (_) {
-      if (mounted) {
+      draftFailed = true;
+      if (mounted && identical(repository, ref.read(repositoryProvider))) {
         setState(
           () => error =
               'Draft could not be saved. Keep this screen open and retry.',
         );
       }
+    } finally {
+      pendingDrafts.remove(write);
+    }
+  }
+
+  Future<void> copyPrevious() async {
+    if (copying || saving || !ready || !widget.enabled) return;
+    final repository = ref.read(repositoryProvider);
+    setState(() {
+      copying = true;
+      error = null;
+    });
+    FocusScope.of(context).unfocus();
+    try {
+      while (pendingDrafts.isNotEmpty) {
+        await Future.wait(List.of(pendingDrafts));
+      }
+      if (draftFailed) {
+        draftFailed = false;
+        throw WorkoutValidation(
+          'A draft save failed. Review your entry and retry.',
+        );
+      }
+      final preview = await repository.previewSetDraftCopy(
+        widget.sessionId,
+        widget.item['set_id'] as String,
+        entry(),
+      );
+      if (!mounted || !identical(repository, ref.read(repositoryProvider))) {
+        return;
+      }
+      final values = preview.values;
+      var decisionMade = false;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Copy values into this draft?'),
+          content: SingleChildScrollView(
+            child: Text(
+              'Working set ${preview.sourceOrdinal} → set ${preview.targetOrdinal}\n'
+              '${values['load']} ${values['unit']} · ${values['reps']} reps\n\n'
+              'Replaces this draft’s load and reps. Effort will be blank. '
+              'No additional set is created. Record the set only after performing it.',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (decisionMade) return;
+                decisionMade = true;
+                Navigator.pop(context, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (decisionMade) return;
+                decisionMade = true;
+                Navigator.pop(context, true);
+              },
+              child: const Text('Copy to draft'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true ||
+          !mounted ||
+          !identical(repository, ref.read(repositoryProvider))) {
+        return;
+      }
+      if (!preview.matchesEntry(entry())) {
+        throw WorkoutValidation('Your entry changed. Review a fresh preview.');
+      }
+      final copied = await repository.applySetDraftCopy(preview);
+      if (!mounted || !identical(repository, ref.read(repositoryProvider))) {
+        return;
+      }
+      if (!preview.matchesEntry(entry())) {
+        await preserve();
+        throw WorkoutValidation(
+          'Your newer entry was retained. Review it before recording.',
+        );
+      }
+      setState(() {
+        load.text = copied['load'] as String;
+        reps.text = copied['reps'] as String;
+        effort.clear();
+        unit = copied['unit'] as String;
+        error = 'Copied to an editable draft. The set has not been recorded.';
+      });
+    } catch (exception) {
+      if (mounted && identical(repository, ref.read(repositoryProvider))) {
+        setState(
+          () => error = exception is WorkoutValidation
+              ? exception.message
+              : 'Copy failed. Your entry is retained; retry.',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => copying = false);
     }
   }
 
   Future<void> save() async {
-    if (saving || !ready || !widget.enabled) return;
+    if (saving || copying || !ready || !widget.enabled) return;
     setState(() {
       saving = true;
       error = null;
@@ -536,10 +645,22 @@ class _SetEditorState extends ConsumerState<SetEditor>
         if (!ready)
           const LinearProgressIndicator()
         else ...[
+          if (!widget.correction) ...[
+            OutlinedButton.icon(
+              onPressed: saving || copying || !widget.enabled
+                  ? null
+                  : copyPrevious,
+              icon: const Icon(Icons.copy),
+              label: Text(
+                copying ? 'Preparing draft…' : 'Use previous working set',
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           if (widget.exercise['loading_basis'] != 'bodyweight_only') ...[
             TextField(
               controller: load,
-              enabled: !saving && widget.enabled,
+              enabled: !saving && !copying && widget.enabled,
               decoration: InputDecoration(
                 labelText: 'Load ($unit, ${loadConvention(widget.exercise)})',
               ),
@@ -553,7 +674,7 @@ class _SetEditorState extends ConsumerState<SetEditor>
           ],
           TextField(
             controller: reps,
-            enabled: !saving && widget.enabled,
+            enabled: !saving && !copying && widget.enabled,
             decoration: const InputDecoration(labelText: 'Actual reps'),
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.next,
@@ -570,7 +691,7 @@ class _SetEditorState extends ConsumerState<SetEditor>
               DropdownMenuItem(value: 'failed', child: Text('Failed attempt')),
               DropdownMenuItem(value: 'skipped', child: Text('Skipped')),
             ],
-            onChanged: saving || !widget.enabled
+            onChanged: saving || copying || !widget.enabled
                 ? null
                 : (value) {
                     setState(() => outcome = value!);
@@ -592,7 +713,7 @@ class _SetEditorState extends ConsumerState<SetEditor>
                 child: Text('RPE · half steps 1–10'),
               ),
             ],
-            onChanged: saving || !widget.enabled
+            onChanged: saving || copying || !widget.enabled
                 ? null
                 : (value) {
                     setState(() => scale = value!);
@@ -602,7 +723,7 @@ class _SetEditorState extends ConsumerState<SetEditor>
           const SizedBox(height: 12),
           TextField(
             controller: effort,
-            enabled: !saving && widget.enabled,
+            enabled: !saving && !copying && widget.enabled,
             decoration: const InputDecoration(
               labelText: 'Actual effort (optional)',
             ),
@@ -617,7 +738,7 @@ class _SetEditorState extends ConsumerState<SetEditor>
             const SizedBox(height: 12),
             TextField(
               controller: reason,
-              enabled: !saving && widget.enabled,
+              enabled: !saving && !copying && widget.enabled,
               maxLength: 240,
               decoration: const InputDecoration(labelText: 'Correction reason'),
               textInputAction: TextInputAction.done,
@@ -626,7 +747,7 @@ class _SetEditorState extends ConsumerState<SetEditor>
           ],
           const SizedBox(height: 20),
           FilledButton.icon(
-            onPressed: saving || !widget.enabled ? null : save,
+            onPressed: saving || copying || !widget.enabled ? null : save,
             icon: const Icon(Icons.check),
             label: Text(
               saving
