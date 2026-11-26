@@ -1,7 +1,7 @@
 # Daily Motion
 
 Daily Motion is a strength and hypertrophy training app for iOS and Android,
-built around **Plan → Train → Record → Predict → Learn → Adapt**.
+built around **Plan → Train → Record → Predict → Learn → Adapt**!
 
 ## Project status
 
